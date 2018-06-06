@@ -1,0 +1,42 @@
+#:kivy 1.10.0
+<HomeScreen>
+    orientation: 'vertical'
+    GridLayout:
+        cols: 1
+        rows: 2
+        Label:
+            id: lbl_txt_1
+            valign: 'middle'
+            halign: 'center'
+            font_size: 30
+            markup: True
+            text: "You don't have selected a tax and benefit system yet \n Select a local one below, or swap page!"
+            size: self.texture_size
+            canvas:
+                Color:
+                    rgba: 1, .3, .8, .5
+        FileChooserIconView:
+            id: home_file_chooser
+            dirselect: True
+            canvas.before:
+                Color:
+                    rgb: .5,.4,.5
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            on_selection: root.selected_file(*args)
+
+    GridLayout:
+        cols: 1
+        rows: 2
+        spacing: 10
+        Label:
+            id: txt_slc_online_1
+            markup: True
+            text: "Download it on"
+            color: (0, 0, 1, 1)
+        Label:
+            id: txt_slc_online_2
+            markup: True
+            text: " \n https://github.com/openfisca"
+            color: (0, 0, 1, 1)
