@@ -14,7 +14,7 @@
         orientation: 'vertical'
         GridLayout:
             cols: 1
-            rows: 2
+            rows: 3
             Label:
                 id: lbl_txt_1
                 valign: 'middle'
@@ -23,9 +23,25 @@
                 markup: True
                 text: "You don't have selected a tax and benefit system yet \n Select a local one below, or swap page!"
                 size: self.texture_size
-                canvas:
+                canvas.before:
                     Color:
-                        rgba: 1, .3, .8, .5
+                        rgba: hex('#00cc00')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            Label:
+                id: lbl_txt_2
+                valign: 'middle'
+                halign: 'center'
+                font_size: 30
+                markup: True
+                text: "You don't have selected a directory"
+                canvas.before:
+                    Color:
+                        rgba: hex('#ffff66')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
             FileChooserIconView:
                 id: home_file_chooser
                 dirselect: True
@@ -36,10 +52,10 @@
                         pos: self.pos
                         size: self.size
                 on_selection: root.selected_file(*args)
+
         GridLayout:
             cols: 1
             rows: 1
-            spacing: 10
             Label:
                 id: txt_slc_online
                 valign: 'middle'
@@ -59,6 +75,44 @@
 
 <HomeScreen>:
     name: "home"
-    Button:
-        id: btn_boh
-        text: "Ciao"
+    GridLayout:
+        id: pagelayout_home
+        orientation: 'vertical'
+        cols: 3
+        rows: 1
+        Button:
+            id: btn_visual_system
+            valign: 'middle'
+            halign: 'center'
+            markup: True
+            text: "Visualize the tax and benefit system"
+            canvas.before:
+                Color:
+                    rgba: hex('#FFFFFF')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        Button:
+            id: btn_visual_system
+            valign: 'middle'
+            halign: 'center'
+            markup: True
+            text: "Do some reforms"
+            canvas.before:
+                Color:
+                    rgba: hex('#FFFFFF')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        Button:
+            id: btn_visual_system
+            valign: 'middle'
+            halign: 'center'
+            markup: True
+            text: "Make a simulation!"
+            canvas.before:
+                Color:
+                    rgba: hex('#FFFFFF')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
