@@ -1,0 +1,64 @@
+#:kivy 1.10.0
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import hex kivy.utils.get_color_from_hex
+
+<MyScreenManager>:
+    transition: FadeTransition()
+    InitScreen:
+    HomeScreen:
+
+<InitScreen>:
+    name: "init"
+    PageLayout:
+        id: pagelayout_init
+        orientation: 'vertical'
+        GridLayout:
+            cols: 1
+            rows: 2
+            Label:
+                id: lbl_txt_1
+                valign: 'middle'
+                halign: 'center'
+                font_size: 30
+                markup: True
+                text: "You don't have selected a tax and benefit system yet \n Select a local one below, or swap page!"
+                size: self.texture_size
+                canvas:
+                    Color:
+                        rgba: 1, .3, .8, .5
+            FileChooserIconView:
+                id: home_file_chooser
+                dirselect: True
+                canvas.before:
+                    Color:
+                        rgba: hex('#413FBF')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                on_selection: root.selected_file(*args)
+        GridLayout:
+            cols: 1
+            rows: 1
+            spacing: 10
+            Label:
+                id: txt_slc_online
+                valign: 'middle'
+                halign: 'center'
+                markup: True
+                text: "Download it from \n [ref=some] [u] openfisca repos [/u] [/ref]"
+                on_ref_press:
+                    import webbrowser
+                    webbrowser.open('https://github.com/openfisca')
+                canvas.before:
+                    Color:
+                        rgba: hex('#FFFFFF')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                        source: "img/github.png"
+
+<HomeScreen>:
+    name: "home"
+    Button:
+        id: btn_boh
+        text: "Ciao"
