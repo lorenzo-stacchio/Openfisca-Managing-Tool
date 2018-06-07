@@ -22,23 +22,24 @@ def get_all_paths(path_di_partenza):
         for sub in os.listdir(path_di_partenza):
             if(sub.startswith("openfisca") and os.path.isdir(sub)):
                 project_folder = sub
-        os.chdir(project_folder)
-        project_absolute_path = path_di_partenza + "/" + project_folder
-        print "You are in " + project_absolute_path
+        if project_folder:
+            os.chdir(project_folder)
+            project_absolute_path = path_di_partenza + "/" + project_folder
+            print "You are in " + project_absolute_path
 
-        dict_path = {}
+            dict_path = {}
 
 
-        dict_path['initial_path'] = str(path_di_partenza)
-        dict_path['reforms'] = str(project_absolute_path + "/" + "reforms")
-        dict_path['parameters'] =  str(project_absolute_path + "/" + "parameters")
-        dict_path['tests'] = str(project_absolute_path + "/" + "tests")
-        dict_path['variables'] = str(project_absolute_path + "/" + "variables")
+            dict_path['initial_path'] = str(path_di_partenza)
+            dict_path['reforms'] = str(project_absolute_path + "/" + "reforms")
+            dict_path['parameters'] =  str(project_absolute_path + "/" + "parameters")
+            dict_path['tests'] = str(project_absolute_path + "/" + "tests")
+            dict_path['variables'] = str(project_absolute_path + "/" + "variables")
 
-        if are_all_folders(dict_path):
-            return dict_path
-        else:
-            return None
+            if are_all_folders(dict_path):
+                return dict_path
+            else:
+                return None
     elif not os.path.exists(path_di_partenza):
         print "Your path isn't correct"
     else: #!os.path.isdir(path_di_partenza)

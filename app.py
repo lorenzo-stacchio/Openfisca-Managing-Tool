@@ -11,6 +11,7 @@ from kivy.clock import Clock
 from kivy.properties import StringProperty,ObjectProperty
 from kivy.utils import get_color_from_hex
 from kivy.graphics import Rectangle, Color
+from kivy.uix.progressbar import ProgressBar
 import os
 from script.get_parameters_reforms_tests_variables_folder_paths import *
 # Screen
@@ -28,20 +29,17 @@ class InitScreen(Screen):
         self.ids.home_file_chooser.path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
 
     def selected_file(self,*args): #in args ci sta il filepath di openfisca scelto
-        try:
-            PATH_OPENFISCA = args[1][0]
-            print "Inside try",PATH_OPENFISCA
-            #self.manager.get_screen('home').ids.btn_visual_system.text = PATH_OPENFISCA
+        PATH_OPENFISCA = args[1][0]
+        #self.manager.get_screen('home').ids.btn_visual_system.text = PATH_OPENFISCA
+        dict = get_all_paths(PATH_OPENFISCA)
+        if dict:
             if self.manager.current == 'init':
                  self.manager.current = 'home'
                  self.manager.get_screen('home'). __path_ricevuto__(PATH_OPENFISCA)
-        except:
+        else:
             print "Path errato"
             self.ids.lbl_txt_2.text = "The selected directory doesn't \n contain an openfisca regular system"
             # TODO: cambiare colore quando si sbaglia directory e ridimensionare label
-            #with self.ids.lbl_txt_2.canvas.before:
-                #Color(get_color_from_hex('#00cc00'))
-            #self.ids.lbl_txt_2.canvas.before.color = get_color_from_hex('#00cc00')
 
 
 class HomeScreen(Screen):
@@ -54,10 +52,9 @@ class HomeScreen(Screen):
         print dict
 
 
-
-
 class MyScreenManager(ScreenManager):
     pass
+
 
 # App
 class openfisca_managing_tool(App):
