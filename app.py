@@ -3,7 +3,6 @@ kivy.require("1.10.0")
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.pagelayout import PageLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager  import ScreenManager,Screen
 from kivy.lang import Builder
@@ -46,10 +45,20 @@ class HomeScreen(Screen):
 
     def __init__(self,**kwargs):
         super(HomeScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._finish_init)
+
+    def _finish_init(self,dt):
+        pass
 
     def __path_ricevuto__(self,path):
         dict = get_all_paths(path)
         print dict
+
+
+class VisualizeSystemScreen(Screen):
+
+    def __init__(self,**kwargs):
+        super(VisualizeSystemScreen, self).__init__(**kwargs)
 
 
 class MyScreenManager(ScreenManager):

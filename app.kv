@@ -6,6 +6,7 @@
     transition: FadeTransition()
     InitScreen:
     HomeScreen:
+    VisualizeSystemScreen:
 
 <InitScreen>:
     name: "init"
@@ -76,34 +77,37 @@
 <HomeScreen>:
     name: "home"
     GridLayout:
-        id: pagelayout_home
+        id: gridlayout_home
         orientation: 'vertical'
-        cols: 3
-        rows: 2
-        Image:
-            valign: 'middle'
-            halign: 'center'
-            size_hint: None, None
-            source: 'img\law.png'
+        cols: 2
+        rows: 3
         Button:
-            id: btn_visual_system
+            id: btn_1_0
             valign: 'middle'
             halign: 'center'
             markup: True
+            background_normal: 'img\\colors\\blue.jpg'
             text: "Visualize the tax and benefit system"
             canvas.before:
-                Color:
-                    rgba: hex('#FFFFFF')
+                #Color:
+                    #rgba: hex('')
                 Rectangle:
                     pos: self.pos
                     size: self.size
-        Image:
+        Label:
+            id: label_0_0
             valign: 'middle'
             halign: 'center'
-            size_hint: None, None
-            source: 'img\law.png'
+            size: self.parent.size
+            background_normal: 'img\\colors\\white.png'
+            canvas.before:
+                Color:
+                    rgba: hex('#0033cc')
+                Rectangle:
+                    pos: self.center_x - 50, self.center_y - 50 # default size is 100x100
+                    source: 'img\law.png'
         Button:
-            id: btn_visual_system
+            id: btn_0_1
             valign: 'middle'
             halign: 'center'
             markup: True
@@ -114,13 +118,18 @@
                 Rectangle:
                     pos: self.pos
                     size: self.size
-        Image:
+        Label:
+            id: label_1_1
             valign: 'middle'
             halign: 'center'
-            size_hint: None, None
-            source: 'img\law.png'
+            size: self.parent.size
+            canvas.before:
+                Rectangle:
+                    pos: self.center_x - 50, self.center_y - 50 # default size is 100x100
+                    source: 'img\law.png'
+
         Button:
-            id: btn_visual_system
+            id: btn_1_2
             valign: 'middle'
             halign: 'center'
             markup: True
@@ -131,3 +140,29 @@
                 Rectangle:
                     pos: self.pos
                     size: self.size
+        Label:
+            id: label_0_2
+            valign: 'middle'
+            halign: 'center'
+            size: self.parent.size
+            canvas.before:
+                Rectangle:
+                    pos: self.center_x - 50, self.center_y - 50 # default size is 100x100
+                    source: 'img\law.png'
+
+<VisualizeSystemScreen>:
+    name: "visualize_system"
+    PageLayout:
+        id: pagelayout_visualize_system
+        orientation: 'vertical'
+        GridLayout:
+            cols: 2
+            rows: 1
+            ListView:
+                
+        GridLayout:
+            cols: 2
+            rows: 1
+        GridLayout:
+            cols: 2
+            rows: 1
