@@ -11,7 +11,7 @@ from kivy.properties import StringProperty,ObjectProperty
 from kivy.utils import get_color_from_hex
 from kivy.graphics import Rectangle, Color
 from kivy.uix.progressbar import ProgressBar
-import os
+import os,sys
 from script.get_parameters_reforms_tests_variables_folder_paths import *
 # Screen
 
@@ -65,19 +65,50 @@ class VisualizeSystemScreen(Screen):
 
     def ricevi_inizializza_path(self,path):
         self.dict_path = get_all_paths(path)
-        self.ids.visualize_file_chooser_variables.path = self.dict_path['parameters']
+        os.chdir(os.getcwd())
+        print "ora", os.getcwd()
+        #self.ids.visualize_file_chooser_parameters.path = self.dict_path['parameters']
+        #self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
+        #self.ids.visualize_file_chooser_reforms.path = self.dict_path['reforms']
+
+    def show_variables(self):
+        self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
+        self.ids.current_path_variables.text = 'Current path: \n' + self.ids.visualize_file_chooser_variables.path
+
+
+    def show_parameters(self):
+        self.ids.visualize_file_chooser_parameters.path = self.dict_path['parameters']
+        self.ids.current_path_parameters.text = 'Current path: \n' + self.ids.visualize_file_chooser_parameters.path
+
+
+    def show_reforms(self):
+        self.ids.visualize_file_chooser_reforms.path = self.dict_path['reforms']
+        self.ids.current_path_reforms.text = 'Current path: \n' + self.ids.visualize_file_chooser_reforms.path
+
+
+    def file_allowed(self,directory,filename):
+        filename, file_extension = os.path.splitext(filename)
+        return ((file_extension in ['.py','.yaml'] and not(os.path.basename(filename) == '__init__')) or (os.path.isdir(os.path.join(directory, filename))))
+
 
     def selected_file(self,*args):
         try:
             path_file_scelto = args[1][0]
-            print path_file_scelto
-            self.ids.document_parameter_viewer.source = path_file_scelto
-        except:
-            print "Some error"
+            self.ids.document_variables_viewer.source = path_file_scelto
+            self.ids.document_parameters_viewer.source = path_file_scelto
+            self.ids.document_reforms_viewer.source = path_file_scelto
+            self.ids.current_path_variables.text = 'Current path: \n' + self.ids.visualize_file_chooser_variables.path
+            self.ids.current_path_parameters.text = 'Current path: \n' + self.ids.visualize_file_chooser_parameters.path
+            self.ids.current_path_reforms.text = 'Current path: \n' + self.ids.visualize_file_chooser_reforms.path
+        except Exception as e:
+            print "Some error ", e
 
     def go_to_home(self):
         if self.manager.current == 'visualize_system':
              self.manager.current = 'home'
+
+
+
 
 class MyScreenManager(ScreenManager):
     pass

@@ -153,58 +153,130 @@
 
 <VisualizeSystemScreen>:
     name: "visualize_system"
-    PageLayout:
-        id: pagelayout_visualize_system
-        orientation: 'vertical'
-        GridLayout:
-            id: grid_1_level_one
-            cols: 1
-            rows: 3
-            GridLayout:
-                id: grid_1_level_two
-                cols: 1
-                rows: 1
-                height: 100
-                size_hint_y: None
-                Label:
-                    id: title_parameters_view
-                    valign: 'middle'
-                    halign: 'center'
-                    text: "Parameters"
-                    size: self.texture_size
-            GridLayout:
-                id: grid_2_level_two
-                cols: 2
-                rows: 1
-                #size_hint_y: None
-                height: self.minimum_height
-                FileChooserListView:
-                    id: visualize_file_chooser_variables
-                    canvas.before:
-                        Color:
-                            rgba: hex('#413FBF')
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    on_selection: root.selected_file(*args)
-                RstDocument:
-                    id: document_parameter_viewer
+    fullscreen: True
+    on_parent: if args[1] and switch_object_visualize.current_tab == tabbed_variables: root.show_variables()
 
-            GridLayout:
-                cols: 1
-                rows: 1
-                height: 30
-                size_hint_y: None
-                Button:
-                    id: button_home_visualize
-                    valign: 'middle'
-                    halign: 'center'
-                    text: "Turn to home"
-                    size: self.texture_size
-                    on_press: root.go_to_home()
-        GridLayout:
-            cols: 2
-            rows: 1
-            Label:
-                id: title_variables_view
-                text: "Variables"
+    TabbedPanel:
+        id: switch_object_visualize
+        do_default_tab: False
+        #pos_hint: {'center_x': .5, 'center_y': .5}
+        canvas.before:
+            Color:
+                rgba: .2,.3,.4,1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TabbedPanelItem:
+            id: tabbed_variables
+            text: 'Variables'
+            on_release: root.show_variables()
+
+            BoxLayout:
+                id: box_variables
+                orientation: 'vertical'
+                BoxLayout:
+                    id: box_variables_inner
+                    orientation: 'horizontal'
+                    size_hint: (1.0,0.8)
+                    FileChooserListView:
+                        id: visualize_file_chooser_variables
+                        filters: [root.file_allowed]
+                        #canvas.before:
+                        #    Color:
+                        #        rgba: hex('#413FBF')
+                        #    Rectangle:
+                        #        pos: self.pos
+                        #        size: self.size
+                        on_selection: root.selected_file(*args)
+                    RstDocument:
+                        id: document_variables_viewer
+                GridLayout:
+                    rows: 1
+                    cols: 2
+                    size_hint: (1.0,0.2)
+                    Label:
+                        id: current_path_variables
+                        valign: 'middle'
+                        halign: 'center'
+                        size_hint: (1.0,0.2)
+                    Button:
+                        id: back_home
+                        on_press: root.go_to_home()
+                        text: 'Come back to home'
+                        size_hint: (1.0,0.2)
+
+        TabbedPanelItem:
+            id: tabbed_parameters
+            text: 'Parameters'
+            on_release: root.show_parameters()
+            BoxLayout:
+                id: box_parameters
+                orientation: 'vertical'
+                BoxLayout:
+                    id: box_parameters_inner
+                    orientation: 'horizontal'
+                    size_hint: (1.0,0.8)
+                    FileChooserListView:
+                        id: visualize_file_chooser_parameters
+                        filters: [root.file_allowed]
+                        #canvas.before:
+                        #    Color:
+                        #        rgba: hex('#413FBF')
+                        #    Rectangle:
+                        #        pos: self.pos
+                        #        size: self.size
+                        on_selection: root.selected_file(*args)
+                    RstDocument:
+                        id: document_parameters_viewer
+                GridLayout:
+                    rows: 1
+                    cols: 2
+                    size_hint: (1.0,0.2)
+                    Label:
+                        id: current_path_parameters
+                        valign: 'middle'
+                        halign: 'center'
+                        size_hint: (1.0,0.2)
+                    Button:
+                        id: back_home_from_parameters
+                        on_press: root.go_to_home()
+                        text: 'Come back to home'
+                        size_hint: (1.0,0.2)
+
+        TabbedPanelItem:
+            id: tabbed_reforms
+            text: 'Reforms'
+            on_release: root.show_reforms()
+            BoxLayout:
+                id: box_reforms
+                orientation: 'vertical'
+                BoxLayout:
+                    id: box_reforms_inner
+                    orientation: 'horizontal'
+                    size_hint: (1.0,0.8)
+                    FileChooserListView:
+                        id: visualize_file_chooser_reforms
+                        filters: [root.file_allowed]
+                        #canvas.before:
+                        #    Color:
+                        #        rgba: hex('#413FBF')
+                        #    Rectangle:
+                        #        pos: self.pos
+                        #        size: self.size
+                        on_selection: root.selected_file(*args)
+                    RstDocument:
+                        id: document_reforms_viewer
+                GridLayout:
+                    rows: 1
+                    cols: 2
+                    size_hint: (1.0,0.2)
+                    Label:
+                        id: current_path_reforms
+                        valign: 'middle'
+                        halign: 'center'
+                        size_hint: (1.0,0.2)
+                    Button:
+                        id: back_home_from_parameters
+                        on_press: root.go_to_home()
+                        text: 'Come back to home'
+                        size_hint: (1.0,0.2)
