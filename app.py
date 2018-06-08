@@ -15,7 +15,6 @@ import os
 from script.get_parameters_reforms_tests_variables_folder_paths import *
 # Screen
 
-PATH_OPENFISCA = ""
 
 class InitScreen(Screen):
 
@@ -34,7 +33,7 @@ class InitScreen(Screen):
         if dict:
             if self.manager.current == 'init':
                  self.manager.current = 'home'
-                 self.manager.get_screen('home'). __path_ricevuto__(PATH_OPENFISCA)
+                 self.manager.get_screen('visualize_system'). ricevi_inizializza_path(PATH_OPENFISCA)
         else:
             print "Path errato"
             self.ids.lbl_txt_2.text = "The selected directory doesn't \n contain an openfisca regular system"
@@ -45,24 +44,45 @@ class HomeScreen(Screen):
 
     def __init__(self,**kwargs):
         super(HomeScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._finish_init)
 
-    def _finish_init(self,dt):
+    def go_to_visualize(self):
+        if self.manager.current == 'home':
+             self.manager.current = 'visualize_system'
+
+    def go_to_reforms(self):
         pass
 
-    def __path_ricevuto__(self,path):
-        dict = get_all_paths(path)
-        print dict
+    def go_to_simulation(self):
+        pass
+
 
 
 class VisualizeSystemScreen(Screen):
+    dict_path = ''
 
     def __init__(self,**kwargs):
         super(VisualizeSystemScreen, self).__init__(**kwargs)
 
+    def ricevi_inizializza_path(self,path):
+        self.dict_path = get_all_paths(path)
+        self.ids.visualize_file_chooser_variables.path = self.dict_path['parameters']
+
+    def selected_file(self,*args):
+        try:
+            path_file_scelto = args[1][0]
+            print path_file_scelto
+            self.ids.document_parameter_viewer.source = path_file_scelto
+        except:
+            print "Some error"
+
+    def go_to_home(self):
+        if self.manager.current == 'visualize_system':
+             self.manager.current = 'home'
 
 class MyScreenManager(ScreenManager):
     pass
+
+
 
 
 # App

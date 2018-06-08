@@ -88,6 +88,7 @@
             markup: True
             background_normal: 'img\\colors\\blue.jpg'
             text: "Visualize the tax and benefit system"
+            on_press: root.go_to_visualize()
             canvas.before:
                 #Color:
                     #rgba: hex('')
@@ -156,13 +157,54 @@
         id: pagelayout_visualize_system
         orientation: 'vertical'
         GridLayout:
-            cols: 2
-            rows: 1
-            ListView:
-                
+            id: grid_1_level_one
+            cols: 1
+            rows: 3
+            GridLayout:
+                id: grid_1_level_two
+                cols: 1
+                rows: 1
+                height: 100
+                size_hint_y: None
+                Label:
+                    id: title_parameters_view
+                    valign: 'middle'
+                    halign: 'center'
+                    text: "Parameters"
+                    size: self.texture_size
+            GridLayout:
+                id: grid_2_level_two
+                cols: 2
+                rows: 1
+                #size_hint_y: None
+                height: self.minimum_height
+                FileChooserListView:
+                    id: visualize_file_chooser_variables
+                    canvas.before:
+                        Color:
+                            rgba: hex('#413FBF')
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    on_selection: root.selected_file(*args)
+                RstDocument:
+                    id: document_parameter_viewer
+
+            GridLayout:
+                cols: 1
+                rows: 1
+                height: 30
+                size_hint_y: None
+                Button:
+                    id: button_home_visualize
+                    valign: 'middle'
+                    halign: 'center'
+                    text: "Turn to home"
+                    size: self.texture_size
+                    on_press: root.go_to_home()
         GridLayout:
             cols: 2
             rows: 1
-        GridLayout:
-            cols: 2
-            rows: 1
+            Label:
+                id: title_variables_view
+                text: "Variables"
