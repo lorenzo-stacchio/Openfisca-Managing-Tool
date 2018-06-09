@@ -34,6 +34,7 @@ class ParameterInterpeter():
             return dict
         elif count_brackets_word >=1:
             self.__parameter_type__ = ParameterType.scale
+            self.__interpeter_scale_parameter__()
 
     #NORMAL PARAMETER
     def __interpeter_normal_parameter__(self):
@@ -83,7 +84,7 @@ class ParameterInterpeter():
         #print collections.OrderedDict(sorted(dict_params_information.items()))
         #Describe parameters generating an RST file
         #path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"
-        path = os.getcwd() + "\\messages\\rst_da_visualizzare.txt"
+        path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"
         if os.path.exists(path):
             os.remove(path)
         with open(path,'a') as rst:
@@ -176,7 +177,7 @@ class ParameterInterpeter():
                 number_rate_found = 0
                 for line in content_parameter.readlines():
                     line = line.strip() #elimino spazi all'inizio e alla fine
-                    #print line
+                    print line
                     pieces = line.split(': ')
                     # Caso speciale per i rate,brackets and value
                     if not (pieces[0] == 'description') and not (pieces[0] == 'reference'):
@@ -184,11 +185,12 @@ class ParameterInterpeter():
                             pieces = [pieces[0].split(':')[0]] #ritorna intestazione riga
                         else:
                             pieces = [pieces[0].split(':')[0],pieces[1]] #ritorna intestazione riga + eventuale valore dopo i :
+                    print pieces
                     # define thing found
                     if pieces[0] == 'brackets':
                         brackets_found = True
                         number_brackets_found = number_brackets_found + 1
-                        dict_brackets['brackets'+number_brackets_found] = "" #si inizializzer quando trovo una rata
+                        dict_brackets['brackets'+ str(number_brackets_found)] = "" #si inizializzer quando trovo una rata
                         # primo brackets
                         if number_brackets_found == 1:
                             dict_information['brackets'] = dict_brackets #inserisco il bind tra i dict
@@ -210,7 +212,8 @@ class ParameterInterpeter():
                     if date_found == True and (pieces[0] == 'value' or pieces[0] == 'expected'):
                         dict_information[date_that_was_found] = pieces[1]
                         date_found = False
-                    return dict_information
+            print 'dizionario alla fine: ', dict_information
+            return dict_information
 
     def return_type(self):
         return self.__parameter_type__
@@ -218,8 +221,8 @@ class ParameterInterpeter():
 
 
 # __main__
-o = ParameterInterpeter('C:\\Users\\Lorenzo Stacchio\\Desktop\\openfisca-italy\\openfisca_italy\\parameters\\imposte\\IRPEF\\Quadro_LC\\limite_acconto_unico_LC2.yaml')
+o = ParameterInterpeter('C:\\Users\\Lorenzo Stacchio\\Desktop\\openfisca-italy\\openfisca_italy\\parameters\\benefici\\boh.yaml')
 dict = o.understand_type()
 #print dict_information
-o.generate_RST_normal_parameter_view(dict)
+#o.generate_RST_normal_parameter_view(dict)
 #print o.return_type()
