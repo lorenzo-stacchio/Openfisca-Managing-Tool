@@ -13,6 +13,7 @@ from kivy.graphics import Rectangle, Color
 from kivy.uix.progressbar import ProgressBar
 import os,sys
 from script.get_parameters_reforms_tests_variables_folder_paths import *
+from script.parameters_interpeter import *
 # Screen
 
 
@@ -93,10 +94,21 @@ class VisualizeSystemScreen(Screen):
 
     def selected_file(self,*args):
         try:
+            # clear document viewer
+            self.ids.document_variables_viewer.source = ""
+            self.ids.document_parameters_viewer.source = ""
+            self.ids.document_reforms_viewer.source = ""
             path_file_scelto = args[1][0]
-            self.ids.document_variables_viewer.source = path_file_scelto
-            self.ids.document_parameters_viewer.source = path_file_scelto
-            self.ids.document_reforms_viewer.source = path_file_scelto
+            parameter_interpeter = ParameterInterpeter(path_file_scelto)
+            dict = parameter_interpeter.understand_type()
+            if (parameter_interpeter.return_type() == ParameterType.normal) and dict:
+                self.ids.document_variables_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
+                self.ids.document_parameters_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
+                self.ids.document_reforms_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
+            else: # file for which the interpretation is not defined yet
+                self.ids.document_variables_viewer.source = path_file_scelto
+                self.ids.document_parameters_viewer.source = path_file_scelto
+                self.ids.document_reforms_viewer.source = path_file_scelto
             self.ids.current_path_variables.text = 'Current path: \n' + self.ids.visualize_file_chooser_variables.path
             self.ids.current_path_parameters.text = 'Current path: \n' + self.ids.visualize_file_chooser_parameters.path
             self.ids.current_path_reforms.text = 'Current path: \n' + self.ids.visualize_file_chooser_reforms.path
