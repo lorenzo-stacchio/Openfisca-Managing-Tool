@@ -31,7 +31,7 @@ class Variable_for_writing():
         self.reference = reference
 
     def __repr__(self):
-        return "\n" + str(self.variable_name) + " " + str(self.value_type) + " " +  str(self.entity) + " " +  str(self.definition_period) + " " +  str(self.label) + " " +  str(self.formula) + " " +  str(self.variables_involved_in_formula) + " " +  str(self.reference)
+        return "\n" + str(self.variable_name) + "," + str(self.value_type) + "," +  str(self.entity) + "," +  str(self.definition_period) + "," +  str(self.label) + "," +  str(self.formula) + "," +  str(self.variables_involved_in_formula) + "," +  str(self.reference)
 
     def set_variable_name(self,variable_name):
         self.variable_name = variable_name
@@ -84,9 +84,9 @@ class Variable_for_writing():
                 rst.write("\n" + "- La descrizione della varabile è: \n\n.. code-block:: rst\n\n " + self.label + "\n")
             else: rst.write("\n" + "- Nessuna descrizione inserita\n")
 
-            if self.label:
+            if self.reference:
                 rst.write("\n" + "- `Riferimento legislativo alla variabile`_ \n\n .. _A cool website:" + self.reference + "\n")
-            else: rst.write("\n" + "- Nessuna descrizione inserita\n")
+            else: rst.write("\n" + "- Nessun riferimento legislativo indicato\n")
 
             if self.formula:
                 rst.write("\n" + "- La formula in codice è la seguente: \n\n.. code-block:: rst\n\n " + self.formula + "\n")
@@ -108,7 +108,6 @@ class Variable_File_Interpeter():
             for line in content_variable.readlines():
                 line =  line.strip()
                 pieces = line.split('=')
-                #print pieces
                 if 'class' in pieces[0] and '(Variable):' in pieces[0]:
                     current_variable_index = current_variable_index + 1
                     variable_name = pieces[0]
@@ -117,21 +116,21 @@ class Variable_File_Interpeter():
                     current_Variable = Variable_for_writing(variable_name = variable_name)
                     self.__variables__.append(current_Variable)
                 if 'value_type' in pieces[0]:
-                    current_Variable.set_value_type(pieces[1])
+                    current_Variable.set_value_type(pieces[1].strip())
                 if 'entity' in pieces[0]:
-                    current_Variable.set_entity(pieces[1])
+                    current_Variable.set_entity(pieces[1].strip())
                 if 'label' in pieces[0]:
                     label = pieces[1]
                     for chs in ['u','\"']:
                         label = label.replace(chs,'')
                     current_Variable.set_label(label)#label could be written with unicode
                 if 'definition_period' in pieces[0]:
-                    current_Variable.set_definition_period(pieces[1])
+                    current_Variable.set_definition_period(pieces[1].strip())
                 if 'reference' in pieces[0]:
                     reference = pieces[1]
                     for chs in ['u','\"']:
                         reference = reference.replace(chs,'')
-                    current_Variable.set_reference(reference)
+                    current_Variable.set_reference(reference.strip())
 
 
 
@@ -143,7 +142,7 @@ class Variable_File_Interpeter():
 # TODO: QUANDO LEGGI LA FORMULA, DEVI FARE UNO STRIP E POI METTERE UNO SPAZIO ALL'INIZIO DI OGNI RIGA PERCHE' SENNO IL COMANDO PER RST NON FUNZIONA
 # __main__
 
-object = Variable_File_Interpeter('C:\\Users\\Lorenzo Stacchio\\Desktop\\aldo.txt')
+object = Variable_File_Interpeter('C:\\Users\\Stach\\Desktop\\aldo.txt')
 object.start_interpetration()
 object.generate_RSTs_variables()
 #v = Variable_for_writing(value_type = 'float',entity = 'person',definition_period = 'MONTH', label = 'Individualized and monthly paid tax on salaries',formula = 'def formula(person, period, parameters): \n salary = person(salary, period)  \n return salary * parameters(period).taxes.salary.rate',variables_involved_in_formula='')
