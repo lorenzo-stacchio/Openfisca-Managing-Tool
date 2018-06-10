@@ -165,8 +165,8 @@ class ParameterInterpeter():
     def __interpeter_scale_parameter__(self):
         dict_information = {}
         dict_brackets = {}
-        dict_single_rate = {}
-        dict_date_values_threshold = {}
+        dict_rates_of_brackets = {}
+        dict_date_values_threshold = {} # questo elemento non verrà utilizzato alla fine, serve come riempimento
         if (self.__parameter_type__ == ParameterType.scale):
             with open(self.__parameter_path__,'r') as content_parameter:
                 date_found = False
@@ -175,9 +175,10 @@ class ParameterInterpeter():
                 number_brackets_found = 0
                 rate_found = False
                 number_rate_found = 0
+                threshold_found = False
                 for line in content_parameter.readlines():
                     line = line.strip() #elimino spazi all'inizio e alla fine
-                    print line
+                    #print "Linea attuale", line
                     pieces = line.split(': ')
                     # Caso speciale per i rate,brackets and value
                     if not (pieces[0] == 'description') and not (pieces[0] == 'reference'):
@@ -185,34 +186,66 @@ class ParameterInterpeter():
                             pieces = [pieces[0].split(':')[0]] #ritorna intestazione riga
                         else:
                             pieces = [pieces[0].split(':')[0],pieces[1]] #ritorna intestazione riga + eventuale valore dopo i :
-                    print pieces
+                    #print "Stampo pieces",pieces
                     # define thing found
                     if pieces[0] == 'brackets':
+                        # if we are in second cicle
+                        rate_found = False
+                        number_rate_found = 0
+                        dict_rates_of_brackets = {}
+                        #bracket init
                         brackets_found = True
                         number_brackets_found = number_brackets_found + 1
                         dict_brackets['brackets'+ str(number_brackets_found)] = "" #si inizializzer quando trovo una rata
                         # primo brackets
                         if number_brackets_found == 1:
                             dict_information['brackets'] = dict_brackets #inserisco il bind tra i dict
-                    if pieces[0] == 'rate':
+                    if pieces[0] == '- rate':
                         rate_found = True
+                        # clear dates and threshold
+                        dict_date_values_threshold = {}
+                        date_found = False
+                        date_that_was_found = ""
+                        threshold_found = False
+                        #logic
+                        #print '\nrata trovata', rate_found
                         number_rate_found = number_rate_found + 1
+                        #print '\nnumero rate trovata', number_rate_found
+                        dict_rates_of_brackets ['rate'+str(number_rate_found)] = ""
+                        if number_rate_found == 1: # first rate of a bracket
+                            dict_brackets['brackets'+ str(number_brackets_found)] = dict_rates_of_brackets
+                    # special case threshold
+                    if pieces[0] == 'threshold':
+                        threshold_found = True
                     # date control
                     try: # cerco le date
                         if date_parser(pieces[0]):
                             #print 'data trovata', date_parser(pieces[0]).date()
                             date_found = True
                             date_that_was_found = date_parser(pieces[0]).date()
+                            if not date_that_was_found in dict_date_values_threshold.keys():
+                                dict_date_values_threshold[date_that_was_found] = ''
+                            if dict_rates_of_brackets['rate'+str(number_rate_found)] == "": #is empty
+                                #print "\nsono qui\n"
+                                dict_rates_of_brackets['rate'+str(number_rate_found)] = dict_date_values_threshold
+                        #print " \n nel date parser ", dict_date_values_threshold
                     except:
                         pass
                     #inserisco description e reference
                     if (pieces[0] == 'description') or (pieces[0] == 'reference'):
                         dict_information[pieces[0]] = pieces[1]
                     # se ho trovato una data posso aggiungere il relativo valore
-                    if date_found == True and (pieces[0] == 'value' or pieces[0] == 'expected'):
-                        dict_information[date_that_was_found] = pieces[1]
+                    if date_found and rate_found and brackets_found and (pieces[0] == 'value'):
+                        if threshold_found:
+                            dict_date_values_threshold[date_that_was_found] = dict_date_values_threshold[date_that_was_found] + " - " + pieces[1]
+                            print "dopo", dict_date_values_threshold[date_that_was_found]
+                        else:
+                            dict_date_values_threshold[date_that_was_found] = pieces[1]
+                        #print " \n nel last section ", dict_date_values_threshold[date_that_was_found]
                         date_found = False
-            print 'dizionario alla fine: ', dict_information
+            print '\ndizionario padre: ', dict_information
+            #print 'dizionario bracket: ', dict_brackets
+            #print 'dizionario rate: ', dict_rates_of_brackets
             return dict_information
 
     def return_type(self):
