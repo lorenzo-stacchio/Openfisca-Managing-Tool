@@ -101,11 +101,18 @@ class VisualizeSystemScreen(Screen):
             path_file_scelto = args[1][0]
             parameter_interpeter = ParameterInterpeter(path_file_scelto)
             dict = parameter_interpeter.understand_type()
-            #print parameter_interpeter.return_type()
-            if not (parameter_interpeter.return_type() == ParameterType.non_parametro) and dict:
+            print parameter_interpeter.return_type()
+            print parameter_interpeter.return_type() == ParameterType.scale
+            print dict
+            if (parameter_interpeter.return_type() == ParameterType.normal) and dict:
                 self.ids.document_variables_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
                 self.ids.document_parameters_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
                 self.ids.document_reforms_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
+            elif (parameter_interpeter.return_type() == ParameterType.scale) and dict:
+                print "SONO QUI CAZZZOOOOOOO"
+                self.ids.document_variables_viewer.source = parameter_interpeter.generate_RST_scale_parameter_view(dict)
+                self.ids.document_parameters_viewer.source = parameter_interpeter.generate_RST_scale_parameter_view(dict)
+                self.ids.document_reforms_viewer.source = parameter_interpeter.generate_RST_scale_parameter_view(dict)
             else: # file for which the interpretation is not defined yet
                 self.ids.document_variables_viewer.source = path_file_scelto
                 self.ids.document_parameters_viewer.source = path_file_scelto

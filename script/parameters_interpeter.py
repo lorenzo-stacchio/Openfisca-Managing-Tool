@@ -34,6 +34,7 @@ class ParameterInterpeter():
             return dict
         elif count_brackets_word >=1:
             self.__parameter_type__ = ParameterType.scale
+            return self.__interpeter_scale_parameter__()
 
     #NORMAL PARAMETER
     def __interpeter_normal_parameter__(self):
@@ -164,8 +165,8 @@ class ParameterInterpeter():
     def __interpeter_scale_parameter__(self):
         dict_information = {}
         dict_brackets = {}
-        dict_single_rate = {}
-        dict_date_values_threshold = {}
+        dict_rates_of_brackets = {}
+        dict_date_values_threshold = {} # questo elemento non verrà utilizzato alla fine, serve come riempimento
         if (self.__parameter_type__ == ParameterType.scale):
             with open(self.__parameter_path__,'r') as content_parameter:
                 date_found = False
@@ -174,9 +175,10 @@ class ParameterInterpeter():
                 number_brackets_found = 0
                 rate_found = False
                 number_rate_found = 0
+                threshold_found = False
                 for line in content_parameter.readlines():
                     line = line.strip() #elimino spazi all'inizio e alla fine
-                    #print line
+                    #print "Linea attuale", line
                     pieces = line.split(': ')
                     # Caso speciale per i rate,brackets and value
                     if not (pieces[0] == 'description') and not (pieces[0] == 'reference'):
@@ -184,33 +186,150 @@ class ParameterInterpeter():
                             pieces = [pieces[0].split(':')[0]] #ritorna intestazione riga
                         else:
                             pieces = [pieces[0].split(':')[0],pieces[1]] #ritorna intestazione riga + eventuale valore dopo i :
+                    #print "Stampo pieces",pieces
                     # define thing found
                     if pieces[0] == 'brackets':
+                        # if we are in second cicle
+                        rate_found = False
+                        number_rate_found = 0
+                        dict_rates_of_brackets = {}
+                        #bracket init
                         brackets_found = True
                         number_brackets_found = number_brackets_found + 1
-                        dict_brackets['brackets'+number_brackets_found] = "" #si inizializzer quando trovo una rata
+                        dict_brackets['brackets'+ str(number_brackets_found)] = "" #si inizializzer quando trovo una rata
                         # primo brackets
                         if number_brackets_found == 1:
                             dict_information['brackets'] = dict_brackets #inserisco il bind tra i dict
-                    if pieces[0] == 'rate':
+                    if pieces[0] == '- rate':
                         rate_found = True
+                        # clear dates and threshold
+                        dict_date_values_threshold = {}
+                        date_found = False
+                        date_that_was_found = ""
+                        threshold_found = False
+                        #logic
+                        #print '\nrata trovata', rate_found
                         number_rate_found = number_rate_found + 1
+                        #print '\nnumero rate trovata', number_rate_found
+                        dict_rates_of_brackets ['rate'+str(number_rate_found)] = ""
+                        if number_rate_found == 1: # first rate of a bracket
+                            dict_brackets['brackets'+ str(number_brackets_found)] = dict_rates_of_brackets
+                    # special case threshold
+                    if pieces[0] == 'threshold':
+                        threshold_found = True
                     # date control
                     try: # cerco le date
                         if date_parser(pieces[0]):
                             #print 'data trovata', date_parser(pieces[0]).date()
                             date_found = True
                             date_that_was_found = date_parser(pieces[0]).date()
+                            if not date_that_was_found in dict_date_values_threshold.keys():
+                                dict_date_values_threshold[date_that_was_found] = ''
+                            if dict_rates_of_brackets['rate'+str(number_rate_found)] == "": #is empty
+                                #print "\nsono qui\n"
+                                dict_rates_of_brackets['rate'+str(number_rate_found)] = dict_date_values_threshold
+                        #print " \n nel date parser ", dict_date_values_threshold
                     except:
                         pass
                     #inserisco description e reference
                     if (pieces[0] == 'description') or (pieces[0] == 'reference'):
                         dict_information[pieces[0]] = pieces[1]
                     # se ho trovato una data posso aggiungere il relativo valore
-                    if date_found == True and (pieces[0] == 'value' or pieces[0] == 'expected'):
-                        dict_information[date_that_was_found] = pieces[1]
+                    if date_found and rate_found and brackets_found and (pieces[0] == 'value'):
+                        if threshold_found:
+                            dict_date_values_threshold[date_that_was_found] = dict_date_values_threshold[date_that_was_found] + " - " + pieces[1]
+                        else:
+                            dict_date_values_threshold[date_that_was_found] = pieces[1]
+                        #print " \n nel last section ", dict_date_values_threshold[date_that_was_found]
                         date_found = False
-                    return dict_information
+            #print '\ndizionario padre: ', dict_information
+            #print 'dizionario bracket: ', dict_brackets
+            #print 'dizionario rate: ', dict_rates_of_brackets
+            #print '\ndizionario padre: ', dict_information
+            return dict_information
+
+    def generate_RST_scale_parameter_view(self,dict_params_information):
+        path = os.getcwd() + "\\messages\\rst_da_visualizzare.txt"
+        if os.path.exists(path):
+            os.remove(path)
+        with open(path,'a') as rst:
+            #parameter name
+            for n in range(1,1000):
+                rst.write('#')
+            rst.write("\n" + self.__parameter_name__ + "\n")
+            for n in range(1,1000):
+                rst.write('#')
+            rst.write("\n")
+            # Description
+            if 'description' in dict_params_information.keys():
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\nDescription:' + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                rst.write(dict_params_information['description'] + "\n\n")
+            else:
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\nDescription:' + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                rst.write("Not Specified" + "\n\n")
+            # Reference is an optional field
+            if 'reference' in dict_params_information.keys():
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\nReference:' + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                rst.write(dict_params_information['reference'] + "\n\n")
+            else:
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\nReference:' + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                rst.write("Not Specified" + "\n\n")
+            #Brackets
+            for key_brackets_father,value_dict_brackets in dict_params_information['brackets'].iteritems():
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\n'+ key_brackets_father + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                ordered_value_dict_brackets = collections.OrderedDict(sorted(value_dict_brackets.items()))
+                # per ogni gruppo di scaglioni, abbiamo n rate
+                for key_rate_number, value_rate_threshold in ordered_value_dict_brackets.iteritems():
+                    rst.write('\n'+ key_rate_number + "\n")
+                    for n in range(1,1000):
+                        rst.write('"')
+                    rst.write("\n\n")
+                    ordered_value_rate_content = collections.OrderedDict(sorted(value_rate_threshold.items()))
+                    # per ogni rata abbiamo valori e soglie per le quali valgono questi valori
+                    for data_valore_soglia, valore_soglia in ordered_value_rate_content.iteritems():
+                        # il valore soglia va splittato con _, il primo numero è il valore mentre il secondo è la soglia definita per lo stesso
+                        values_threshold_splitted = valore_soglia.split('-')
+                        stringa_solo_valore = stringa_valore_soglia = ""
+                        if data_valore_soglia < datetime.datetime.now().date():
+                            stringa_solo_valore = " è stato definito il valore di questa rata che è pari a: "
+                            stringa_valore_soglia = " sono stati definiti:"
+                        else:
+                            stringa_solo_valore = " ci si aspetta che il valore di questa rata sarà pari a: "
+                            stringa_valore_soglia = " ci si aspetta che verranno definiti:"
+                        if len(values_threshold_splitted)==1:
+                            to_write = str('Nel **' + str(data_valore_soglia) +'** ' + stringa_solo_valore + '**' + values_threshold_splitted[0]).strip() +'**\n\n'
+                            rst.write(to_write)
+                        if len(values_threshold_splitted)==2:
+                            to_write = str('Nel **' + str(data_valore_soglia) + "**" + stringa_valore_soglia +'\n - Il valore di questa rata che è pari a: **' + values_threshold_splitted[0].strip() + "**;\n - La soglia da superare per fare in modo che questa rata valga che è pari a **" + values_threshold_splitted[0].strip() + "**\n\n")
+                            rst.write(to_write)
+            return path #return path of written file
+
+
 
     def return_type(self):
         return self.__parameter_type__

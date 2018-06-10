@@ -30,11 +30,10 @@ class ParameterInterpeter():
                     count_brackets_word = count_brackets_word + 1
         if count_values_word == 1:
             self.__parameter_type__ = ParameterType.normal
-            dict = self.__interpeter_normal_parameter__()
-            return dict
+            return self.__interpeter_normal_parameter__()
         elif count_brackets_word >=1:
             self.__parameter_type__ = ParameterType.scale
-            self.__interpeter_scale_parameter__()
+            return self.__interpeter_scale_parameter__()
 
     #NORMAL PARAMETER
     def __interpeter_normal_parameter__(self):
@@ -238,15 +237,109 @@ class ParameterInterpeter():
                     if date_found and rate_found and brackets_found and (pieces[0] == 'value'):
                         if threshold_found:
                             dict_date_values_threshold[date_that_was_found] = dict_date_values_threshold[date_that_was_found] + " - " + pieces[1]
-                            print "dopo", dict_date_values_threshold[date_that_was_found]
                         else:
                             dict_date_values_threshold[date_that_was_found] = pieces[1]
                         #print " \n nel last section ", dict_date_values_threshold[date_that_was_found]
                         date_found = False
-            print '\ndizionario padre: ', dict_information
+            #print '\ndizionario padre: ', dict_information
             #print 'dizionario bracket: ', dict_brackets
             #print 'dizionario rate: ', dict_rates_of_brackets
+            print '\ndizionario padre: ', dict_information
             return dict_information
+
+    def generate_RST_scale_parameter_view(self,dict_params_information):
+        #print dict_params_information
+        #dict_values = {}
+        #extracing the dates
+        #for k,v in dict_params_information.iteritems():
+        #    if isinstance(k,datetime.date):
+        #        dict_values[k] = v
+        #dict_values = collections.OrderedDict(sorted(dict_values.items()))
+        #print collections.OrderedDict(sorted(dict_params_information.items()))
+        #Describe parameters generating an RST file
+        #path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"
+        path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"
+        if os.path.exists(path):
+            os.remove(path)
+        with open(path,'a') as rst:
+            #parameter name
+            for n in range(1,1000):
+                rst.write('#')
+            rst.write("\n" + self.__parameter_name__ + "\n")
+            for n in range(1,1000):
+                rst.write('#')
+            rst.write("\n")
+            # Description
+            if 'description' in dict_params_information.keys():
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\nDescription:' + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                rst.write(dict_params_information['description'] + "\n\n")
+            else:
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\nDescription:' + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                rst.write("Not Specified" + "\n\n")
+            # Reference is an optional field
+            if 'reference' in dict_params_information.keys():
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\nReference:' + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                rst.write(dict_params_information['reference'] + "\n\n")
+            else:
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\nReference:' + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                rst.write("Not Specified" + "\n\n")
+            #Brackets
+            for key_brackets_father,value_dict_brackets in dict_params_information['brackets'].iteritems():
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write('\n'+ key_brackets_father + "\n")
+                for n in range(1,1000):
+                    rst.write('*')
+                rst.write("\n\n")
+                ordered_value_dict_brackets = collections.OrderedDict(sorted(value_dict_brackets.items()))
+                # per ogni gruppo di scaglioni, abbiamo n rate
+                for key_rate_number, value_rate_threshold in ordered_value_dict_brackets.iteritems():
+                    rst.write('\n'+ key_rate_number + "\n")
+                    for n in range(1,1000):
+                        rst.write('"')
+                    rst.write("\n\n")
+                    print key_rate_number , "\n", value_rate_threshold
+                    ordered_value_rate_content = collections.OrderedDict(sorted(value_rate_threshold.items()))
+                    # per ogni rata abbiamo valori e soglie per le quali valgono questi valori
+                    for data_valore_soglia, valore_soglia in ordered_value_rate_content.iteritems():
+                        print "ultimo ciclo", data_valore_soglia, valore_soglia
+                        # il valore soglia va splittato con _, il primo numero è il valore mentre il secondo è la soglia definita per lo stesso
+                        values_threshold_splitted = valore_soglia.split('-')
+                        stringa_solo_valore = stringa_valore_soglia = ""
+                        if data_valore_soglia < datetime.datetime.now().date():
+                            stringa_solo_valore = " è stato definito il valore di questa rata che è pari a: "
+                            stringa_valore_soglia = " sono stati definiti:"
+                        else:
+                            stringa_solo_valore = " ci si aspetta che il valore di questa rata sarà pari a: "
+                            stringa_valore_soglia = " ci si aspetta che verranno definiti:"
+                        if len(values_threshold_splitted)==1:
+                            to_write = str('Nel **' + str(data_valore_soglia) +'** ' + stringa_solo_valore + '**' + values_threshold_splitted[0]).strip() +'**\n\n'
+                            rst.write(to_write)
+                        if len(values_threshold_splitted)==2:
+                            to_write = str('Nel **' + str(data_valore_soglia) + "**" + stringa_valore_soglia +'\n - Il valore di questa rata che è pari a: **' + values_threshold_splitted[0].strip() + "**;\n - La soglia da superare per fare in modo che questa rata valga che è pari a **" + values_threshold_splitted[0].strip() + "**\n\n")
+                            rst.write(to_write)
+            return path #return path of written file
+
 
     def return_type(self):
         return self.__parameter_type__
@@ -257,5 +350,5 @@ class ParameterInterpeter():
 o = ParameterInterpeter('C:\\Users\\Lorenzo Stacchio\\Desktop\\openfisca-italy\\openfisca_italy\\parameters\\benefici\\boh.yaml')
 dict = o.understand_type()
 #print dict_information
-#o.generate_RST_normal_parameter_view(dict)
+o.generate_RST_scale_parameter_view(dict)
 #print o.return_type()
