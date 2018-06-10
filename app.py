@@ -109,7 +109,6 @@ class VisualizeSystemScreen(Screen):
                 self.ids.document_parameters_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
                 self.ids.document_reforms_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
             elif (parameter_interpeter.return_type() == ParameterType.scale) and dict:
-                print "SONO QUI CAZZZOOOOOOO"
                 self.ids.document_variables_viewer.source = parameter_interpeter.generate_RST_scale_parameter_view(dict)
                 self.ids.document_parameters_viewer.source = parameter_interpeter.generate_RST_scale_parameter_view(dict)
                 self.ids.document_reforms_viewer.source = parameter_interpeter.generate_RST_scale_parameter_view(dict)

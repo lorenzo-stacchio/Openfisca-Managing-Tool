@@ -91,7 +91,7 @@ class ParameterInterpeter():
             #parameter name
             for n in range(1,1000):
                 rst.write('#')
-            rst.write("\n" + self.__parameter_name__ + "\n")
+            rst.write("\nParameter: " + self.__parameter_name__ + "\n")
             for n in range(1,1000):
                 rst.write('#')
             rst.write("\n")
@@ -256,7 +256,7 @@ class ParameterInterpeter():
             #parameter name
             for n in range(1,1000):
                 rst.write('#')
-            rst.write("\n" + self.__parameter_name__ + "\n")
+            rst.write("\nParameter: " + self.__parameter_name__ + "\n")
             for n in range(1,1000):
                 rst.write('#')
             rst.write("\n")
@@ -325,7 +325,7 @@ class ParameterInterpeter():
                             to_write = str('Nel **' + str(data_valore_soglia) +'** ' + stringa_solo_valore + '**' + values_threshold_splitted[0]).strip() +'**\n\n'
                             rst.write(to_write)
                         if len(values_threshold_splitted)==2:
-                            to_write = str('Nel **' + str(data_valore_soglia) + "**" + stringa_valore_soglia +'\n - Il valore di questa rata che è pari a: **' + values_threshold_splitted[0].strip() + "**;\n - La soglia da superare per fare in modo che questa rata valga che è pari a **" + values_threshold_splitted[0].strip() + "**\n\n")
+                            to_write = str('Nel **' + str(data_valore_soglia) + "**" + stringa_valore_soglia +'\n - Il valore di questa rata che è pari a: **' + values_threshold_splitted[0].strip() + "**;\n - La soglia da superare per fare in modo che questa rata valga che è pari a **" + values_threshold_splitted[1].strip() + "**\n\n")
                             rst.write(to_write)
             return path #return path of written file
 
