@@ -39,7 +39,7 @@ class InitScreen(Screen):
                  self.manager.get_screen('visualize_system'). ricevi_inizializza_path(PATH_OPENFISCA)
         else:
             print "Path errato"
-            self.ids.lbl_txt_2.text = "The selected directory doesn't \n contain an openfisca regular system"
+            self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
             # TODO: cambiare colore quando si sbaglia directory e ridimensionare label
 
 
@@ -72,17 +72,17 @@ class VisualizeSystemScreen(Screen):
 
     def show_variables(self):
         self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
-        self.ids.current_path_variables.text = 'Current path: \n' + self.ids.visualize_file_chooser_variables.path
+        self.ids.current_path_variables.text = self.ids.visualize_file_chooser_variables.path
 
 
     def show_parameters(self):
         self.ids.visualize_file_chooser_parameters.path = self.dict_path['parameters']
-        self.ids.current_path_parameters.text = 'Current path: \n' + self.ids.visualize_file_chooser_parameters.path
+        self.ids.current_path_parameters.text = self.ids.visualize_file_chooser_parameters.path
 
 
     def show_reforms(self):
         self.ids.visualize_file_chooser_reforms.path = self.dict_path['reforms']
-        self.ids.current_path_reforms.text = 'Current path: \n' + self.ids.visualize_file_chooser_reforms.path
+        self.ids.current_path_reforms.text = self.ids.visualize_file_chooser_reforms.path
 
 
     def file_allowed(self,directory,filename):
@@ -121,9 +121,9 @@ class VisualizeSystemScreen(Screen):
                 self.ids.document_variables_viewer.source = path_file_scelto
                 self.ids.document_parameters_viewer.source = path_file_scelto
                 self.ids.document_reforms_viewer.source = path_file_scelto
-            self.ids.current_path_variables.text = 'Current path: \n' + self.ids.visualize_file_chooser_variables.path
-            self.ids.current_path_parameters.text = 'Current path: \n' + self.ids.visualize_file_chooser_parameters.path
-            self.ids.current_path_reforms.text = 'Current path: \n' + self.ids.visualize_file_chooser_reforms.path
+            self.ids.current_path_variables.text = self.ids.visualize_file_chooser_variables.path
+            self.ids.current_path_parameters.text = self.ids.visualize_file_chooser_parameters.path
+            self.ids.current_path_reforms.text = self.ids.visualize_file_chooser_reforms.path
         except Exception as e:
             print "Some error ", e
 
