@@ -5,6 +5,7 @@ from dateutil.parser import parse as date_parser
 import datetime
 import collections
 import re
+import time
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 100
 
@@ -19,10 +20,9 @@ class Variable_for_writing():
     reference = None
     set_input = None
     def __init__(self, variable_name = None, value_type = None, entity = None, definition_period = None, set_input = None, label = None, reference = None, formula = None, variables_involved_in_formula = None):
+        if os.path.exists(os.getcwd() + "\\messages\\rst_da_visualizzare.txt"):
+            os.remove(os.getcwd() + "\\messages\\rst_da_visualizzare.txt")
         # a file contains many variable, so i can't erase it when i generate an RST so i'll do when i create a variable
-        if os.path.exists(os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"):
-            #print "RIMOZIONE"
-            os.remove(os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt")
         self.variable_name = variable_name
         self.value_type = value_type
         self.entity = entity
@@ -54,6 +54,9 @@ class Variable_for_writing():
     def set_formula(self,formula):
         self.formula = formula
 
+    def get_formula(self):
+        return self.formula
+
     def set_variables_involved_in_formula(self,variables_involved_in_formula):
         self.variables_involved_in_formula = variables_involved_in_formula
 
@@ -66,8 +69,8 @@ class Variable_for_writing():
 
 
     def generate_RST_variable(self):
-
-        path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"
+        #path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"
+        path = os.getcwd() + "\\messages\\rst_da_visualizzare.txt"
         with open(path,'a') as rst:
             #variable name
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
@@ -92,70 +95,92 @@ class Variable_for_writing():
             if self.label:
                 rst.write("\n" + "- La descrizione della varabile è: \n\n.. code-block:: rst\n\n " + self.label + "\n")
             else: rst.write("\n" + "- Nessuna descrizione inserita\n")
-
             if self.reference:
-                rst.write("\n" + "- `Riferimento legislativo alla variabile`_ \n\n .. _Riferimento legislativo alla variabile: " + self.reference + "\n")
+                rst.write("\n" + "- `Riferimento legislativo alla variabile`__ \n\n   .. _link"+self.variable_name.strip()+": " + self.reference + "\n\n   __ link"+self.variable_name+"_" + "\n")
             else: rst.write("\n" + "- Nessun riferimento legislativo indicato\n")
-
             if self.formula:
                 rst.write("\n" + "- La formula in codice è la seguente: \n\n.. code-block:: rst\n\n " + self.formula + "\n")
             else: rst.write("\n" + "- La variabile non possiede una formula\n\n")
-
+        return path
 
 class Variable_File_Interpeter():
     __variables_file_path__ = ""
-    __variables__ = [] # will be an array
+    __variables__ = [] # will be a list
+    __file_is_a_variable__ = False
 
     def __init__(self,variable_path):
         self.__variable_path__ = variable_path
+        # check if the file passed contains a variable
+        with open(self.__variable_path__,'r') as content_variable:
+            for line in content_variable.readlines():
+                if 'class' in line and '(Variable):' in line:
+                    self.__file_is_a_variable__ = True
+
+    def file_is_a_variable(self):
+        return self.__file_is_a_variable__
 
     def start_interpetration(self):
+        self.__variables__ = []
         formula_found = False
         current_variable_index = -1
         current_Variable = None
         with open(self.__variable_path__,'r') as content_variable:
             for line in content_variable.readlines():
                 line =  line.strip()
-                pieces = line.split('=')
-                if 'class' in pieces[0] and '(Variable):' in pieces[0]:
-                    current_variable_index = current_variable_index + 1
-                    variable_name = pieces[0]
-                    for chs in ['class','(Variable):']:
-                        variable_name = variable_name.replace(chs,'')
-                    current_Variable = Variable_for_writing(variable_name = variable_name)
-                    self.__variables__.append(current_Variable)
-                if 'value_type' in pieces[0]:
-                    current_Variable.set_value_type(pieces[1].strip())
-                if 'entity' in pieces[0]:
-                    current_Variable.set_entity(pieces[1].strip())
-                if 'label' in pieces[0]:
-                    label = pieces[1]
-                    for chs in ['u"','\"']:
-                        label = label.replace(chs,'')
-                    current_Variable.set_label(label)#label could be written with unicode
-                if 'definition_period' in pieces[0]:
-                    current_Variable.set_definition_period(pieces[1].strip())
-                if 'set_input' in pieces[0]:
-                    current_Variable.set_set_input(pieces[1].strip())
-                if 'reference' in pieces[0]:
-                    reference = pieces[1]
-                    for chs in ['\"']:
-                        reference = reference.replace(chs,'')
-                    reference = re.search("(?P<url>https?://[^\s]+)", reference).group("url")
-                    current_Variable.set_reference(reference.strip())
+                if not line.startswith('#'):
+                    # if found a formula, we don't have to split the line
+                    if formula_found:
+                        if 'class' in line and '(Variable):' in line:
+                            formula_found = False
+                        else:
+                            current_Variable.set_formula(current_Variable.get_formula() + "\n ")
+                    pieces = line.split('=')
+                    if 'class' in pieces[0] and '(Variable):' in pieces[0]:
+                        formula_found = False
+                        current_variable_index = current_variable_index + 1
+                        variable_name = pieces[0]
+                        for chs in ['class','(Variable):']:
+                            variable_name = variable_name.replace(chs,'')
+                        current_Variable = Variable_for_writing(variable_name = variable_name)
+                        self.__variables__.append(current_Variable)
+                    if 'value_type' in pieces[0]:
+                        current_Variable.set_value_type(pieces[1].strip())
+                    if 'entity' in pieces[0]:
+                        current_Variable.set_entity(pieces[1].strip())
+                    if 'label' in pieces[0]:
+                        label = pieces[1]
+                        for chs in ['u"','\"']:
+                            label = label.replace(chs,'')
+                        current_Variable.set_label(label)#label could be written with unicode
+                    if 'definition_period' in pieces[0]:
+                        current_Variable.set_definition_period(pieces[1].strip())
+                    if 'set_input' in pieces[0]:
+                        current_Variable.set_set_input(pieces[1].strip())
+                    if 'reference' in pieces[0]:
+                        reference = pieces[1]
+                        for chs in ['\"']:
+                            reference = reference.replace(chs,'')
+                        reference = re.search("(?P<url>https?://[^\s]+)", reference).group("url")
+                        current_Variable.set_reference(reference.strip())
+                    if 'formula' in pieces[0]:
+                        formula_found = True
+                        current_Variable.set_formula(' ' + pieces[0].strip())
 
 
 
     def generate_RSTs_variables(self):
         #print self.__variables__
         for var in self.__variables__:
-            var.generate_RST_variable()
+            path = var.generate_RST_variable() # the path is always the same
+        return path
 
 # TODO: QUANDO LEGGI LA FORMULA, DEVI FARE UNO STRIP E POI METTERE UNO SPAZIO ALL'INIZIO DI OGNI RIGA PERCHE' SENNO IL COMANDO PER RST NON FUNZIONA
 # __main__
 
-object = Variable_File_Interpeter('C:\\Users\\Stach\\Desktop\\aldo.txt')
-object.start_interpetration()
-object.generate_RSTs_variables()
-#v = Variable_for_writing(value_type = 'float',entity = 'person',definition_period = 'MONTH', label = 'Individualized and monthly paid tax on salaries',formula = 'def formula(person, period, parameters): \n salary = person(salary, period)  \n return salary * parameters(period).taxes.salary.rate',variables_involved_in_formula='')
-#v.generate_RST_variable()
+#object = Variable_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\parameters\\benefici\\indennita_alloggio.yaml')
+#object = Variable_File_Interpeter('C:\\Users\\Stach\\Desktop\\aldo.txt')
+#object.start_interpetration()
+#if object.file_is_a_variable():
+#    object.generate_RSTs_variables()
+#else:
+#    print "Not a variable"

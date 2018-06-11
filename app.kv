@@ -20,6 +20,7 @@
                 id: lbl_txt_1
                 valign: 'middle'
                 halign: 'center'
+                size_hint: (1.0,0.33)
                 font_size: 30
                 markup: True
                 text: "You don't have selected a tax and benefit system yet \n Select a local one below, or swap page!"
@@ -34,12 +35,13 @@
                 id: lbl_txt_2
                 valign: 'middle'
                 halign: 'center'
+                size_hint: (1.0,0.25)
                 font_size: 30
                 markup: True
                 text: "You don't have selected a directory"
                 canvas.before:
                     Color:
-                        rgba: hex('#cc4d6a')
+                        rgba: hex('#971640')
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -48,7 +50,7 @@
                 dirselect: True
                 canvas.before:
                     Color:
-                        rgba: hex('#63001a')
+                        rgba: hex('#326C97')
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -56,13 +58,45 @@
 
         GridLayout:
             cols: 1
-            rows: 1
+            rows: 4
             Label:
-                id: txt_slc_online
+                canvas.before:
+                    Color:
+                        rgba: hex('#FFFFFF')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            FloatLayout:
+                pos: self.parent.pos
+                size: self.parent.size
+                orientation: "horizontal"
+                Label:
+                    pos: self.parent.pos
+                    text: ""
+                    canvas.before:
+                        Color:
+                            rgba: hex('#FFFFFF')
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                GridLayout:
+                    pos: self.parent.pos
+                    size: self.parent.size
+                    rows: 1
+                    cols: 2
+                    Image:
+                        source: 'img/openfisca.png'
+                    Image:
+                        source: 'img/github.png'
+
+            Label:
+                id: blablabla
                 valign: 'middle'
                 halign: 'center'
                 markup: True
-                text: "Download it from \n [ref=some] [u] openfisca repos [/u] [/ref]"
+                font_size: 25
+                text: "[color=000000]Download it from [ref=some][u]Openfisca repositories[/u][/ref][/color]"
                 on_ref_press:
                     import webbrowser
                     webbrowser.open('https://github.com/openfisca')
@@ -72,7 +106,13 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
-                        source: "img/github.png"
+            Label:
+                canvas.before:
+                    Color:
+                        rgba: hex('#FFFFFF')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
 
 <HomeScreen>:
     name: "home"
@@ -86,7 +126,7 @@
             valign: 'middle'
             halign: 'center'
             markup: True
-            background_normal: 'img\\colors\\blue.jpg'
+            background_color: hex('971640')
             text: "Visualize the tax and benefit system"
             on_press: root.go_to_visualize()
             canvas.before:
@@ -100,10 +140,9 @@
             valign: 'middle'
             halign: 'center'
             size: self.parent.size
-            background_normal: 'img\\colors\\white.png'
             canvas.before:
                 Color:
-                    rgba: hex('#0033cc')
+                    rgba: hex('#971640')
                 Rectangle:
                     pos: self.center_x - 50, self.center_y - 50 # default size is 100x100
                     source: 'img\law.png'
@@ -177,9 +216,10 @@
                 BoxLayout:
                     id: box_variables_inner
                     orientation: 'horizontal'
-                    size_hint: (1.0,0.8)
+                    size_hint: (1.0,0.95)
                     FileChooserListView:
                         id: visualize_file_chooser_variables
+                        size_hint: (0.70,1.0)
                         filters: [root.file_allowed]
                         #canvas.before:
                         #    Color:
@@ -193,17 +233,16 @@
                 GridLayout:
                     rows: 1
                     cols: 2
-                    size_hint: (1.0,0.2)
+                    size_hint: (1.0,0.05)
                     Label:
                         id: current_path_variables
                         valign: 'middle'
                         halign: 'center'
-                        size_hint: (1.0,0.2)
                     Button:
                         id: back_home
+                        size_hint: (0.3,1.0)
                         on_press: root.go_to_home()
                         text: 'Come back to home'
-                        size_hint: (1.0,0.2)
 
         TabbedPanelItem:
             id: tabbed_parameters
@@ -215,9 +254,10 @@
                 BoxLayout:
                     id: box_parameters_inner
                     orientation: 'horizontal'
-                    size_hint: (1.0,0.8)
+                    size_hint: (1.0,0.95)
                     FileChooserListView:
                         id: visualize_file_chooser_parameters
+                        size_hint: (0.70,1.0)
                         filters: [root.file_allowed]
                         #canvas.before:
                         #    Color:
@@ -231,17 +271,16 @@
                 GridLayout:
                     rows: 1
                     cols: 2
-                    size_hint: (1.0,0.2)
+                    size_hint: (1.0,0.05)
                     Label:
                         id: current_path_parameters
                         valign: 'middle'
                         halign: 'center'
-                        size_hint: (1.0,0.2)
                     Button:
                         id: back_home_from_parameters
+                        size_hint: (0.3,1.0)
                         on_press: root.go_to_home()
                         text: 'Come back to home'
-                        size_hint: (1.0,0.2)
 
         TabbedPanelItem:
             id: tabbed_reforms
@@ -253,9 +292,10 @@
                 BoxLayout:
                     id: box_reforms_inner
                     orientation: 'horizontal'
-                    size_hint: (1.0,0.8)
+                    size_hint: (1.0,0.95)
                     FileChooserListView:
                         id: visualize_file_chooser_reforms
+                        size_hint: (0.70,1.0)
                         filters: [root.file_allowed]
                         #canvas.before:
                         #    Color:
@@ -269,14 +309,13 @@
                 GridLayout:
                     rows: 1
                     cols: 2
-                    size_hint: (1.0,0.2)
+                    size_hint: (1.0,0.05)
                     Label:
                         id: current_path_reforms
                         valign: 'middle'
                         halign: 'center'
-                        size_hint: (1.0,0.2)
                     Button:
                         id: back_home_from_parameters
+                        size_hint: (0.3,1.0)
                         on_press: root.go_to_home()
                         text: 'Come back to home'
-                        size_hint: (1.0,0.2)
