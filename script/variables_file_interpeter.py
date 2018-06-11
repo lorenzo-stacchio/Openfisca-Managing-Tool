@@ -4,7 +4,9 @@ from enum import Enum
 from dateutil.parser import parse as date_parser
 import datetime
 import collections
+import re
 
+GRANDEZZA_STRINGHE_INTESTAZIONE = 100
 
 class Variable_for_writing():
     variable_name = None
@@ -15,11 +17,11 @@ class Variable_for_writing():
     formula = None
     variables_involved_in_formula = None
     reference = None
-
-    def __init__(self, variable_name = None, value_type = None, entity = None, definition_period = None, label = None, reference = None, formula = None, variables_involved_in_formula = None):
+    set_input = None
+    def __init__(self, variable_name = None, value_type = None, entity = None, definition_period = None, set_input = None, label = None, reference = None, formula = None, variables_involved_in_formula = None):
         # a file contains many variable, so i can't erase it when i generate an RST so i'll do when i create a variable
         if os.path.exists(os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"):
-            print "RIMOZIONE"
+            #print "RIMOZIONE"
             os.remove(os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt")
         self.variable_name = variable_name
         self.value_type = value_type
@@ -29,6 +31,7 @@ class Variable_for_writing():
         self.formula = formula
         self.variables_involved_in_formula = variables_involved_in_formula
         self.reference = reference
+        self.set_input = set_input
 
     def __repr__(self):
         return "\n" + str(self.variable_name) + "," + str(self.value_type) + "," +  str(self.entity) + "," +  str(self.definition_period) + "," +  str(self.label) + "," +  str(self.formula) + "," +  str(self.variables_involved_in_formula) + "," +  str(self.reference)
@@ -54,6 +57,10 @@ class Variable_for_writing():
     def set_variables_involved_in_formula(self,variables_involved_in_formula):
         self.variables_involved_in_formula = variables_involved_in_formula
 
+    def set_set_input(self,set_input):
+        self.set_input = set_input
+
+
     def set_reference(self,reference):
         self.reference = reference
 
@@ -63,29 +70,31 @@ class Variable_for_writing():
         path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"
         with open(path,'a') as rst:
             #variable name
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n Variable: " + self.variable_name + "\n")
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n\n")
             # properties
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n Properties \n")
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n")
             rst.write("\n" + "- Il tipo di questa variabile è: **" + self.value_type + "**\n")
             rst.write("\n" + "- L'entità a cui questa variabile appartiene è: **" + self.entity + "**\n")
             rst.write("\n" + "- Il periodo di definizione di questa varabile è: **" + self.definition_period + "**\n")
-
+            if self.set_input:
+                rst.write("\n" + "- Il set_input di questa variabile vale: **" + self.set_input + "**\n")
+            else: rst.write("\n" + "- Nessun set_input inserito\n")
             if self.label:
                 rst.write("\n" + "- La descrizione della varabile è: \n\n.. code-block:: rst\n\n " + self.label + "\n")
             else: rst.write("\n" + "- Nessuna descrizione inserita\n")
 
             if self.reference:
-                rst.write("\n" + "- `Riferimento legislativo alla variabile`_ \n\n .. _A cool website:" + self.reference + "\n")
+                rst.write("\n" + "- `Riferimento legislativo alla variabile`_ \n\n .. _Riferimento legislativo alla variabile: " + self.reference + "\n")
             else: rst.write("\n" + "- Nessun riferimento legislativo indicato\n")
 
             if self.formula:
@@ -121,21 +130,24 @@ class Variable_File_Interpeter():
                     current_Variable.set_entity(pieces[1].strip())
                 if 'label' in pieces[0]:
                     label = pieces[1]
-                    for chs in ['u','\"']:
+                    for chs in ['u"','\"']:
                         label = label.replace(chs,'')
                     current_Variable.set_label(label)#label could be written with unicode
                 if 'definition_period' in pieces[0]:
                     current_Variable.set_definition_period(pieces[1].strip())
+                if 'set_input' in pieces[0]:
+                    current_Variable.set_set_input(pieces[1].strip())
                 if 'reference' in pieces[0]:
                     reference = pieces[1]
-                    for chs in ['u','\"']:
+                    for chs in ['\"']:
                         reference = reference.replace(chs,'')
+                    reference = re.search("(?P<url>https?://[^\s]+)", reference).group("url")
                     current_Variable.set_reference(reference.strip())
 
 
 
     def generate_RSTs_variables(self):
-        print self.__variables__
+        #print self.__variables__
         for var in self.__variables__:
             var.generate_RST_variable()
 
