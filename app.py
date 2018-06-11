@@ -13,8 +13,8 @@ from kivy.graphics import Rectangle, Color
 from kivy.uix.progressbar import ProgressBar
 import os,sys
 from script.get_parameters_reforms_tests_variables_folder_paths import *
-from script.variables_file_interpeter import *
-from script.parameters_interpeter import *
+from script.interpeters.variables_file_interpeter import *
+from script.interpeters.parameters_interpeter import *
 from kivy.config import Config
 
 

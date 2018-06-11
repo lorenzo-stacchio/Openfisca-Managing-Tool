@@ -4,6 +4,8 @@ from enum import Enum
 from dateutil.parser import parse as date_parser
 import datetime
 import collections
+GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
+PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
 
 class ParameterType(Enum):
     non_parametro = "The file doesn't contain a valid parameter"
@@ -81,76 +83,72 @@ class ParameterInterpeter():
             if isinstance(k,datetime.date):
                 dict_values[k] = v
         dict_values = collections.OrderedDict(sorted(dict_values.items()))
-        #print collections.OrderedDict(sorted(dict_params_information.items()))
-        #Describe parameters generating an RST file
-        #path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"
-        path = os.getcwd() + "\\messages\\rst_da_visualizzare.txt"
-        if os.path.exists(path):
-            os.remove(path)
-        with open(path,'a') as rst:
+        if os.path.exists(PATH_RST_DOCUMENT):
+            os.remove(PATH_RST_DOCUMENT)
+        with open(PATH_RST_DOCUMENT,'a') as rst:
             #parameter name
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\nParameter: " + self.__parameter_name__ + "\n")
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n")
             # Description
             if 'description' in dict_params_information.keys():
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nDescription:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write(dict_params_information['description'] + "\n\n")
             else:
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nDescription:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write("Not Specified" + "\n\n")
             # Reference is an optional field
             if 'reference' in dict_params_information.keys():
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nReference:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write(dict_params_information['reference'] + "\n\n")
             else:
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nReference:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write("Not Specified" + "\n\n")
             # Reference is an optional field
             if 'unit' in dict_params_information.keys():
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nUnit:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write(dict_params_information['unit'] + "\n\n")
             else:
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nUnit:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write("Not Specified" + "\n\n")
             #VALUES
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('*')
             rst.write('\nValues:' + "\n")
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('*')
             rst.write("\n")
             # writing the formatted the dates
@@ -159,7 +157,7 @@ class ParameterInterpeter():
                     rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** il parametro é valso **" + v + "**\n")
                 else:
                     rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** si presume che il parametro varrà **" + v + "**\n")
-            return path #return path of written file
+            return PATH_RST_DOCUMENT #return path of written file
 
     #SCALE PARAMETER
     def __interpeter_scale_parameter__(self):
@@ -249,64 +247,63 @@ class ParameterInterpeter():
             return dict_information
 
     def generate_RST_scale_parameter_view(self,dict_params_information):
-        path = os.getcwd() + "\\messages\\rst_da_visualizzare.txt"
-        if os.path.exists(path):
-            os.remove(path)
-        with open(path,'a') as rst:
+        if os.path.exists(PATH_RST_DOCUMENT):
+            os.remove(PATH_RST_DOCUMENT)
+        with open(PATH_RST_DOCUMENT,'a') as rst:
             #parameter name
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\nParameter: " + self.__parameter_name__ + "\n")
-            for n in range(1,1000):
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n")
             # Description
             if 'description' in dict_params_information.keys():
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nDescription:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write(dict_params_information['description'] + "\n\n")
             else:
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nDescription:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write("Not Specified" + "\n\n")
             # Reference is an optional field
             if 'reference' in dict_params_information.keys():
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nReference:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write(dict_params_information['reference'] + "\n\n")
             else:
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nReference:' + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 rst.write("Not Specified" + "\n\n")
             #Brackets
             for key_brackets_father,value_dict_brackets in dict_params_information['brackets'].iteritems():
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\n'+ key_brackets_father + "\n")
-                for n in range(1,1000):
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
                 ordered_value_dict_brackets = collections.OrderedDict(sorted(value_dict_brackets.items()))
                 # per ogni gruppo di scaglioni, abbiamo n rate
                 for key_rate_number, value_rate_threshold in ordered_value_dict_brackets.iteritems():
                     rst.write('\n'+ key_rate_number + "\n")
-                    for n in range(1,1000):
+                    for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                         rst.write('"')
                     rst.write("\n\n")
                     ordered_value_rate_content = collections.OrderedDict(sorted(value_rate_threshold.items()))
@@ -327,7 +324,7 @@ class ParameterInterpeter():
                         if len(values_threshold_splitted)==2:
                             to_write = str('Nel **' + str(data_valore_soglia) + "**" + stringa_valore_soglia +'\n - Il valore di questa rata che è pari a: **' + values_threshold_splitted[0].strip() + "**;\n - La soglia da superare per fare in modo che questa rata valga che è pari a **" + values_threshold_splitted[1].strip() + "**\n\n")
                             rst.write(to_write)
-            return path #return path of written file
+            return PATH_RST_DOCUMENT #return path of written file
 
 
 

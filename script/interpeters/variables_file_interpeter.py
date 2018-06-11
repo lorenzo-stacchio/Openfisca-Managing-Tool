@@ -7,7 +7,8 @@ import collections
 import re
 import time
 
-GRANDEZZA_STRINGHE_INTESTAZIONE = 100
+GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
+PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
 
 class Variable_for_writing():
     variable_name = None
@@ -16,12 +17,12 @@ class Variable_for_writing():
     definition_period = None
     label = None
     formula = None
-    variables_involved_in_formula = None
     reference = None
     set_input = None
+
     def __init__(self, variable_name = None, value_type = None, entity = None, definition_period = None, set_input = None, label = None, reference = None, formula = None, variables_involved_in_formula = None):
-        if os.path.exists(os.getcwd() + "\\messages\\rst_da_visualizzare.txt"):
-            os.remove(os.getcwd() + "\\messages\\rst_da_visualizzare.txt")
+        if os.path.exists(PATH_RST_DOCUMENT):
+            os.remove(PATH_RST_DOCUMENT)
         # a file contains many variable, so i can't erase it when i generate an RST so i'll do when i create a variable
         self.variable_name = variable_name
         self.value_type = value_type
@@ -69,9 +70,7 @@ class Variable_for_writing():
 
 
     def generate_RST_variable(self):
-        #path = os.path.abspath(os.path.join(os.getcwd(), os.pardir)) + "\\messages\\rst_da_visualizzare.txt"
-        path = os.getcwd() + "\\messages\\rst_da_visualizzare.txt"
-        with open(path,'a') as rst:
+        with open(PATH_RST_DOCUMENT,'a') as rst:
             #variable name
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
@@ -96,12 +95,15 @@ class Variable_for_writing():
                 rst.write("\n" + "- La descrizione della varabile è: \n\n.. code-block:: rst\n\n " + self.label + "\n")
             else: rst.write("\n" + "- Nessuna descrizione inserita\n")
             if self.reference:
-                rst.write("\n" + "- `Riferimento legislativo alla variabile`__ \n\n   .. _link"+self.variable_name.strip()+": " + self.reference + "\n\n   __ link"+self.variable_name+"_" + "\n")
+                #rst.write("\n" + "- `Riferimento legislativo alla variabile`_\n\n   .. _Riferimento legislativo alla variabile: " + self.reference + "\n")
+                #rst.write("\n" + "- `Riferimento legislativo alla variabile`__ \n\n   .. _link"+self.variable_name.strip()+": " + self.reference + "\n\n   __ link"+self.variable_name+"_" + "\n")
+                rst.write("\n" + "- `Riferimento legislativo alla variabile <" + self.reference.strip() + ">`__" + "\n")
             else: rst.write("\n" + "- Nessun riferimento legislativo indicato\n")
             if self.formula:
                 rst.write("\n" + "- La formula in codice è la seguente: \n\n.. code-block:: rst\n\n " + self.formula + "\n")
             else: rst.write("\n" + "- La variabile non possiede una formula\n\n")
-        return path
+        return PATH_RST_DOCUMENT
+
 
 class Variable_File_Interpeter():
     __variables_file_path__ = ""
@@ -133,7 +135,7 @@ class Variable_File_Interpeter():
                         if 'class' in line and '(Variable):' in line:
                             formula_found = False
                         else:
-                            current_Variable.set_formula(current_Variable.get_formula() + "\n ")
+                            current_Variable.set_formula(current_Variable.get_formula() + "\n   "+ line)
                     pieces = line.split('=')
                     if 'class' in pieces[0] and '(Variable):' in pieces[0]:
                         formula_found = False
@@ -174,11 +176,10 @@ class Variable_File_Interpeter():
             path = var.generate_RST_variable() # the path is always the same
         return path
 
-# TODO: QUANDO LEGGI LA FORMULA, DEVI FARE UNO STRIP E POI METTERE UNO SPAZIO ALL'INIZIO DI OGNI RIGA PERCHE' SENNO IL COMANDO PER RST NON FUNZIONA
 # __main__
 
 #object = Variable_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\parameters\\benefici\\indennita_alloggio.yaml')
-#object = Variable_File_Interpeter('C:\\Users\\Stach\\Desktop\\aldo.txt')
+#object = Variable_File_Interpeter('C:\\Users\\Stach\\Desktop\\aldo.rst')
 #object.start_interpetration()
 #if object.file_is_a_variable():
 #    object.generate_RSTs_variables()
