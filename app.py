@@ -14,9 +14,10 @@ from kivy.uix.progressbar import ProgressBar
 import os,sys
 from script.get_parameters_reforms_tests_variables_folder_paths import *
 from script.parameters_interpeter import *
+from kivy.config import Config
+
+
 # Screen
-
-
 class InitScreen(Screen):
 
     def __init__(self,**kwargs):
@@ -139,6 +140,8 @@ class MyScreenManager(ScreenManager):
 class openfisca_managing_tool(App):
     def build(self):
         Builder.load_file('app.kv')
+        self.icon = 'openfisca.ico'
+        self.title = 'Openfisca Managing Tool'
         return MyScreenManager()
 
 # main

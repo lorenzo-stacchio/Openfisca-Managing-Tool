@@ -337,8 +337,8 @@ class ParameterInterpeter():
 
 
 # __main__
-o = ParameterInterpeter('C:\\Users\\Lorenzo Stacchio\\Desktop\\openfisca-italy\\openfisca_italy\\parameters\\imposte\\IRPEF\\Quadro_LC\\limite_acconto_unico_LC2.yaml')
-dict = o.understand_type()
+#o = ParameterInterpeter('C:\\Users\\Lorenzo Stacchio\\Desktop\\openfisca-italy\\openfisca_italy\\parameters\\imposte\\IRPEF\\Quadro_LC\\limite_acconto_unico_LC2.yaml')
+#dict = o.understand_type()
 #print dict_information
-o.generate_RST_normal_parameter_view(dict)
+#o.generate_RST_normal_parameter_view(dict)
 #print o.return_type()
