@@ -19,10 +19,10 @@ class TypeReformAction(Enum):
 
 
 class Reform_for_writing():
-    reform_name = None
-    reform_full_name = None
-    reference = None
-    reform_actions = [] # lista di n dict, ogni dict ha tipo azione e contenuto
+    __reform_name__ = None
+    __reform_full_name__ = None
+    __reference__ = None
+    __reform_actions__ = [] # lista di n dict, ogni dict ha tipo azione e contenuto
     # dovrebbe essere un dict di azione e su cosa fa l'azione che però è al chiave della spiegazione
     modifier_function_dict = {}
     reformed_variables_dict = {}
@@ -30,35 +30,35 @@ class Reform_for_writing():
     def __init__(self, reform_name = None, reform_full_name = None, reference = None, reform_actions = []):
         if os.path.exists(PATH_RST_DOCUMENT):
             os.remove(PATH_RST_DOCUMENT)
-        self.reform_name = reform_name
-        self.reference = reference
-        self.reform_actions = reform_actions
-        self.reform_full_name = reform_full_name
+        self.__reform_name__ = reform_name
+        self.__reference__ = reference
+        self.__reform_actions__ = reform_actions
+        self.__reform_full_name__ = reform_full_name
 
     def __repr__(self):
-        return "\n" + str(self.reform_name) + "," + str(self.reform_full_name) + "," + str(self.reference) + "," +  str(self.reform_actions)
+        return "\n" + str(self.__reform_name__) + "," + str(self.__reform_full_name__) + "," + str(self.__reference__) + "," +  str(self.__reform_actions__)
 
     def set_reform_name(self, reform_name):
-        self.reform_name = reform_name
+        self.__reform_name__ = reform_name
 
     def set_reform_full_name(self, reform_full_name):
-        self.reform_full_name = reform_full_name
+        self.__reform_full_name__ = reform_full_name
 
     def set_reference(self, reference):
-        self.reference = reference
+        self.__reference__ = reference
 
     def set_reform_actions(self, reform_actions):
-        self.reform_actions = reform_actions
+        self.__reform_actions__ = reform_actions
 
     def append_reform_action(self, reform_action):
-        self.reform_actions.append(reform_action)
+        self.__reform_actions__.append(reform_action)
 
     def generate_RST_reform(self):
         with open(PATH_RST_DOCUMENT,'a') as rst:
             #reform name
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
-            rst.write("\nReform: " + self.reform_name + "\n")
+            rst.write("\nReform: " + self.__reform_name__ + "\n")
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n\n")
@@ -68,7 +68,7 @@ class Reform_for_writing():
             rst.write("\nFull name Reform\n")
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
-            rst.write("\n\n" + self.reform_full_name.strip() + "\n\n")
+            rst.write("\n\n" + self.__reform_full_name__.strip() + "\n\n")
             # Properties
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
@@ -79,8 +79,8 @@ class Reform_for_writing():
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             # reference
-            if self.reference:
-                rst.write("\n" + self.reference + "\n")
+            if self.__reference__:
+                rst.write("\n" + self.__reference__ + "\n")
             else:
                 rst.write("\nReference non specificata\n")
             rst.write("\nReform Actions \n")
@@ -88,9 +88,10 @@ class Reform_for_writing():
                 rst.write('*')
             # type of actions in reform
             count_actions = 0
-            for action in self.reform_actions:
-                rst.write("\n- Azione " + str(count_actions) +" : " + action)
+            for action in self.__reform_actions__:
+                rst.write("\n- Azione " + str(count_actions) +" : " + action + "\n")
                 count_actions = count_actions + 1
+            rst.write("\n\n")
         return PATH_RST_DOCUMENT
 
 
@@ -109,16 +110,17 @@ class Reform_File_Interpeter():
 
     def start_interpetration(self):
         self.__reforms__ = []
-        reform__apply_fun_found = False
+        reform_apply_fun_found = False
         current_reform_index = -1
         current_reform = None
         with open(self.__reforms_file_path__,'r') as content_variable:
             for line in content_variable.readlines():
                 line =  line.strip()
                 if not line.startswith('#'):
-                    if reform__apply_fun_found:
+                    #print "Linea attuale", line
+                    if reform_apply_fun_found:
                         if 'class' in line and '(Reform):' in line:
-                            reform__apply_fun_found = False
+                            reform_apply_fun_found = False
                         else:
                             if 'modify_parameters' in line:
                                 current_reform.append_reform_action("Modifica o aggiunge dei parametri tramite la funzione")
@@ -128,12 +130,14 @@ class Reform_File_Interpeter():
                                 current_reform.append_reform_action("Aggiunge una nuova variabile")
                     pieces = line.split('=')
                     if 'class' in pieces[0] and '(Reform):' in pieces[0]:
-                        reform__apply_fun_found = False
+                        reform_apply_fun_found = False
                         current_reform_index = current_reform_index + 1
                         reform_name = pieces[0]
                         for chs in ['class','(Reform):']:
                             reform_name = reform_name.replace(chs,'')
                         current_reform = Reform_for_writing(reform_name = reform_name)
+                        current_reform.set_reform_actions(reform_actions=[])
+                        #print "Dopo creazione", current_reform
                         self.__reforms__.append(current_reform)
                     if 'name' in pieces[0]:
                         full_name = pieces[1]
@@ -141,7 +145,7 @@ class Reform_File_Interpeter():
                             full_name = full_name.replace(chs,'')
                         current_reform.set_reform_full_name(full_name)
                     if 'def apply(self):' in pieces[0]:
-                        reform__apply_fun_found = True
+                        reform_apply_fun_found = True
         print self.__reforms__
 
     def generate_RST_reforms(self):
