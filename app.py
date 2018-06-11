@@ -13,6 +13,7 @@ from kivy.graphics import Rectangle, Color
 from kivy.uix.progressbar import ProgressBar
 import os,sys
 from script.get_parameters_reforms_tests_variables_folder_paths import *
+from script.variables_file_interpeter import *
 from script.parameters_interpeter import *
 from kivy.config import Config
 
@@ -68,10 +69,6 @@ class VisualizeSystemScreen(Screen):
     def ricevi_inizializza_path(self,path):
         self.dict_path = get_all_paths(path)
         os.chdir(os.getcwd())
-        print "ora", os.getcwd()
-        #self.ids.visualize_file_chooser_parameters.path = self.dict_path['parameters']
-        #self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
-        #self.ids.visualize_file_chooser_reforms.path = self.dict_path['reforms']
 
     def show_variables(self):
         self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
@@ -100,19 +97,26 @@ class VisualizeSystemScreen(Screen):
             self.ids.document_parameters_viewer.source = ""
             self.ids.document_reforms_viewer.source = ""
             path_file_scelto = args[1][0]
+            # the file could be a parameter or a variable
             parameter_interpeter = ParameterInterpeter(path_file_scelto)
-            dict = parameter_interpeter.understand_type()
-            print parameter_interpeter.return_type()
-            print parameter_interpeter.return_type() == ParameterType.scale
-            print dict
-            if (parameter_interpeter.return_type() == ParameterType.normal) and dict:
-                self.ids.document_variables_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
-                self.ids.document_parameters_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
-                self.ids.document_reforms_viewer.source = parameter_interpeter.generate_RST_normal_parameter_view(dict)
+            dict_param = parameter_interpeter.understand_type()
+            variable_interpeter = Variable_File_Interpeter(path_file_scelto)
+            if (parameter_interpeter.return_type() == ParameterType.normal) and dict_param:
+                path_prm = parameter_interpeter.generate_RST_normal_parameter_view(dict_param)
+                self.ids.document_variables_viewer.source = path_prm
+                self.ids.document_parameters_viewer.source = path_prm
+                self.ids.document_reforms_viewer.source = path_prm
             elif (parameter_interpeter.return_type() == ParameterType.scale) and dict:
-                self.ids.document_variables_viewer.source = parameter_interpeter.generate_RST_scale_parameter_view(dict)
-                self.ids.document_parameters_viewer.source = parameter_interpeter.generate_RST_scale_parameter_view(dict)
-                self.ids.document_reforms_viewer.source = parameter_interpeter.generate_RST_scale_parameter_view(dict)
+                path_prm = parameter_interpeter.generate_RST_scale_parameter_view(dict_param)
+                self.ids.document_variables_viewer.source = path_prm
+                self.ids.document_parameters_viewer.source = path_prm
+                self.ids.document_reforms_viewer.source = path_prm
+            elif (variable_interpeter.file_is_a_variable()):
+                variable_interpeter.start_interpetration()
+                path_rst = variable_interpeter.generate_RSTs_variables()
+                self.ids.document_variables_viewer.source = path_rst
+                self.ids.document_parameters_viewer.source = path_rst
+                self.ids.document_reforms_viewer.source = path_rst
             else: # file for which the interpretation is not defined yet
                 self.ids.document_variables_viewer.source = path_file_scelto
                 self.ids.document_parameters_viewer.source = path_file_scelto
