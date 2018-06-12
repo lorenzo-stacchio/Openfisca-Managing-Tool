@@ -44,7 +44,7 @@ class Variable_for_writing():
 
     def get_variable_name(self):
         return self.variable_name
-        
+
     def set_entity(self,entity):
         self.entity = entity
 
@@ -76,7 +76,7 @@ class Variable_for_writing():
     def RST_string(self):
         return self.__RST_string__
 
-    def generate_RST_string_variable(self):
+    def generate_RST_string_variable(self): #used for reforms reading, so i'll put some more if necessary
         self.__RST_string__ = ""
         for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
             self.__RST_string__= self.__RST_string__ + '#'
@@ -84,15 +84,28 @@ class Variable_for_writing():
         for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
             self.__RST_string__= self.__RST_string__ + '#'
         self.__RST_string__= self.__RST_string__ + "\n\n"
+        # Properties check
         for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
             self.__RST_string__= self.__RST_string__ + "#"
         self.__RST_string__= self.__RST_string__ + "\n Properties \n"
         for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
             self.__RST_string__= self.__RST_string__ + "#"
         self.__RST_string__= self.__RST_string__ + "\n"
-        self.__RST_string__= self.__RST_string__ + "\n" + "- Il tipo di questa variabile è: **" + self.value_type + "**\n"
-        self.__RST_string__= self.__RST_string__ +"\n" + "- L'entità a cui questa variabile appartiene è: **" + self.entity + "**\n"
-        self.__RST_string__= self.__RST_string__ + "\n" + "- Il periodo di definizione di questa varabile è: **" + self.definition_period + "**\n"
+
+        if self.value_type:
+            self.__RST_string__= self.__RST_string__ + "\n" + "- Il tipo di questa variabile è: **" + self.value_type + "**\n"
+        else: self.__RST_string__= self.__RST_string__ + "\n" + "- Tipo non ridefinito\n"
+
+        if self.entity:
+            self.__RST_string__= self.__RST_string__ +"\n" + "- L'entità a cui questa variabile appartiene è: **" + self.entity + "**\n"
+        else:
+            self.__RST_string__= self.__RST_string__ +"\n" + "- Entità non ridefinita\n"
+
+        if self.definition_period:
+            self.__RST_string__= self.__RST_string__ + "\n" + "- Il periodo di definizione di questa varabile è: **" + self.definition_period + "**\n"
+        else:
+            self.__RST_string__= self.__RST_string__ + "\n" + "- Periodo di definizione non ridefinito\n"
+
         if self.set_input:
             self.__RST_string__= self.__RST_string__ + "\n" + "- Il set_input di questa variabile vale: **" + self.set_input + "**\n"
         else:
@@ -102,10 +115,12 @@ class Variable_for_writing():
             self.__RST_string__= self.__RST_string__ + "\n" + "- La descrizione della varabile è: \n\n.. code-block:: rst\n\n " + self.label + "\n"
         else:
             self.__RST_string__= self.__RST_string__ + "\n" + "- Nessuna descrizione inserita\n"
+
         if self.reference:
             self.__RST_string__= self.__RST_string__ + "\n" + "- `Riferimento legislativo alla variabile <" + self.reference.strip() + ">`__" + "\n"
         else:
             self.__RST_string__= self.__RST_string__ + "\n" + "- Nessun riferimento legislativo indicato\n"
+
         if self.formula:
             self.__RST_string__= self.__RST_string__ + "\n" + "- La formula in codice è la seguente: \n\n.. code-block:: rst\n\n " + self.formula + "\n"
         else:
@@ -130,9 +145,20 @@ class Variable_for_writing():
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n")
-            rst.write("\n" + "- Il tipo di questa variabile è: **" + self.value_type + "**\n")
-            rst.write("\n" + "- L'entità a cui questa variabile appartiene è: **" + self.entity + "**\n")
-            rst.write("\n" + "- Il periodo di definizione di questa varabile è: **" + self.definition_period + "**\n")
+            if self.value_type:
+                rst.write("\n" + "- Il tipo di questa variabile è: **" + self.value_type + "**\n")
+            else:
+                rst.write("\n" + "- Tipo non definito\n")
+
+            if self.entity:
+                rst.write("\n" + "- L'entità a cui questa variabile appartiene è: **" + self.entity + "**\n")
+            else:
+                rst.write("\n" + "- Entità non definita\n")
+
+            if self.definition_period:
+                rst.write("\n" + "- Il periodo di definizione di questa varabile è: **" + self.definition_period + "**\n")
+            else:
+                rst.write("\n" + "- Periodo di definizione non definito\n")
 
             if self.set_input:
                 rst.write("\n" + "- Il set_input di questa variabile vale: **" + self.set_input + "**\n")
@@ -221,7 +247,7 @@ class Variable_File_Interpeter():
                     if 'formula' in pieces[0]:
                         formula_found = True
                         current_Variable.set_formula(' ' + pieces[0].strip())
-
+            print self.__variables__
 
 
     def generate_RSTs_variables(self):

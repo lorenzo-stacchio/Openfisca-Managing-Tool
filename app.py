@@ -15,6 +15,7 @@ import os,sys
 from script.get_parameters_reforms_tests_variables_folder_paths import *
 from script.interpeters.variables_file_interpeter import *
 from script.interpeters.parameters_interpeter import *
+from script.interpeters.reforms_file_interpeter import *
 from kivy.config import Config
 
 
@@ -92,7 +93,7 @@ class VisualizeSystemScreen(Screen):
 
     def selected_file(self,*args):
         try:
-            # clear document viewer
+                # clear document viewer
             self.ids.document_variables_viewer.source = ""
             self.ids.document_parameters_viewer.source = ""
             self.ids.document_reforms_viewer.source = ""
@@ -101,6 +102,7 @@ class VisualizeSystemScreen(Screen):
             parameter_interpeter = ParameterInterpeter(path_file_scelto)
             dict_param = parameter_interpeter.understand_type()
             variable_interpeter = Variable_File_Interpeter(path_file_scelto)
+            reform_interpeter = Reform_File_Interpeter(path_file_scelto)
             if (parameter_interpeter.return_type() == ParameterType.normal) and dict_param:
                 path_prm = parameter_interpeter.generate_RST_normal_parameter_view(dict_param)
                 self.ids.document_variables_viewer.source = path_prm
@@ -111,9 +113,15 @@ class VisualizeSystemScreen(Screen):
                 self.ids.document_variables_viewer.source = path_prm
                 self.ids.document_parameters_viewer.source = path_prm
                 self.ids.document_reforms_viewer.source = path_prm
-            elif (variable_interpeter.file_is_a_variable()):
+            elif (variable_interpeter.file_is_a_variable() and not(reform_interpeter.file_is_a_reform())):
                 variable_interpeter.start_interpetration()
                 path_rst = variable_interpeter.generate_RSTs_variables()
+                self.ids.document_variables_viewer.source = path_rst
+                self.ids.document_parameters_viewer.source = path_rst
+                self.ids.document_reforms_viewer.source = path_rst
+            elif (reform_interpeter.file_is_a_reform()):
+                reform_interpeter.start_interpetration_reforms()
+                path_rst = reform_interpeter.generate_RST_reforms()
                 self.ids.document_variables_viewer.source = path_rst
                 self.ids.document_parameters_viewer.source = path_rst
                 self.ids.document_reforms_viewer.source = path_rst

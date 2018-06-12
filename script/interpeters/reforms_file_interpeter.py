@@ -11,7 +11,8 @@ from variables_file_interpeter import *
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
-PATH_RST_DOCUMENT = os.path.abspath(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), os.pardir)) + "\\messages\\rst_da_visualizzare.rst"
+#PATH_RST_DOCUMENT = os.path.abspath(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), os.pardir)) + "\\messages\\rst_da_visualizzare.rst"
+PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
 
 class TypeReformAction(Enum):
     add_variable = "Aggiunta variabile"
@@ -73,7 +74,10 @@ class Reform_for_writing():
             rst.write("\nFull name or description\n")
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
-            rst.write("\n\n" + self.__reform_full_name__.strip() + "\n\n")
+            if self.__reform_full_name__:
+                rst.write("\n\n" + self.__reform_full_name__.strip() + "\n\n")
+            else:
+                rst.write("\n\nUndefined full name\n\n")
             # Properties
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
@@ -199,7 +203,8 @@ class Reform_File_Interpeter():
         return self.__file_is_a_reform__
 
 #object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\reforms\\IRPEF\\Quadro_Determinazione_Imposta\\Quadro_RN\\RN5\\aliquota_irpef_minore_redditi_minori_15000.py')
-object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\rodino.txt')
+#object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\rodino.txt')
+object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\reforms\\IRPEF\\Quadro_Determinazione_Imposta\\Quadro_RN\\RN6\\riforma_detrazioni_per_figli_a_carico.py')
 object.file_is_a_reform()
 object.start_interpetration_reforms()
 object.generate_RST_reforms()
