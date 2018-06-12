@@ -93,38 +93,38 @@ class Variable_for_writing():
         self.__RST_string__= self.__RST_string__ + "\n"
 
         if self.value_type:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- Il tipo di questa variabile è: **" + self.value_type + "**\n"
-        else: self.__RST_string__= self.__RST_string__ + "\n" + "- Tipo non ridefinito\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "Il ``tipo`` di questa variabile è: **" + self.value_type + "**\n"
+        else: self.__RST_string__= self.__RST_string__ + "\n" + "``Tipo`` non ridefinito\n"
 
         if self.entity:
-            self.__RST_string__= self.__RST_string__ +"\n" + "- L'entità a cui questa variabile appartiene è: **" + self.entity + "**\n"
+            self.__RST_string__= self.__RST_string__ +"\n" + "L'``entità`` a cui questa variabile appartiene è: **" + self.entity + "**\n"
         else:
-            self.__RST_string__= self.__RST_string__ +"\n" + "- Entità non ridefinita\n"
+            self.__RST_string__= self.__RST_string__ +"\n" + "``Entità`` non ridefinita\n"
 
         if self.definition_period:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- Il periodo di definizione di questa varabile è: **" + self.definition_period + "**\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "Il ``periodo`` di definizione di questa varabile è: **" + self.definition_period + "**\n"
         else:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- Periodo di definizione non ridefinito\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "``Periodo`` di definizione non ridefinito\n"
 
         if self.set_input:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- Il set_input di questa variabile vale: **" + self.set_input + "**\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "Il ``set_input`` di questa variabile vale: **" + self.set_input + "**\n"
         else:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- Nessun set_input inserito\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "Nessun ``set_input`` inserito\n"
 
         if self.label:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- La descrizione della varabile è: \n\n.. code-block:: rst\n\n " + self.label + "\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "La ``descrizione`` della varabile è: \n\n.. code-block:: rst\n\n " + self.label + "\n"
         else:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- Nessuna descrizione inserita\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "Nessuna ``descrizione`` inserita\n"
 
         if self.reference:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- `Riferimento legislativo alla variabile <" + self.reference.strip() + ">`__" + "\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "`Riferimento legislativo alla variabile <" + self.reference.strip() + ">`__" + "\n"
         else:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- Nessun riferimento legislativo indicato\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "Nessun ``riferimento legislativo`` indicato\n"
 
         if self.formula:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- La formula in codice è la seguente: \n\n.. code-block:: rst\n\n " + self.formula + "\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "La ``formula`` in codice è la seguente: \n\n.. code:: python\n\n " + self.formula + "\n"
         else:
-            self.__RST_string__= self.__RST_string__ + "\n" + "- La variabile non possiede una formula\n\n"
+            self.__RST_string__= self.__RST_string__ + "\n" + "La variabile non possiede una ``formula``\n\n"
         return self.__RST_string__
 
 
@@ -134,51 +134,49 @@ class Variable_for_writing():
             #variable name
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
-            rst.write("\n Variable: " + self.variable_name + "\n")
+            rst.write("\nVariable: " + self.variable_name + "\n")
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n\n")
             # properties
+            rst.write("\nProperties \n")
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                rst.write('#')
-            rst.write("\n Properties \n")
-            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                rst.write('#')
+                rst.write('=')
             rst.write("\n")
             if self.value_type:
-                rst.write("\n" + "- Il tipo di questa variabile è: **" + self.value_type + "**\n")
+                rst.write("\n" + "Il ``tipo`` di questa variabile è: ``" + self.value_type + "``\n")
             else:
-                rst.write("\n" + "- Tipo non definito\n")
+                rst.write("\n" + "``Tipo`` non definito\n")
 
             if self.entity:
-                rst.write("\n" + "- L'entità a cui questa variabile appartiene è: **" + self.entity + "**\n")
+                rst.write("\n" + "L'``entità`` a cui questa variabile appartiene è: ``" + self.entity + "``\n")
             else:
-                rst.write("\n" + "- Entità non definita\n")
+                rst.write("\n" + "``Entità`` non definita\n")
 
             if self.definition_period:
-                rst.write("\n" + "- Il periodo di definizione di questa varabile è: **" + self.definition_period + "**\n")
+                rst.write("\n" + "Il ``periodo`` di definizione di questa varabile è: ``" + self.definition_period + "``\n")
             else:
-                rst.write("\n" + "- Periodo di definizione non definito\n")
+                rst.write("\n" + "``Periodo`` di definizione non definito\n")
 
             if self.set_input:
-                rst.write("\n" + "- Il set_input di questa variabile vale: **" + self.set_input + "**\n")
+                rst.write("\n" + "Il ``set_input`` di questa variabile vale: ``" + self.set_input + "``\n")
             else:
-                rst.write("\n" + "- Nessun set_input inserito\n")
+                rst.write("\n" + "Nessun ``set_input`` inserito\n")
 
             if self.label:
-                rst.write("\n" + "- La descrizione della varabile è: \n\n.. code-block:: rst\n\n " + self.label + "\n")
+                rst.write("\n" + "La ``descrizione`` della varabile è: \n\n.. code-block:: rst\n\n " + self.label + "\n")
             else:
-                rst.write("\n" + "- Nessuna descrizione inserita\n")
+                rst.write("\n" + "Nessuna ``descrizione`` inserita\n")
 
             if self.reference:
-                rst.write("\n" + "- `Riferimento legislativo alla variabile <" + self.reference.strip() + ">`__" + "\n")
+                rst.write("\n" + "`Riferimento legislativo alla variabile <" + self.reference.strip() + ">`__" + "\n")
             else:
-                rst.write("\n" + "- Nessun riferimento legislativo indicato\n")
+                rst.write("\n" + "Nessun ``riferimento legislativo`` indicato\n")
 
             if self.formula:
-                rst.write("\n" + "- La formula in codice è la seguente: \n\n.. code-block:: rst\n\n " + self.formula + "\n")
+                rst.write("\n" + "La ``formula`` in codice è la seguente: \n\n.. code:: python \n\n\n " + self.formula + "\n")
             else:
-                rst.write("\n" + "- La variabile non possiede una formula\n\n")
+                rst.write("\n" + "La variabile non possiede una ``formula``\n\n")
         return PATH_RST_DOCUMENT
 
 
@@ -209,7 +207,9 @@ class Variable_File_Interpeter():
         with open(self.__variable_path__,'r') as content_variable:
             for line in content_variable.readlines():
                 line =  line.strip()
-                if not line.startswith('#'):
+                if '#' in line:
+                    line = line[:line.find('#')]
+                if line:
                     # if found a formula, we don't have to split the line
                     if formula_found:
                         if ('class' in line and '(Variable):' in line) or ('class' in line and '(Reform):' in line):
@@ -247,7 +247,7 @@ class Variable_File_Interpeter():
                     if 'formula' in pieces[0]:
                         formula_found = True
                         current_Variable.set_formula(' ' + pieces[0].strip())
-            print self.__variables__
+            #print self.__variables__
 
 
     def generate_RSTs_variables(self):

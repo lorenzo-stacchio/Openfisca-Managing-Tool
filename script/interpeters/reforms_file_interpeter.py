@@ -119,11 +119,11 @@ class Reform_File_Interpeter():
                     self.__file_is_a_reform__ = True
 
 
-    def __find_variables__(self):
+    def __find_and_bind_variables__(self):
         var_interpeter = Variable_File_Interpeter(self.__reforms_file_path__)
         var_interpeter.start_interpetration()
         variables = var_interpeter.get_variables()
-        print "Quante variabili?", len(variables)
+        #print "Quante variabili?", len(variables)
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():
                 for key,value in action.iteritems():
@@ -131,11 +131,40 @@ class Reform_File_Interpeter():
                     for var in variables:
                         if key==var.get_variable_name():
                             action[key] = action[key] + var.generate_RST_string_variable()
-                            #print value
-            #print "\nStampo le variabili", v.generate_RST_string_variable()
-        #print "\nSTAMPO LE RIFORME",self.__reforms__
-    #def __merge_reforms_varibles__(self): # calling after execute start_interpretation
 
+
+    def __find_and_bind_modifier_func__(self):
+        modifier_function_found = False
+        modifier_function_dict = {}
+        with open(self.__reforms_file_path__,'r') as content_variable:
+            for line in content_variable.readlines():
+                line =  line.strip()
+                if '#' in line:
+                    line = line[:line.find('#')]
+                if line:
+                    if ('(Reform):' in line) or ('(Variable):' in line) or ('class'in line) or ('def'in line):
+                        modifier_function_found = False
+                    if modifier_function_found == True:
+                        modifier_function_dict[name] = modifier_function_dict[name] + "\n  " + line
+                    if ('def' in line) and ('parameters' in line) and ('(' in line) and (')' in line) and (':' in line) and not('formula' in line): # is almost a modifier function
+                        modifier_function_found = True
+                        name = (line[:line.find('(')].replace("def","")).strip()
+                        #print "Name of modifier function:", name
+                        modifier_function_dict[name] = "\n .. code:: python \n\n  " + line
+            #print "Dict", modifier_function_dict
+
+        for reform in self.__reforms__:
+            for action in reform.get_reform_actions():
+                for key,value in action.iteritems():
+                    print "key", key
+                    print "value", value
+                    # get the actions
+                    for name,value_name in modifier_function_dict.iteritems():
+                        print "name", name
+                        if key==name:
+                            action[key] = action[key] + value_name
+        for reform in self.__reforms__:
+            print "Riforme", reform.get_reform_actions()
 
     def start_interpetration_reforms(self):
         self.__reforms__ = []
@@ -147,7 +176,9 @@ class Reform_File_Interpeter():
         with open(self.__reforms_file_path__,'r') as content_variable:
             for line in content_variable.readlines():
                 line =  line.strip()
-                if not line.startswith('#'):
+                if '#' in line:
+                    line = line[:line.find('#')]
+                if line:
                     #print "Linea attuale", line
                     if reform_apply_fun_found:
                         if 'class' in line and '(Reform):' in line:
@@ -157,17 +188,17 @@ class Reform_File_Interpeter():
                             if 'modify_parameters' in line:
                                 # example of code line self.modify_parameters(modifier_function = modifica_scaglioni_IRPEF), i suppose that all lines will be like this
                                 line = line.split('=')[1]
-                                line = line [:line.find(')')].strip()
+                                line = (line[:line.find(')')].strip()).replace("self.","")
                                 dict_action[line] = "Modifica o aggiunge dei parametri tramite la seguente funzione: \n\n"
                                 current_reform.append_reform_action(dict_action)
                             elif 'update_variable' in line:
                                 # example of code line self.update_variable(income_tax)
-                                line = line [(line.find('(') + 1):line.find(')')].strip() # start is inclusive, instead end is exclusive
+                                line = (line [(line.find('(') + 1):line.find(')')].strip()).replace("self.","") # start is inclusive, instead end is exclusive
                                 dict_action[line] = "Aggiorna la variabile esistente " + line + " rendendola:\n\n"
                                 current_reform.append_reform_action(dict_action)
                             elif 'add_variable' in line:
                                 # example of code line self.add_variable(income_tax)
-                                line = line [(line.find('(') + 1):line.find(')')].strip()
+                                line = (line[(line.find('(') + 1):line.find(')')].strip()).replace("self.","")
                                 dict_action[line] = "Aggiunge al sistema la seguente variabile: \n\n"
                                 current_reform.append_reform_action(dict_action)
                     pieces = line.split('=')
@@ -191,7 +222,9 @@ class Reform_File_Interpeter():
                         reform_found = False # set to false because the function is the last part
                         reform_apply_fun_found = True
         #print "\nSTAMPO LE RIFORME",self.__reforms__
-        self.__find_variables__()
+        print self.__reforms__
+        self.__find_and_bind_variables__()
+        self.__find_and_bind_modifier_func__()
 
 
     def generate_RST_reforms(self):
