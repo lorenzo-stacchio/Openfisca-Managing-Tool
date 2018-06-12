@@ -101,7 +101,7 @@ class VisualizeSystemScreen(Screen):
 
     def selected_file(self,*args):
         try:
-                # clear document viewer
+            # clear document viewer
             self.ids.document_variables_viewer.source = ""
             self.ids.document_parameters_viewer.source = ""
             self.ids.document_reforms_viewer.source = ""
@@ -178,6 +178,10 @@ class MakeSimulation(Screen):
             #Go to home
             self.manager.current = 'home'
 
+    def go_to_output_variables(self):
+        if self.manager.current == 'make_simulation':
+            #Go to output_variable
+            self.manager.current = 'output_variable'
 
     def add_value_and_reset_form(self):
         if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
@@ -187,6 +191,9 @@ class MakeSimulation(Screen):
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.input_value_variable.text = ''
 
+
+class OutputVariableScreen(Screen):
+    pass
 
 class MyScreenManager(ScreenManager):
     pass

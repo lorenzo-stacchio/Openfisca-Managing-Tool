@@ -8,6 +8,7 @@
     HomeScreen:
     VisualizeSystemScreen:
     MakeSimulation:
+    OutputVariableScreen:
 
 <InitScreen>:
     name: "init"
@@ -117,79 +118,68 @@
 
 <HomeScreen>:
     name: "home"
-    GridLayout:
-        id: gridlayout_home
+    BoxLayout:
+        id: boxlayout_home
         orientation: 'vertical'
-        cols: 2
-        rows: 3
-        Button:
-            id: btn_1_0
-            valign: 'middle'
-            halign: 'center'
-            markup: True
-            background_color: hex('971640')
-            font_size: 25
-            text: "Visualize the tax\nand benefit system"
-            on_press: root.go_to_visualize()
-            canvas.before:
-                #Color:
-                    #rgba: hex('')
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
+        rows: 2
+
         Label:
             id: label_0_0
-            valign: 'middle'
-            halign: 'center'
-            size: self.parent.size
-            canvas.before:
-                Rectangle:
-                    pos: self.center_x - 50, self.center_y - 50 # default size is 100x100
-                    source: 'img\law.png'
-        Button:
-            id: btn_0_1
-            valign: 'middle'
-            halign: 'center'
-            background_color: hex('971640')
-            font_size: 25
-            markup: True
-            text: "Do some reforms"
-            canvas.before:
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-        Label:
-            id: label_1_1
-            valign: 'middle'
-            halign: 'center'
-            size: self.parent.size
-            canvas.before:
-                Rectangle:
-                    pos: self.center_x - 50, self.center_y - 50 # default size is 100x100
-                    source: 'img\law.png'
+            text: "blablabla"
+            #canvas.before:
+            #    Rectangle:
+            #        pos: self.center_x, self.center_y # default size is 100x100
+            #        source: 'img\law.png'
+        BoxLayout:
+            id: boxlayout_withbuttons
+            orientation: 'horizontal'
 
-        Button:
-            id: btn_1_2
-            valign: 'middle'
-            halign: 'center'
-            background_color: hex('971640')
-            font_size: 25
-            markup: True
-            text: "Make a [b]simulation[/b]!"
-            on_press: root.go_to_simulation()
-            canvas.before:
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-        Label:
-            id: label_0_2
-            valign: 'middle'
-            halign: 'center'
-            size: self.parent.size
-            canvas.before:
-                Rectangle:
-                    pos: self.center_x - 50, self.center_y - 50 # default size is 100x100
-                    source: 'img\law.png'
+            Button:
+                id: btn_1_0
+                valign: 'middle'
+                halign: 'center'
+                markup: True
+                background_color: hex('971640')
+                font_size: 20
+                size_hint: .4, .2
+                text: "Visualize the tax\nand benefit system"
+                on_press: root.go_to_visualize()
+                canvas.before:
+                    #Color:
+                        #rgba: hex('')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            Button:
+                id: btn_0_1
+                valign: 'middle'
+                halign: 'center'
+                background_color: hex('971640')
+                font_size: 20
+                size_hint: .4, .2
+                markup: True
+                text: "Do some reforms"
+                canvas.before:
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            Button:
+                id: btn_1_2
+                valign: 'middle'
+                halign: 'center'
+                background_color: hex('971640')
+                font_size: 20
+                size_hint: .4, .2
+                markup: True
+                text: "Make a [b]simulation[/b]!"
+                on_press: root.go_to_simulation()
+                canvas.before:
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+
 
 <VisualizeSystemScreen>:
     name: "visualize_system"
@@ -384,6 +374,7 @@
             Button:
                 text: 'Go to Output variable Screen'
                 size_hint: (1.0,0.07)
+                on_press: root.go_to_output_variables()
         BoxLayout:
             orientation: 'vertical'
             Label:
@@ -405,3 +396,12 @@
                 size_hint: (1.0,0.05)
                 on_press: root.go_to_home()
                 text: 'Come back to home'
+
+
+
+<OutputVariableScreen>:
+    name: "output_variable"
+
+
+    Label:
+        text: "Lorem Ipsum"
