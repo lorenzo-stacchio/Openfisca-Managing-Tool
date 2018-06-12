@@ -202,7 +202,7 @@
         #pos_hint: {'center_x': .5, 'center_y': .5}
         canvas.before:
             Color:
-                rgba: .2,.3,.4,1
+                rgb: hex("8F021F")
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -210,10 +210,16 @@
             id: tabbed_variables
             text: 'Variables'
             on_release: root.show_variables()
-
+            background_color: (1, 0, 0, .5)
             BoxLayout:
                 id: box_variables
                 orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgb: hex("5F021F")
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
                 BoxLayout:
                     id: box_variables_inner
                     orientation: 'horizontal'
@@ -249,9 +255,16 @@
             id: tabbed_parameters
             text: 'Parameters'
             on_release: root.show_parameters()
+            background_color: (1, 0, 0, .5)
             BoxLayout:
                 id: box_parameters
                 orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgb: hex("5F021F")
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
                 BoxLayout:
                     id: box_parameters_inner
                     orientation: 'horizontal'
@@ -287,9 +300,16 @@
             id: tabbed_reforms
             text: 'Reforms'
             on_release: root.show_reforms()
+            background_color: (1, 0, 0, .5)
             BoxLayout:
                 id: box_reforms
                 orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgb: hex("5F021F")
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
                 BoxLayout:
                     id: box_reforms_inner
                     orientation: 'horizontal'
