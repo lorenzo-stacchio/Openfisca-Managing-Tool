@@ -6,6 +6,8 @@ import datetime
 import collections
 import re
 import time
+from variables_file_interpeter import *
+
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
@@ -19,13 +21,13 @@ class TypeReformAction(Enum):
 
 
 class Reform_for_writing():
+    #each reform coul contain variables and modifier functions
     __reform_name__ = None
     __reform_full_name__ = None
     __reference__ = None
-    __reform_actions__ = [] # lista di n dict, ogni dict ha tipo azione e contenuto
-    # dovrebbe essere un dict di azione e su cosa fa l'azione che però è al chiave della spiegazione
-    modifier_function_dict = {}
-    reformed_variables_dict = {}
+    __reform_actions__ = []
+    __variables_used__ = {}  # dict key = name, value = RST string
+    #__modifier_functions__ = []
 
     def __init__(self, reform_name = None, reform_full_name = None, reference = None, reform_actions = []):
         if os.path.exists(PATH_RST_DOCUMENT):
@@ -43,6 +45,9 @@ class Reform_for_writing():
 
     def set_reform_full_name(self, reform_full_name):
         self.__reform_full_name__ = reform_full_name
+
+    def get_reform_actions(self):
+        return self.__reform_actions__
 
     def set_reference(self, reference):
         self.__reference__ = reference
@@ -65,7 +70,7 @@ class Reform_for_writing():
             # Full name
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
-            rst.write("\nFull name Reform\n")
+            rst.write("\nFull name or description\n")
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('#')
             rst.write("\n\n" + self.__reform_full_name__.strip() + "\n\n")
@@ -88,9 +93,10 @@ class Reform_for_writing():
                 rst.write('*')
             # type of actions in reform
             count_actions = 0
-            for action in self.__reform_actions__:
-                rst.write("\n- Azione " + str(count_actions) +" : " + action + "\n")
-                count_actions = count_actions + 1
+            for action in self.__reform_actions__: # action is ever a dict of one
+                for k,v in action.iteritems():
+                    rst.write("\n- Azione " + str(count_actions) +" : " + v + "\n")
+                    count_actions = count_actions + 1
             rst.write("\n\n")
         return PATH_RST_DOCUMENT
 
@@ -108,11 +114,32 @@ class Reform_File_Interpeter():
                 if 'class' in line and '(Reform):' in line:
                     self.__file_is_a_reform__ = True
 
-    def start_interpetration(self):
+
+    def __find_variables__(self):
+        var_interpeter = Variable_File_Interpeter(self.__reforms_file_path__)
+        var_interpeter.start_interpetration()
+        variables = var_interpeter.get_variables()
+        print "Quante variabili?", len(variables)
+        for reform in self.__reforms__:
+            for action in reform.get_reform_actions():
+                for key,value in action.iteritems():
+                    # get the actions
+                    for var in variables:
+                        if key==var.get_variable_name():
+                            action[key] = action[key] + var.generate_RST_string_variable()
+                            #print value
+            #print "\nStampo le variabili", v.generate_RST_string_variable()
+        #print "\nSTAMPO LE RIFORME",self.__reforms__
+    #def __merge_reforms_varibles__(self): # calling after execute start_interpretation
+
+
+    def start_interpetration_reforms(self):
         self.__reforms__ = []
         reform_apply_fun_found = False
         current_reform_index = -1
         current_reform = None
+        reform_found = False
+        # Find Reform
         with open(self.__reforms_file_path__,'r') as content_variable:
             for line in content_variable.readlines():
                 line =  line.strip()
@@ -122,14 +149,26 @@ class Reform_File_Interpeter():
                         if 'class' in line and '(Reform):' in line:
                             reform_apply_fun_found = False
                         else:
+                            dict_action = {}
                             if 'modify_parameters' in line:
-                                current_reform.append_reform_action("Modifica o aggiunge dei parametri tramite la funzione")
+                                # example of code line self.modify_parameters(modifier_function = modifica_scaglioni_IRPEF), i suppose that all lines will be like this
+                                line = line.split('=')[1]
+                                line = line [:line.find(')')].strip()
+                                dict_action[line] = "Modifica o aggiunge dei parametri tramite la seguente funzione: \n\n"
+                                current_reform.append_reform_action(dict_action)
                             elif 'update_variable' in line:
-                                current_reform.append_reform_action("Aggiorna una variabile esistente")
+                                # example of code line self.update_variable(income_tax)
+                                line = line [(line.find('(') + 1):line.find(')')].strip() # start is inclusive, instead end is exclusive
+                                dict_action[line] = "Aggiorna la variabile esistente " + line + " rendendola:\n\n"
+                                current_reform.append_reform_action(dict_action)
                             elif 'add_variable' in line:
-                                current_reform.append_reform_action("Aggiunge una nuova variabile")
+                                # example of code line self.add_variable(income_tax)
+                                line = line [(line.find('(') + 1):line.find(')')].strip()
+                                dict_action[line] = "Aggiunge al sistema la seguente variabile: \n\n"
+                                current_reform.append_reform_action(dict_action)
                     pieces = line.split('=')
                     if 'class' in pieces[0] and '(Reform):' in pieces[0]:
+                        reform_found = True
                         reform_apply_fun_found = False
                         current_reform_index = current_reform_index + 1
                         reform_name = pieces[0]
@@ -139,14 +178,17 @@ class Reform_File_Interpeter():
                         current_reform.set_reform_actions(reform_actions=[])
                         #print "Dopo creazione", current_reform
                         self.__reforms__.append(current_reform)
-                    if 'name' in pieces[0]:
+                    elif 'name ' in pieces[0] and reform_found == True:
                         full_name = pieces[1]
                         for chs in ['u"','\"']:
                             full_name = full_name.replace(chs,'')
                         current_reform.set_reform_full_name(full_name)
-                    if 'def apply(self):' in pieces[0]:
+                    elif 'def apply(self):' in pieces[0]:
+                        reform_found = False # set to false because the function is the last part
                         reform_apply_fun_found = True
-        print self.__reforms__
+        #print "\nSTAMPO LE RIFORME",self.__reforms__
+        self.__find_variables__()
+
 
     def generate_RST_reforms(self):
         for reform in self.__reforms__:
@@ -156,9 +198,9 @@ class Reform_File_Interpeter():
     def file_is_a_reform(self):
         return self.__file_is_a_reform__
 
-object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\reforms\\IRPEF\\Quadro_Determinazione_Imposta\\Quadro_RN\\RN5\\aliquota_irpef_minore_redditi_minori_15000.py')
-#object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\aldo.txt')
+#object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\reforms\\IRPEF\\Quadro_Determinazione_Imposta\\Quadro_RN\\RN5\\aliquota_irpef_minore_redditi_minori_15000.py')
+object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\rodino.txt')
 object.file_is_a_reform()
-object.start_interpetration()
+object.start_interpetration_reforms()
 object.generate_RST_reforms()
 #object.start_interpetration()
