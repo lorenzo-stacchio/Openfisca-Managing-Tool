@@ -72,6 +72,12 @@ class VisualizeSystemScreen(Screen):
     def ricevi_inizializza_path(self,path):
         self.dict_path = get_all_paths(path)
         os.chdir(os.getcwd())
+        self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
+        self.ids.document_variables_viewer.colors["link"] = "33AAFFff"
+        self.ids.document_variables_viewer.colors["background"] = "ffffffff"
+        self.ids.document_variables_viewer.colors["bullet"] = "000000ff"
+        self.ids.document_variables_viewer.colors["title"] = "971640ff"
+        self.ids.document_variables_viewer.underline_color = "971640ff"
 
     def show_variables(self):
         self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
@@ -95,14 +101,6 @@ class VisualizeSystemScreen(Screen):
 
     def selected_file(self,*args):
         try:
-
-            self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
-            self.ids.document_variables_viewer.colors["link"] = "33AAFFff"
-            self.ids.document_variables_viewer.colors["background"] = "ffffffff"
-            self.ids.document_variables_viewer.colors["bullet"] = "000000ff"
-            self.ids.document_variables_viewer.colors["title"] = "971640ff"
-            self.ids.document_variables_viewer.underline_color = "971640ff"
-
                 # clear document viewer
             self.ids.document_variables_viewer.source = ""
             self.ids.document_parameters_viewer.source = ""
