@@ -204,8 +204,8 @@ class Reform_File_Interpeter():
 
 #object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\reforms\\IRPEF\\Quadro_Determinazione_Imposta\\Quadro_RN\\RN5\\aliquota_irpef_minore_redditi_minori_15000.py')
 #object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\rodino.txt')
-object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\reforms\\IRPEF\\Quadro_Determinazione_Imposta\\Quadro_RN\\RN6\\riforma_detrazioni_per_figli_a_carico.py')
-object.file_is_a_reform()
-object.start_interpetration_reforms()
-object.generate_RST_reforms()
+#object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\reforms\\IRPEF\\Quadro_Determinazione_Imposta\\Quadro_RN\\RN6\\riforma_detrazioni_per_figli_a_carico.py')
+#object.file_is_a_reform()
+#object.start_interpetration_reforms()
+#object.generate_RST_reforms()
 #object.start_interpetration()
