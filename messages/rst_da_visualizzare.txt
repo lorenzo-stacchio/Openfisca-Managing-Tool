@@ -1,81 +1,5 @@
 ###################################################################################################
- Variable:  income_tax
-###################################################################################################
-
-###################################################################################################
- Properties 
-###################################################################################################
-
-- Il tipo di questa variabile è: **float**
-
-- L'entità a cui questa variabile appartiene è: **Persona**
-
-- Il periodo di definizione di questa varabile è: **MONTH**
-
-- Nessun set_input inserito
-
-- La descrizione della varabile è: 
-
-.. code-block:: rst
-
-  Imposta sul reddito
-
-- `Riferimento legislativo alla variabile`__ 
-
-   .. _linkincome_tax: https://law.gov.example/income_tax
-
-   __ link income_tax_
-
-- La formula in codice è la seguente: 
-
-.. code-block:: rst
-
-  def formula(person, period, parameters):
- 
- 
- 
-###################################################################################################
- Variable:  social_security_contribution
-###################################################################################################
-
-###################################################################################################
- Properties 
-###################################################################################################
-
-- Il tipo di questa variabile è: **float**
-
-- L'entità a cui questa variabile appartiene è: **Persona**
-
-- Il periodo di definizione di questa varabile è: **MONTH**
-
-- Nessun set_input inserito
-
-- La descrizione della varabile è: 
-
-.. code-block:: rst
-
-  Contributo progressivo pagato sui salari per finanziare la previdenza sociale
-
-- `Riferimento legislativo alla variabile`__ 
-
-   .. _linksocial_security_contribution: https://law.gov.example/social_security_contribution
-
-   __ link social_security_contribution_
-
-- La formula in codice è la seguente: 
-
-.. code-block:: rst
-
-  def formula(person, period, parameters):
- 
- 
- 
- 
- 
- 
- 
-###################################################################################################
- Variable:  housing_tax
+ Variable:  accomodation_size
 ###################################################################################################
 
 ###################################################################################################
@@ -86,7 +10,7 @@
 
 - L'entità a cui questa variabile appartiene è: **Famiglia**
 
-- Il periodo di definizione di questa varabile è: **YEAR  # This housing tax is defined for a year.**
+- Il periodo di definizione di questa varabile è: **MONTH**
 
 - Nessun set_input inserito
 
@@ -94,23 +18,61 @@
 
 .. code-block:: rst
 
-  Imposta pagata da ogni famiglia proporzionalmente alle dimensioni del suo alloggio
+  Dimensione dell'alloggio, in metri quadri
 
-- `Riferimento legislativo alla variabile`__ 
+- Nessun riferimento legislativo indicato
 
-   .. _linkhousing_tax: https://law.gov.example/housing_tax
+- La variabile non possiede una formula
 
-   __ link housing_tax_
+###################################################################################################
+ Variable:  rent
+###################################################################################################
 
-- La formula in codice è la seguente: 
+###################################################################################################
+ Properties 
+###################################################################################################
+
+- Il tipo di questa variabile è: **float**
+
+- L'entità a cui questa variabile appartiene è: **Famiglia**
+
+- Il periodo di definizione di questa varabile è: **MONTH**
+
+- Nessun set_input inserito
+
+- La descrizione della varabile è: 
 
 .. code-block:: rst
 
-  def formula(household, period, parameters):
- 
- 
- 
- 
- 
- 
- 
+  Affitto pagato dalla famiglia
+
+- Nessun riferimento legislativo indicato
+
+- La variabile non possiede una formula
+
+###################################################################################################
+ Variable:  housing_occupancy_status
+###################################################################################################
+
+###################################################################################################
+ Properties 
+###################################################################################################
+
+- Il tipo di questa variabile è: **Enum**
+
+- L'entità a cui questa variabile appartiene è: **Famiglia**
+
+- Il periodo di definizione di questa varabile è: **MONTH**
+
+- Nessun set_input inserito
+
+- La descrizione della varabile è: 
+
+.. code-block:: rst
+
+  Situazione abitativa legale della famiglia riguardante la loro residenza principale
+
+- Nessun riferimento legislativo indicato
+
+- La variabile non possiede una formula
+

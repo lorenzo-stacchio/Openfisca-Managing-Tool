@@ -16,6 +16,8 @@ from script.get_parameters_reforms_tests_variables_folder_paths import *
 from script.variables_file_interpeter import *
 from script.parameters_interpeter import *
 from kivy.config import Config
+from kivy.uix.spinner import Spinner
+from kivy.uix.button import Button
 
 
 # Screen
@@ -40,7 +42,6 @@ class InitScreen(Screen):
         else:
             print "Path errato"
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
-            # TODO: cambiare colore quando si sbaglia directory e ridimensionare label
 
 
 class HomeScreen(Screen):
@@ -56,7 +57,8 @@ class HomeScreen(Screen):
         pass
 
     def go_to_simulation(self):
-        pass
+        if self.manager.current == 'home':
+             self.manager.current = 'make_simulation'
 
 
 
@@ -132,11 +134,47 @@ class VisualizeSystemScreen(Screen):
              self.manager.current = 'home'
 
 
+class MakeSimulation(Screen):
+    def __init__(self,**kwargs):
+        super(MakeSimulation, self).__init__(**kwargs)
+        Clock.schedule_once(self._finish_init)
+
+    def _finish_init(self,dt):
+        valori = ['','Pluto','Paperino','Aldo','Rodo']
+        self.ids.menu_a_tendina_variabili.values = valori
+        self.ids.menu_a_tendina_variabili.text = valori[0]
+        self.ids.information.text = """
+[b]Instructions[/b]:
+    - Select a variable
+    - Insert into the text input form its value
+    - Click on "Add Variable"
+
+[b]Rules[/b]:
+    - You can't insert a blank variable
+    - You can't insert a blank variable value
+            """
+
+    def go_to_home(self):
+        if self.manager.current == 'make_simulation':
+            #Reset when you go to home
+            self.ids.variable_added.clear_widgets()
+            self.ids.menu_a_tendina_variabili.text = ''
+            self.ids.input_value_variable.text = ''
+            #Go to home
+            self.manager.current = 'home'
+
+
+    def add_value_and_reset_form(self):
+        if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
+            self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_variabili.text+": "+self.ids.input_value_variable.text))
+            #last_object = self.ids.variable_added.children[len(self.ids.variable_added.children)-1]
+            #self.manager.get_screen('make_simulation').destroy_widget(last_object)
+            self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
+            self.ids.input_value_variable.text = ''
 
 
 class MyScreenManager(ScreenManager):
     pass
-
 
 
 

@@ -7,6 +7,7 @@
     InitScreen:
     HomeScreen:
     VisualizeSystemScreen:
+    MakeSimulation:
 
 <InitScreen>:
     name: "init"
@@ -127,7 +128,8 @@
             halign: 'center'
             markup: True
             background_color: hex('971640')
-            text: "Visualize the tax and benefit system"
+            font_size: 25
+            text: "Visualize the tax\nand benefit system"
             on_press: root.go_to_visualize()
             canvas.before:
                 #Color:
@@ -141,8 +143,6 @@
             halign: 'center'
             size: self.parent.size
             canvas.before:
-                Color:
-                    rgba: hex('#971640')
                 Rectangle:
                     pos: self.center_x - 50, self.center_y - 50 # default size is 100x100
                     source: 'img\law.png'
@@ -150,11 +150,11 @@
             id: btn_0_1
             valign: 'middle'
             halign: 'center'
+            background_color: hex('971640')
+            font_size: 25
             markup: True
             text: "Do some reforms"
             canvas.before:
-                Color:
-                    rgba: hex('#FFFFFF')
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -172,11 +172,12 @@
             id: btn_1_2
             valign: 'middle'
             halign: 'center'
+            background_color: hex('971640')
+            font_size: 25
             markup: True
-            text: "Make a simulation!"
+            text: "Make a [b]simulation[/b]!"
+            on_press: root.go_to_simulation()
             canvas.before:
-                Color:
-                    rgba: hex('#FFFFFF')
                 Rectangle:
                     pos: self.pos
                     size: self.size
@@ -319,3 +320,68 @@
                         size_hint: (0.3,1.0)
                         on_press: root.go_to_home()
                         text: 'Come back to home'
+
+
+
+
+
+<MakeSimulation>:
+    name: "make_simulation"
+    fullscreen: True
+
+    BoxLayout:
+        orientation: 'horizontal'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Select variable'
+                halign: 'right'
+                valign: 'top'
+                size_hint: (1.0,0.05)
+            Label:
+                size_hint: (1.0,0.05)
+            Spinner:
+                id: menu_a_tendina_variabili
+                size_hint: (1.0,0.1)
+            Label:
+                size_hint: (1.0,0.05)
+            TextInput:
+                id: input_value_variable
+                multiline: False
+                hint_text: 'Value of the selected variable'
+                size_hint: (1.0,0.1)
+            Label:
+                size_hint: (1.0,0.05)
+            Button:
+                text: 'Add variable'
+                size_hint: (0.5,0.05)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_press: root.add_value_and_reset_form()
+            Label:
+                id: information
+                markup: True
+                valign: 'center'
+            Button:
+                text: 'Go to Output variable Screen'
+                size_hint: (1.0,0.07)
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Added variable(s)'
+                halign: 'right'
+                valign: 'top'
+                size_hint: (1.0,0.05)
+            ScrollView:
+                canvas.before:
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                do_scroll_x: False
+                BoxLayout:
+                    id: variable_added
+                    orientation: 'vertical'
+            Button:
+                id: back_home
+                size_hint: (1.0,0.05)
+                on_press: root.go_to_home()
+                text: 'Come back to home'
