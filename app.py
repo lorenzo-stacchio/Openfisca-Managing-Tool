@@ -55,7 +55,8 @@ class HomeScreen(Screen):
              self.manager.current = 'visualize_system'
 
     def go_to_reforms(self):
-        pass
+        if self.manager.current == 'home':
+             self.manager.current = 'reforms'
 
     def go_to_simulation(self):
         if self.manager.current == 'home':
@@ -98,7 +99,7 @@ class VisualizeSystemScreen(Screen):
         filename, file_extension = os.path.splitext(filename)
         return ((file_extension in ['.py','.yaml'] and not(os.path.basename(filename) == '__init__')) or (os.path.isdir(os.path.join(directory, filename))))
 
-    
+
     def __check_path__(self,path_file_scelto):
         path_file_scelto = str(os.path.normpath(path_file_scelto))
         path_variable = str(os.path.normpath(self.dict_path['variables']))
@@ -211,6 +212,14 @@ class MakeSimulation(Screen):
 
 
 class OutputVariableScreen(Screen):
+    def go_to_home(self):
+        if self.manager.current == 'output_variable':
+            self.manager.current = 'home'
+    def go_to_make_simulation(self):
+        if self.manager.current == 'output_variable':
+            self.manager.current = 'make_simulation'
+
+class ReformsScreen(Screen):
     pass
 
 class MyScreenManager(ScreenManager):
