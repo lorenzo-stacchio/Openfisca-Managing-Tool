@@ -98,7 +98,7 @@ class VisualizeSystemScreen(Screen):
         filename, file_extension = os.path.splitext(filename)
         return ((file_extension in ['.py','.yaml'] and not(os.path.basename(filename) == '__init__')) or (os.path.isdir(os.path.join(directory, filename))))
 
-    
+
     def __check_path__(self,path_file_scelto):
         path_file_scelto = str(os.path.normpath(path_file_scelto))
         path_variable = str(os.path.normpath(self.dict_path['variables']))
@@ -127,16 +127,17 @@ class VisualizeSystemScreen(Screen):
             if self.__check_path__(path_file_scelto):
                 # the file could be a parameter or a variable
                 parameter_interpeter = ParameterInterpeter(path_file_scelto)
-                dict_param = parameter_interpeter.understand_type()
                 variable_interpeter = Variable_File_Interpeter(path_file_scelto)
                 reform_interpeter = Reform_File_Interpeter(path_file_scelto)
-                if (parameter_interpeter.return_type() == ParameterType.normal and not(reform_interpeter.file_is_a_reform())) and dict_param:
-                    path_prm = parameter_interpeter.generate_RST_normal_parameter_view(dict_param)
+                if (parameter_interpeter.understand_type() == ParameterType.normal and not(reform_interpeter.file_is_a_reform())):
+                    parameter_interpeter.__interpeter_normal_parameter__()
+                    path_prm = parameter_interpeter.generate_RST_parameter()
                     self.ids.document_variables_viewer.source = path_prm
                     self.ids.document_parameters_viewer.source = path_prm
                     self.ids.document_reforms_viewer.source = path_prm
-                elif (parameter_interpeter.return_type() == ParameterType.scale and not(reform_interpeter.file_is_a_reform())) and dict:
-                    path_prm = parameter_interpeter.generate_RST_scale_parameter_view(dict_param)
+                elif (parameter_interpeter.understand_type() == ParameterType.scale and not(reform_interpeter.file_is_a_reform())):
+                    dict = parameter_interpeter.__interpeter_scale_parameter__()
+                    path_prm = parameter_interpeter.generate_RST_scale_parameter_view(dict)
                     self.ids.document_variables_viewer.source = path_prm
                     self.ids.document_parameters_viewer.source = path_prm
                     self.ids.document_reforms_viewer.source = path_prm
