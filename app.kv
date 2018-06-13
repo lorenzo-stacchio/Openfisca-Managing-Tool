@@ -217,6 +217,7 @@
                     FileChooserListView:
                         id: visualize_file_chooser_variables
                         size_hint: (0.70,1.0)
+                        filter_dirs: True
                         filters: [root.file_allowed]
                         #canvas.before:
                         #    Color:
@@ -225,6 +226,7 @@
                         #        pos: self.pos
                         #        size: self.size
                         on_selection: root.selected_file(*args)
+                        #entry_touched: root.__check_directories__(*args)
                     RstDocument:
                         id: document_variables_viewer
                 GridLayout:

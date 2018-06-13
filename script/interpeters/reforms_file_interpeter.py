@@ -156,15 +156,15 @@ class Reform_File_Interpeter():
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():
                 for key,value in action.iteritems():
-                    print "key", key
-                    print "value", value
+                    #print "key", key
+                    #print "value", value
                     # get the actions
                     for name,value_name in modifier_function_dict.iteritems():
                         print "name", name
                         if key==name:
                             action[key] = action[key] + value_name
-        for reform in self.__reforms__:
-            print "Riforme", reform.get_reform_actions()
+        #for reform in self.__reforms__:
+            #print "Riforme", reform.get_reform_actions()
 
     def start_interpetration_reforms(self):
         self.__reforms__ = []
@@ -222,7 +222,7 @@ class Reform_File_Interpeter():
                         reform_found = False # set to false because the function is the last part
                         reform_apply_fun_found = True
         #print "\nSTAMPO LE RIFORME",self.__reforms__
-        print self.__reforms__
+        #print self.__reforms__
         self.__find_and_bind_variables__()
         self.__find_and_bind_modifier_func__()
 
