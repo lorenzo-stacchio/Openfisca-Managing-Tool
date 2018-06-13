@@ -54,7 +54,10 @@ class HomeScreen(Screen):
         Clock.schedule_once(self._finish_init)
 
     def _finish_init(self, dt):
-        pass
+        self.ids.label_0_0.text = """
+[b]Hello![/b]\n
+You are into
+        """
 
     def ricevi_inizializza_path(self,path):
         self.dict_path = get_all_paths(path)
@@ -155,8 +158,8 @@ class VisualizeSystemScreen(Screen):
                     self.ids.document_parameters_viewer.source = path_prm
                     self.ids.document_reforms_viewer.source = path_prm
                 elif (parameter_interpeter.understand_type() == ParameterType.scale and not(reform_interpeter.file_is_a_reform())):
-                    dict = parameter_interpeter.__interpeter_scale_parameter__()
-                    path_prm = parameter_interpeter.generate_RST_scale_parameter_view(dict)
+                    parameter_interpeter.__interpeter_scale_parameter__()
+                    path_prm = parameter_interpeter.generate_RST_parameter()
                     self.ids.document_variables_viewer.source = path_prm
                     self.ids.document_parameters_viewer.source = path_prm
                     self.ids.document_reforms_viewer.source = path_prm
