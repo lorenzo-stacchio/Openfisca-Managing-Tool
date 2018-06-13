@@ -9,6 +9,7 @@
     VisualizeSystemScreen:
     MakeSimulation:
     OutputVariableScreen:
+    ReformsScreen:
 
 <InitScreen>:
     name: "init"
@@ -159,6 +160,7 @@
                 size_hint: .4, .2
                 markup: True
                 text: "Do some reforms"
+                on_press: root.go_to_reforms()
                 canvas.before:
                     Rectangle:
                         pos: self.pos
@@ -346,7 +348,7 @@
         BoxLayout:
             orientation: 'vertical'
             Label:
-                text: 'Select variable'
+                text: 'Select input variable'
                 halign: 'right'
                 valign: 'top'
                 size_hint: (1.0,0.05)
@@ -403,7 +405,76 @@
 
 <OutputVariableScreen>:
     name: "output_variable"
+    fullscreen: True
+    BoxLayout:
+        orientation: 'horizontal'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Select output variable'
+                halign: 'right'
+                valign: 'top'
+                size_hint: (1.0,0.05)
+            Label:
+                size_hint: (1.0,0.05)
+            Spinner
+                id: menu_a_tendina_variabili_output
+                size_hint: (1.0,0.1)
+            Label:
+                size_hint: (1.0,0.05)
+            TextInput:
+                id: input_value_variable_output
+                multiline: False
+                hint_text: 'Value of the selected variable'
+                size_hint: (1.0,0.1)
+            Label:
+                size_hint: (1.0,0.05)
+            Button:
+                text: 'Add variable'
+                size_hint: (0.5,0.05)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_press: root.add_value_and_reset_form()
+            Label:
+                id: information
+                markup: True
+                valign: 'center'
+            Button:
+                text: 'Make Simulation!'
+                size_hint: (1.0,0.07)
+                on_press: root.go_to_output_variables()
+        BoxLayout:
+            id: boxlayout_addedvariables
+            orientation: 'vertical'
+            Label:
+                text: 'Added variable(s)'
+                halign: 'right'
+                valign: 'top'
+                size_hint: (1.0,0.05)
+            ScrollView:
+                canvas.before:
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                do_scroll_x: False
+                BoxLayout:
+                    id: variable_added_output
+                    orientation: 'vertical'
+            GridLayout:
+                cols:2
+                rows:1
+                size_hint: (1.0,0.05)
+                Button:
+                    id: back_home_02
+                    size_hint: (0.5,0.05)
+                    on_press: root.go_to_home()
+                    text: 'Come back to home'
+                Button:
+                    id: back_to_make_simulation
+                    size_hint: (0.5,0.05)
+                    on_press: root.go_to_make_simulation()
+                    text: 'Come back to input variables'
 
-
+<ReformsScreen>:
+    name: "reforms"
     Label:
-        text: "Lorem Ipsum"
+        text: "Boooo"
