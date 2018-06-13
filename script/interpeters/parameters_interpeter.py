@@ -17,18 +17,23 @@ class NormalParameter():
     __reference__ = None
     __unit__ = None
     __dict_data_value__= None
+    __parameter_name__ = None
 
-    def __init__(self, description = "",reference = "", unit = "",dict_data_value={}):
+    def __init__(self, parameter_name=None, description = None,reference = None, unit = None, dict_data_value=None):
         self.__description__ = description
         self.__reference__ = reference
         self.__dict_data_value__ = dict_data_value
         self.__unit__ = unit
+        self.__parameter_name__ = parameter_name
 
     def __repr__(self):
-        return "\nDescrizione: " + str(self.__description__) + "\nReference: " + str(self.__reference__) + "\nUnit: " + str(self.__unit__) + "\nDict value: " + str(self.__dict_data_value__)
+        return "\nNome: " + str(self.__parameter_name__) + "\nDescrizione: " + str(self.__description__) + "\nReference: " + str(self.__reference__) + "\nUnit: " + str(self.__unit__) + "\nDict value: " + str(self.__dict_data_value__)
 
     def set_description(self,description):
         self.__description__ = description
+
+    def set_parameter_name(self,parameter_name):
+        self.__parameter_name__ = parameter_name
 
     def set_reference(self,reference):
         self.__reference__ = reference
@@ -37,17 +42,13 @@ class NormalParameter():
         self.__unit__ = unit
 
     def set_dict_data_value(self,dict_data_value):
-        self.__dict_data_value__ = __dict_data_value__
+        self.__dict_data_value__ = dict_data_value
 
     def set_element_to_dict_key(self,key,value):
         self.__dict_data_value__[key] =  value
 
-    def generate_RST_normal_parameter_view(self):
-        #extracing the dates
-        for k,v in dict_params_information.iteritems():
-            if isinstance(k,datetime.date):
-                self.__dict_data_value__[k] = v
-        self.__dict_data_value__ = collections.OrderedDict(sorted(self.__dict_data_value__.items()))
+    def generate_RST(self):
+        ordined_dict = collections.OrderedDict(sorted(self.__dict_data_value__.items()))
         if os.path.exists(PATH_RST_DOCUMENT):
             os.remove(PATH_RST_DOCUMENT)
         with open(PATH_RST_DOCUMENT,'a') as rst:
@@ -59,14 +60,14 @@ class NormalParameter():
                 rst.write('#')
             rst.write("\n")
             # Description
-            if 'description' in dict_params_information.keys():
+            if self.__description__:
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nDescription:' + "\n")
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
-                rst.write(dict_params_information['description'] + "\n\n")
+                rst.write(self.__description__ + "\n\n")
             else:
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
@@ -76,14 +77,14 @@ class NormalParameter():
                 rst.write("\n\n")
                 rst.write("Not Specified" + "\n\n")
             # Reference is an optional field
-            if 'reference' in dict_params_information.keys():
+            if self.__reference__:
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nReference:' + "\n")
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
-                rst.write(dict_params_information['reference'] + "\n\n")
+                rst.write(self.__reference__ + "\n\n")
             else:
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
@@ -93,14 +94,14 @@ class NormalParameter():
                 rst.write("\n\n")
                 rst.write("Not Specified" + "\n\n")
             # Reference is an optional field
-            if 'unit' in dict_params_information.keys():
+            if self.__unit__:
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write('\nUnit:' + "\n")
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
                 rst.write("\n\n")
-                rst.write(dict_params_information['unit'] + "\n\n")
+                rst.write(self.__unit__ + "\n\n")
             else:
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('*')
@@ -117,11 +118,11 @@ class NormalParameter():
                 rst.write('*')
             rst.write("\n")
             # writing the formatted the dates
-            for k,v in self.__dict_data_value__.iteritems(): #key are the dates
+            for k,v in ordined_dict.iteritems(): #key are the dates
                 if k <= datetime.datetime.now().date(): # check if the value is future or not
-                    rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** il parametro é valso **" + v + "**\n")
+                    rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** il parametro é valso **" + v.strip() + "**\n")
                 else:
-                    rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** si presume che il parametro varrà **" + v + "**\n")
+                    rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** si presume che il parametro varrà **" + v.strip() + "**\n")
             return PATH_RST_DOCUMENT #return path of written file
 
 
@@ -129,10 +130,12 @@ class ParameterInterpeter():
     __parameter_path__ = None
     __parameter_name__ = None
     __parameter_type__ = ParameterType.non_parametro
+    __actual_parameter__ = None
 
     def __init__(self,parameter_path):
         self.__parameter_path__  = parameter_path
         self.__parameter_name__ = os.path.basename(parameter_path)
+
 
     def understand_type(self):
         count_values_word = 0
@@ -145,23 +148,23 @@ class ParameterInterpeter():
                     count_brackets_word = count_brackets_word + 1
         if count_values_word == 1:
             self.__parameter_type__ = ParameterType.normal
-            dict = self.__interpeter_normal_parameter__()
-            return dict
         elif count_brackets_word >=1:
             self.__parameter_type__ = ParameterType.scale
-            return self.__interpeter_scale_parameter__()
+        return self.__parameter_type__
 
     #NORMAL PARAMETER
     def __interpeter_normal_parameter__(self):
-        dict_information = {}
         if (self.__parameter_type__ == ParameterType.normal):
-            normal_parameter = NormalParameter()
+            self.__actual_parameter__ = NormalParameter()
+            self.__actual_parameter__.set_dict_data_value({})
+            self.__actual_parameter__.set_parameter_name(os.path.basename(self.__parameter_path__))
             with open(self.__parameter_path__,'r') as content_parameter:
                 date_found = False
                 date_that_was_found = ""
                 for line in content_parameter.readlines():
                     line = line.strip() #elimino spazi all'inizio e alla fine
-                    #print line
+                    if '#' in line:
+                        line = line[:line.find('#')]
                     pieces = line.split(': ')
                     # Caso speciale per i values and value
                     if not (pieces[0] == 'description') and not (pieces[0] == 'reference') and not (pieces[0] == 'unit'):
@@ -179,106 +182,22 @@ class ParameterInterpeter():
                         pass
                         #inserisco description e reference
                     if (pieces[0] == 'description'):
-                        normal_parameter.set_description(pieces[1])
-                        dict_information[pieces[0]] = pieces[1]
+                        self.__actual_parameter__.set_description(pieces[1])
                     elif (pieces[0] == 'reference'):
-                        normal_parameter.set_reference(pieces[1])
-                        dict_information[pieces[0]] = pieces[1]
+                        self.__actual_parameter__.set_reference(pieces[1])
                     elif (pieces[0] == 'unit'):
-                        normal_parameter.set_unit(pieces[1])
-                        dict_information[pieces[0]] = pieces[1]
+                        self.__actual_parameter__.set_unit(pieces[1])
                     # se ho trovato una data posso aggiungere il relativo valore
                     if date_found == True and (pieces[0] == 'value' or pieces[0] == 'expected'):
-                        normal_parameter.set_element_to_dict_key(date_that_was_found,pieces[1])
-                        dict_information[date_that_was_found] = pieces[1]
+                        self.__actual_parameter__.set_element_to_dict_key(date_that_was_found,pieces[1])
                         date_found = False
-        print "Stampo parametro normale ",normal_parameter
-        return dict_information
+        print "Stampo parametro normale ",self.__actual_parameter__
+
+    def generate_RST_parameter(self):
+        if not (self.__parameter_type__ == ParameterType.non_parametro):
+            return self.__actual_parameter__.generate_RST()
 
 
-    def generate_RST_normal_parameter_view(self,dict_params_information):
-        #print dict_params_information
-        dict_values = {}
-        #extracing the dates
-        for k,v in dict_params_information.iteritems():
-            if isinstance(k,datetime.date):
-                dict_values[k] = v
-        dict_values = collections.OrderedDict(sorted(dict_values.items()))
-        if os.path.exists(PATH_RST_DOCUMENT):
-            os.remove(PATH_RST_DOCUMENT)
-        with open(PATH_RST_DOCUMENT,'a') as rst:
-            #parameter name
-            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                rst.write('#')
-            rst.write("\nParameter: " + self.__parameter_name__ + "\n")
-            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                rst.write('#')
-            rst.write("\n")
-            # Description
-            if 'description' in dict_params_information.keys():
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write('\nDescription:' + "\n")
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write("\n\n")
-                rst.write(dict_params_information['description'] + "\n\n")
-            else:
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write('\nDescription:' + "\n")
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write("\n\n")
-                rst.write("Not Specified" + "\n\n")
-            # Reference is an optional field
-            if 'reference' in dict_params_information.keys():
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write('\nReference:' + "\n")
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write("\n\n")
-                rst.write(dict_params_information['reference'] + "\n\n")
-            else:
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write('\nReference:' + "\n")
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write("\n\n")
-                rst.write("Not Specified" + "\n\n")
-            # Reference is an optional field
-            if 'unit' in dict_params_information.keys():
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write('\nUnit:' + "\n")
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write("\n\n")
-                rst.write(dict_params_information['unit'] + "\n\n")
-            else:
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write('\nUnit:' + "\n")
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write("\n\n")
-                rst.write("Not Specified" + "\n\n")
-            #VALUES
-            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                rst.write('*')
-            rst.write('\nValues:' + "\n")
-            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                rst.write('*')
-            rst.write("\n")
-            # writing the formatted the dates
-            for k,v in dict_values.iteritems(): #key are the dates
-                if k <= datetime.datetime.now().date(): # check if the value is future or not
-                    rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** il parametro é valso **" + v + "**\n")
-                else:
-                    rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** si presume che il parametro varrà **" + v + "**\n")
-            return PATH_RST_DOCUMENT #return path of written file
 
     #SCALE PARAMETER
     def __interpeter_scale_parameter__(self):
