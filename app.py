@@ -39,7 +39,8 @@ class InitScreen(Screen):
         if dict:
             if self.manager.current == 'init':
                  self.manager.current = 'home'
-                 self.manager.get_screen('visualize_system'). ricevi_inizializza_path(PATH_OPENFISCA)
+                 self.manager.get_screen('visualize_system').ricevi_inizializza_path(PATH_OPENFISCA)
+                 self.manager.get_screen('visualize_system').ricevi_inizializza_path(PATH_OPENFISCA)
         else:
             print "Path errato"
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
@@ -49,6 +50,17 @@ class HomeScreen(Screen):
 
     def __init__(self,**kwargs):
         super(HomeScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._finish_init)
+
+    def _finish_init(self, dt):
+        self.ids.label_0_0.text = """
+[b]Hello![/b]\n
+You are into
+        """ +
+
+    def ricevi_inizializza_path(self,path):
+        self.dict_path = get_all_paths(path)
+
 
     def go_to_visualize(self):
         if self.manager.current == 'home':
