@@ -21,6 +21,7 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.button import Button
 
 
+
 # Screen
 class InitScreen(Screen):
 
@@ -40,7 +41,7 @@ class InitScreen(Screen):
             if self.manager.current == 'init':
                  self.manager.current = 'home'
                  self.manager.get_screen('visualize_system').ricevi_inizializza_path(PATH_OPENFISCA)
-                 self.manager.get_screen('visualize_system').ricevi_inizializza_path(PATH_OPENFISCA)
+                 self.manager.get_screen('home').ricevi_inizializza_path(PATH_OPENFISCA)
         else:
             print "Path errato"
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
@@ -53,13 +54,18 @@ class HomeScreen(Screen):
         Clock.schedule_once(self._finish_init)
 
     def _finish_init(self, dt):
-        self.ids.label_0_0.text = """
-[b]Hello![/b]\n
-You are into
-        """ +
+        pass
 
     def ricevi_inizializza_path(self,path):
         self.dict_path = get_all_paths(path)
+        self.ids.label_0_0.text = """[color=000000]
+[b][size=20sp]Hello ![/size][/b]\n
+Thanks for installing [size=20sp][b]OpenFisca Tool Manager[/b][/size]!\n
+This software will help you to manage some feature provided by OpenFisca, in particular you can:
+- Visualize variables, reforms and parameters of the selected country;
+- Create and Execute a reform;
+- Execute a Simulation.
+Actually you are into """ +path[:path.rindex('\\')+1]+"[b]"+os.path.basename(path)+"[/b]"+".[/color]"
 
 
     def go_to_visualize(self):
