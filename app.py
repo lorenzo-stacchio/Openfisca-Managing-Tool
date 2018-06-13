@@ -55,7 +55,8 @@ class HomeScreen(Screen):
              self.manager.current = 'visualize_system'
 
     def go_to_reforms(self):
-        pass
+        if self.manager.current == 'home':
+             self.manager.current = 'reforms'
 
     def go_to_simulation(self):
         if self.manager.current == 'home':
@@ -212,6 +213,14 @@ class MakeSimulation(Screen):
 
 
 class OutputVariableScreen(Screen):
+    def go_to_home(self):
+        if self.manager.current == 'output_variable':
+            self.manager.current = 'home'
+    def go_to_make_simulation(self):
+        if self.manager.current == 'output_variable':
+            self.manager.current = 'make_simulation'
+
+class ReformsScreen(Screen):
     pass
 
 class MyScreenManager(ScreenManager):
