@@ -4,6 +4,8 @@ from enum import Enum
 from dateutil.parser import parse as date_parser
 import datetime
 import collections
+import yaml
+
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
 
@@ -48,7 +50,6 @@ class NormalParameter():
         self.__dict_data_value__[key] =  value
 
     def generate_RST(self):
-        ordined_dict = collections.OrderedDict(sorted(self.__dict_data_value__.items()))
         if os.path.exists(PATH_RST_DOCUMENT):
             os.remove(PATH_RST_DOCUMENT)
         with open(PATH_RST_DOCUMENT,'a') as rst:
@@ -118,11 +119,12 @@ class NormalParameter():
                 rst.write('*')
             rst.write("\n")
             # writing the formatted the dates
-            for k,v in ordined_dict.iteritems(): #key are the dates
-                if k <= datetime.datetime.now().date(): # check if the value is future or not
-                    rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** il parametro é valso **" + v.strip() + "**\n")
+            for date,value_dict in self.__dict_data_value__.iteritems(): #key are the dates
+                true_value = value_dict['value'] #is ever one element
+                if date <= datetime.datetime.now().date(): # check if the value is future or not
+                    rst.write("- Dal **" + date.strftime('%Y/%m/%d') + "** il parametro é valso **" + str(true_value) + "**\n")
                 else:
-                    rst.write("- Dal **" + k.strftime('%Y/%m/%d') + "** si presume che il parametro varrà **" + v.strip() + "**\n")
+                    rst.write("- Dal **" + date.strftime('%Y/%m/%d') + "** si presume che il parametro varrà **" + str(true_value) + "**\n")
             return PATH_RST_DOCUMENT #return path of written file
 
 
@@ -199,42 +201,63 @@ class ScaleParameter():
                 rst.write("\n\n")
                 rst.write("Not Specified" + "\n\n")
             #Brackets
-            for key_brackets_father,value_dict_brackets in self.__brackets__.iteritems():
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                rst.write('*')
+            rst.write('\nBrackets:' + "\n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                rst.write('*')
+            rst.write("\n\n")
+            # Rates
+            count_rate_for_view = 0
+            formatted_dict = {}
+            #print "Dict non formattato ", self.__brackets__, "\n"
+            for element in self.__brackets__:
+                count_rate_for_view = count_rate_for_view + 1
+                formatted_dict[count_rate_for_view] = {}
+                for key_name, dict_date in element.iteritems(): #inizialize
+                    for date, value in dict_date.iteritems():
+                        formatted_dict[count_rate_for_view][date] = {}
+                for key_name, dict_date in element.iteritems(): #inizialize
+                    if key_name == 'rate':
+                        for date, value in dict_date.iteritems():
+                            formatted_dict[count_rate_for_view][date]['rate'] = value['value']
+                    elif key_name == 'threshold':
+                        for date, value in dict_date.iteritems():
+                            formatted_dict[count_rate_for_view][date]['threshold'] = value['value']
+                # sort the values
+                formatted_dict[count_rate_for_view] = collections.OrderedDict(sorted(formatted_dict[count_rate_for_view].items()))
+            formatted_dict = collections.OrderedDict(sorted(formatted_dict.items()))
+            #Dict formatted!
+            for number_group_rates, date_dict in formatted_dict.iteritems():
+                rst.write('\n\nBracket group'+ str(number_group_rates) + "\n")
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
-                rst.write('\n'+ key_brackets_father + "\n")
-                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                    rst.write('*')
+                    rst.write('"')
                 rst.write("\n\n")
-                ordered_value_dict_brackets = collections.OrderedDict(sorted(value_dict_brackets.items()))
-                # per ogni gruppo di scaglioni, abbiamo n rate
-                for key_rate_number, value_rate_threshold in ordered_value_dict_brackets.iteritems():
-                    rst.write('\n'+ key_rate_number + "\n")
-                    for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                        rst.write('"')
-                    rst.write("\n\n")
-                    ordered_value_rate_content = collections.OrderedDict(sorted(value_rate_threshold.items()))
-                    # per ogni rata abbiamo valori e soglie per le quali valgono questi valori
-                    for data_valore_soglia, valore_soglia in ordered_value_rate_content.iteritems():
-                        # il valore soglia va splittato con _, il primo numero è il valore mentre il secondo è la soglia definita per lo stesso
-                        values_threshold_splitted = valore_soglia.split('-')
-                        stringa_solo_valore = stringa_valore_soglia = ""
-                        if data_valore_soglia < datetime.datetime.now().date():
-                            stringa_solo_valore = " è stato definito il valore di questa rata che è pari a: "
-                            stringa_valore_soglia = " sono stati definiti:"
+                for date, values in date_dict.iteritems():
+                    # 1 value
+                    if len(values)==1 and date < datetime.datetime.now().date():
+                        if 'threshold' in values:
+                            to_write = str('In **' + str(date) +'** it was defined the threshold for this rate as: **' + str(values['threshold'])).strip() +'**\n\n'
                         else:
-                            stringa_solo_valore = " ci si aspetta che il valore di questa rata sarà pari a: "
-                            stringa_valore_soglia = " ci si aspetta che verranno definiti:"
-                        if len(values_threshold_splitted)==1:
-                            to_write = str('Nel **' + str(data_valore_soglia) +'** ' + stringa_solo_valore + '**' + values_threshold_splitted[0]).strip() +'**\n\n'
-                            rst.write(to_write)
-                        if len(values_threshold_splitted)==2: #could be only a threshold
-                            if values_threshold_splitted[0].strip() == "":
-                                to_write = str('Nel **' + str(data_valore_soglia) +'** è stata definita la soglia da superare per far valere la rata corrente, pari a :**' + values_threshold_splitted[1].strip() +'**\n\n')
-                            else:
-                                to_write = str('Nel **' + str(data_valore_soglia) + "**" + stringa_valore_soglia +'\n - Il valore di questa rata che è pari a: **' + values_threshold_splitted[0].strip() + "**;\n - La soglia da superare per fare in modo che questa rata valga che è pari a **" + values_threshold_splitted[1].strip() + "**\n\n")
-                            rst.write(to_write)
+                            to_write = str('In **' + str(date) +'** it was defined the value for this rate as: **' + str(values['rate'])).strip() +'**\n\n'
+                        rst.write(to_write)
+                    if len(values)==1 and date >= datetime.datetime.now().date():
+                        if 'threshold' in values:
+                            to_write = str('In **' + str(date) +'** it will be defined the threshold for this rate as: **' + str(values['threshold'])).strip() +'**\n\n'
+                        else:
+                            to_write = str('In **' + str(date) +'** it will be defined the value for this rate as: **' + str(values['rate'])).strip() +'**\n\n'
+                        rst.write(to_write)
+                    # 2 values
+                    if len(values)==2 and date < datetime.datetime.now().date():
+                        if 'threshold' in values:
+                            to_write = str('In **' + str(date) +'** were defined both: \n - The threshold for this rate: **' + str(values['threshold']) + '**; \n - The value for this rate: **'+ str(values['rate']) + '**').strip() +'**\n\n'
+                        rst.write(to_write)
+                    if len(values)==2 and date >= datetime.datetime.now().date():
+                        if 'threshold' in values:
+                            to_write = str('In **' + str(date) +'** will be defined both: \n - The threshold for this rate: **' + str(values['threshold']) + '**; \n - The value for this rate: **'+ str(values['rate']) + '**').strip() +'**\n\n'
+                        rst.write(to_write)
             return PATH_RST_DOCUMENT
+
 
 
 class FancyIndexingParamater():
@@ -251,67 +274,42 @@ class ParameterInterpeter():
     __parameter_name__ = None
     __parameter_type__ = ParameterType.non_parametro
     __actual_parameter__ = None
+    __yaml_file__ = None
 
     def __init__(self,parameter_path):
         self.__parameter_path__  = parameter_path
         self.__parameter_name__ = os.path.basename(parameter_path)
+        self.__yaml_file__ = yaml.load(file(parameter_path))
 
 
     def understand_type(self):
         count_values_word = 0
         count_brackets_word = 0
-        with open(self.__parameter_path__,'r') as content_parameter:
-            for line in content_parameter.readlines():
-                if 'values' in line: #first control
-                    count_values_word = count_values_word + 1
-                elif 'brackets' in line: #first control
-                    count_brackets_word = count_brackets_word + 1
+        for key_lv_1, value_lv_1 in self.__yaml_file__.iteritems():
+            if key_lv_1 == 'values':
+                count_values_word = count_values_word + 1
+            elif key_lv_1 == 'brackets':
+                count_brackets_word = count_brackets_word +1
         if count_values_word == 1:
             self.__parameter_type__ = ParameterType.normal
         elif count_brackets_word >=1:
             self.__parameter_type__ = ParameterType.scale
         return self.__parameter_type__
 
+
     #NORMAL PARAMETER
     def __interpeter_normal_parameter__(self):
         if (self.__parameter_type__ == ParameterType.normal):
             self.__actual_parameter__ = NormalParameter()
-            self.__actual_parameter__.set_dict_data_value({})
+            self.__actual_parameter__.set_dict_data_value(self.__yaml_file__['values'])
             self.__actual_parameter__.set_parameter_name(os.path.basename(self.__parameter_path__))
-            with open(self.__parameter_path__,'r') as content_parameter:
-                date_found = False
-                date_that_was_found = ""
-                for line in content_parameter.readlines():
-                    line = line.strip() #elimino spazi all'inizio e alla fine
-                    if '#' in line:
-                        line = line[:line.find('#')]
-                    pieces = line.split(': ')
-                    # Caso speciale per i values and value
-                    if not (pieces[0] == 'description') and not (pieces[0] == 'reference') and not (pieces[0] == 'unit'):
-                        if len(pieces)==1:
-                            pieces = [pieces[0].split(':')[0]] #ritorna intestazione riga
-                        else:
-                            pieces = [pieces[0].split(':')[0],pieces[1]] #ritorna intestazione riga + eventuale valore dopo i :
-                    # date control
-                    try: # cerco le date
-                        if date_parser(pieces[0]):
-                            #print 'data trovata', date_parser(pieces[0]).date()
-                            date_found = True
-                            date_that_was_found = date_parser(pieces[0]).date()
-                    except:
-                        pass
-                        #inserisco description e reference
-                    if (pieces[0] == 'description'):
-                        self.__actual_parameter__.set_description(pieces[1])
-                    elif (pieces[0] == 'reference'):
-                        self.__actual_parameter__.set_reference(pieces[1])
-                    elif (pieces[0] == 'unit'):
-                        self.__actual_parameter__.set_unit(pieces[1])
-                    # se ho trovato una data posso aggiungere il relativo valore
-                    if date_found == True and (pieces[0] == 'value' or pieces[0] == 'expected'):
-                        self.__actual_parameter__.set_element_to_dict_key(date_that_was_found,pieces[1])
-                        date_found = False
-        #print "Stampo parametro normale ",self.__actual_parameter__
+            if 'description' in self.__yaml_file__:
+                self.__actual_parameter__.set_description(self.__yaml_file__['description'].encode('utf-8').strip())
+            if 'reference' in self.__yaml_file__:
+                self.__actual_parameter__.set_reference(self.__yaml_file__['reference'].encode('utf-8').strip())
+            if 'unit' in self.__yaml_file__:
+                self.__actual_parameter__.set_unit(self.__yaml_file__['unit'].encode('utf-8').strip())
+
 
     def generate_RST_parameter(self):
         if not (self.__parameter_type__ == ParameterType.non_parametro):
@@ -320,89 +318,16 @@ class ParameterInterpeter():
 
     #SCALE PARAMETER
     def __interpeter_scale_parameter__(self):
-        dict_brackets = {}
-        dict_rates_of_brackets = {}
-        dict_date_values_threshold = {} # questo elemento non verrà utilizzato alla fine, serve come riempimento
-        if (self.__parameter_type__ == ParameterType.scale):
-            self.__actual_parameter__ = ScaleParameter()
-            self.__actual_parameter__.set_parameter_name(os.path.basename(self.__parameter_path__))
-            with open(self.__parameter_path__,'r') as content_parameter:
-                date_found = False
-                date_that_was_found = ""
-                brackets_found = False
-                number_brackets_found = 0
-                rate_found = False
-                number_rate_found = 0
-                threshold_found = False
-                for line in content_parameter.readlines():
-                    line = line.strip() #elimino spazi all'inizio e alla fine
-                    if '#' in line:
-                        line = line[:line.find('#')]
-                    pieces = line.split(': ')
-                    # Caso speciale per i rate,brackets and value
-                    if not (pieces[0] == 'description') and not (pieces[0] == 'reference'):
-                        if len(pieces)==1:
-                            pieces = [pieces[0].split(':')[0]] #ritorna intestazione riga
-                        else:
-                            pieces = [pieces[0].split(':')[0],pieces[1]] #ritorna intestazione riga + eventuale valore dopo i :
-                    #print "Stampo pieces",pieces
-                    # define thing found
-                    if pieces[0] == 'brackets':
-                        # if we are in second cicle
-                        rate_found = False
-                        number_rate_found = 0
-                        dict_rates_of_brackets = {}
-                        #bracket init
-                        brackets_found = True
-                        number_brackets_found = number_brackets_found + 1
-                        dict_brackets['brackets'+ str(number_brackets_found)] = "" #si inizializzer quando trovo una rata
-                    if pieces[0] == '- rate':
-                        rate_found = True
-                        # clear dates and threshold
-                        dict_date_values_threshold = {}
-                        date_found = False
-                        date_that_was_found = ""
-                        threshold_found = False
-                        #logic
-                        #print '\nrata trovata', rate_found
-                        number_rate_found = number_rate_found + 1
-                        #print '\nnumero rate trovata', number_rate_found
-                        dict_rates_of_brackets ['rate'+str(number_rate_found)] = ""
-                        if number_rate_found == 1: # first rate of a bracket
-                            dict_brackets['brackets'+ str(number_brackets_found)] = dict_rates_of_brackets
-                    # special case threshold
-                    if pieces[0] == 'threshold':
-                        threshold_found = True
-                    # date control
-                    try: # cerco le date
-                        if date_parser(pieces[0]):
-                            #print 'data trovata', date_parser(pieces[0]).date()
-                            date_found = True
-                            date_that_was_found = date_parser(pieces[0]).date()
-                            if not date_that_was_found in dict_date_values_threshold.keys():
-                                dict_date_values_threshold[date_that_was_found] = ''
-                            if dict_rates_of_brackets['rate'+str(number_rate_found)] == "": #is empty
-                                #print "\nsono qui\n"
-                                dict_rates_of_brackets['rate'+str(number_rate_found)] = dict_date_values_threshold
-                        #print " \n nel date parser ", dict_date_values_threshold
-                    except:
-                        pass
-                    #inserisco description e reference
-                    if (pieces[0] == 'description'):
-                        self.__actual_parameter__.set_description(pieces[1])
-                    if (pieces[0] == 'reference'):
-                        self.__actual_parameter__.set_reference(pieces[1])
-                    # se ho trovato una data posso aggiungere il relativo valore
-                    if date_found and rate_found and brackets_found and (pieces[0] == 'value'):
-                        if threshold_found:
-                            dict_date_values_threshold[date_that_was_found] = dict_date_values_threshold[date_that_was_found] + " - " + pieces[1]
-                        else:
-                            dict_date_values_threshold[date_that_was_found] = pieces[1]
-                        #print " \n nel last section ", dict_date_values_threshold[date_that_was_found]
-                        date_found = False
-            #aggiungi brackets
-            self.__actual_parameter__.set_brackets(dict_brackets)
-            #print self.__actual_parameter__
+        #print "In scala", self.__yaml_file__
+        self.__actual_parameter__ = ScaleParameter()
+        self.__actual_parameter__.set_brackets(self.__yaml_file__['brackets'])
+        self.__actual_parameter__.set_parameter_name(os.path.basename(self.__parameter_path__))
+        if 'description' in self.__yaml_file__:
+            self.__actual_parameter__.set_description(self.__yaml_file__['description'].encode('utf-8').strip())
+        if 'reference' in self.__yaml_file__:
+            self.__actual_parameter__.set_reference(self.__yaml_file__['reference'].encode('utf-8').strip())
+        if 'unit' in self.__yaml_file__:
+            self.__actual_parameter__.set_unit(self.__yaml_file__['unit'].encode('utf-8').strip())
 
 
     def return_type(self):
