@@ -131,6 +131,11 @@
                 size: self.size
         Label:
             id: label_0_0
+            size_hint_y: None
+            valign: 'middle'
+            text_size: self.width, None
+            height: self.texture_size[1]
+            padding_x: 50
             markup: True
             #canvas.before:
             #    Rectangle:
@@ -353,8 +358,10 @@
 
 
 <MakeSimulation>:
+    variable_added : variable_added
     name: "make_simulation"
     fullscreen: True
+
 
     BoxLayout:
         orientation: 'horizontal'
