@@ -21,6 +21,7 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.button import Button
 
 
+
 # Screen
 class InitScreen(Screen):
 
@@ -40,7 +41,7 @@ class InitScreen(Screen):
             if self.manager.current == 'init':
                  self.manager.current = 'home'
                  self.manager.get_screen('visualize_system').ricevi_inizializza_path(PATH_OPENFISCA)
-                 self.manager.get_screen('visualize_system').ricevi_inizializza_path(PATH_OPENFISCA)
+                 self.manager.get_screen('home').ricevi_inizializza_path(PATH_OPENFISCA)
         else:
             print "Path errato"
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
@@ -50,16 +51,17 @@ class HomeScreen(Screen):
 
     def __init__(self,**kwargs):
         super(HomeScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._finish_init)
-
-    def _finish_init(self, dt):
-        self.ids.label_0_0.text = """
-[b]Hello![/b]\n
-You are into
-        """
 
     def ricevi_inizializza_path(self,path):
         self.dict_path = get_all_paths(path)
+        self.ids.label_0_0.text = """[color=000000]
+[b][size=20sp]Hello ![/size][/b]\n
+Thanks for installing [size=20sp][b]OpenFisca Tool Manager[/b][/size]!\n
+This software will help you to manage some feature provided by OpenFisca, in particular you can:
+    - Visualize variables, reforms and parameters of the selected country;
+    - Create and Execute a reform;
+    - Execute a Simulation.
+Actually you are into """ +path[:path.rindex('\\')+1]+"[b]"+os.path.basename(path)+"[/b]"+".[/color]"
 
 
     def go_to_visualize(self):
@@ -182,6 +184,8 @@ class VisualizeSystemScreen(Screen):
 
 
 class MakeSimulation(Screen):
+
+    variable_added = ObjectProperty()
     def __init__(self,**kwargs):
         super(MakeSimulation, self).__init__(**kwargs)
         Clock.schedule_once(self._finish_init)
@@ -212,17 +216,22 @@ class MakeSimulation(Screen):
 
     def go_to_output_variables(self):
         if self.manager.current == 'make_simulation':
-            #Go to output_variable
-            self.manager.current = 'output_variable'
+            #you can't go to output variable if you haven't insert nothing
+            if len(self.ids.variable_added.children)!=0:
+                #Go to output_variable
+                self.manager.current = 'output_variable'
 
     def add_value_and_reset_form(self):
         if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
-            self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_variabili.text+": "+self.ids.input_value_variable.text))
+            self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_variabili.text+": "+self.ids.input_value_variable.text,
+                                                        on_release=self.destroy_button))
             #last_object = self.ids.variable_added.children[len(self.ids.variable_added.children)-1]
             #self.manager.get_screen('make_simulation').destroy_widget(last_object)
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.input_value_variable.text = ''
 
+    def destroy_button(self,button):
+        self.variable_added.remove_widget(button)
 
 class OutputVariableScreen(Screen):
     def go_to_home(self):

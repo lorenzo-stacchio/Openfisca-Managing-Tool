@@ -89,9 +89,9 @@
                     rows: 1
                     cols: 2
                     Image:
-                        source: 'img/openfisca.png'
+                        source: '/openfisca.png'
                     Image:
-                        source: 'img/github.png'
+                        source: '/github.png'
 
             Label:
                 id: blablabla
@@ -122,15 +122,33 @@
     BoxLayout:
         id: boxlayout_home
         orientation: 'vertical'
-        rows: 2
-
+        rows: 3
+        canvas.before:
+            Color:
+                rgba: hex('ffffff')
+            Rectangle:
+                pos: self.pos
+                size: self.size
         Label:
             id: label_0_0
-            markdown: True
+            size_hint_y: None
+            valign: 'middle'
+            text_size: self.width, None
+            height: self.texture_size[1]
+            padding_x: 50
+            markup: True
             #canvas.before:
             #    Rectangle:
             #        pos: self.center_x, self.center_y # default size is 100x100
             #        source: 'img\law.png'
+        BoxLayout:
+            id: boxlayout_image
+            orientation: 'horizontal'
+            Image:
+                source: 'img\logo.png'
+
+
+
         BoxLayout:
             id: boxlayout_withbuttons
             orientation: 'horizontal'
@@ -141,8 +159,8 @@
                 halign: 'center'
                 markup: True
                 background_color: hex('971640')
-                font_size: 20
-                size_hint: .4, .2
+                font_size: "18sp"
+                size_hint: .4, .3
                 text: "Visualize the tax\nand benefit system"
                 on_press: root.go_to_visualize()
                 canvas.before:
@@ -156,8 +174,8 @@
                 valign: 'middle'
                 halign: 'center'
                 background_color: hex('971640')
-                font_size: 20
-                size_hint: .4, .2
+                font_size: "18sp"
+                size_hint: .4, .3
                 markup: True
                 text: "Do some reforms"
                 on_press: root.go_to_reforms()
@@ -171,8 +189,8 @@
                 valign: 'middle'
                 halign: 'center'
                 background_color: hex('971640')
-                font_size: 20
-                size_hint: .4, .2
+                font_size: "18sp"
+                size_hint: .4, .3
                 markup: True
                 text: "Make a [b]simulation[/b]!"
                 on_press: root.go_to_simulation()
@@ -340,8 +358,10 @@
 
 
 <MakeSimulation>:
+    variable_added : variable_added
     name: "make_simulation"
     fullscreen: True
+
 
     BoxLayout:
         orientation: 'horizontal'
