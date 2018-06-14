@@ -5,6 +5,8 @@ from dateutil.parser import parse as date_parser
 import datetime
 import collections
 import yaml
+from script.interpeters.variables_file_interpeter import *
+from script.interpeters.reforms_file_interpeter import *
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
@@ -259,7 +261,6 @@ class ScaleParameter():
             return PATH_RST_DOCUMENT
 
 
-
 class FancyIndexingParamater():
     __values__ = None #dict
     __parameter_name__ = None
@@ -285,15 +286,19 @@ class ParameterInterpeter():
     def understand_type(self):
         count_values_word = 0
         count_brackets_word = 0
+        # first check
         for key_lv_1, value_lv_1 in self.__yaml_file__.iteritems():
             if key_lv_1 == 'values':
                 count_values_word = count_values_word + 1
             elif key_lv_1 == 'brackets':
                 count_brackets_word = count_brackets_word +1
-        if count_values_word == 1:
+        if count_values_word == 1: #simple parameter
             self.__parameter_type__ = ParameterType.normal
-        elif count_brackets_word >=1:
+        elif count_brackets_word >=1: #bracket parameter
             self.__parameter_type__ = ParameterType.scale
+        if (self.__parameter_type__ == ParameterType.non_parametro) : # could be a fancy indexing
+            for key_lv_1, value_lv_1 in self.__yaml_file__.iteritems():
+                print "Roba del fancy", key_lv_1, value_lv_1
         return self.__parameter_type__
 
 
