@@ -143,34 +143,37 @@ class VisualizeSystemScreen(Screen):
         try:
             path_file_scelto = args[1][0]
             if self.__check_path__(path_file_scelto):
+                filename, file_extension = os.path.splitext(path_file_scelto)
                 # the file could be a parameter or a variable
-                parameter_interpeter = ParameterInterpeter(path_file_scelto)
-                variable_interpeter = Variable_File_Interpeter(path_file_scelto)
-                reform_interpeter = Reform_File_Interpeter(path_file_scelto)
-                if (parameter_interpeter.understand_type() == ParameterType.normal and not(reform_interpeter.file_is_a_reform())):
-                    parameter_interpeter.__interpeter_normal_parameter__()
-                    path_prm = parameter_interpeter.generate_RST_parameter()
-                    self.ids.document_variables_viewer.source = path_prm
-                    self.ids.document_parameters_viewer.source = path_prm
-                    self.ids.document_reforms_viewer.source = path_prm
-                elif (parameter_interpeter.understand_type() == ParameterType.scale and not(reform_interpeter.file_is_a_reform())):
-                    parameter_interpeter.__interpeter_scale_parameter__()
-                    path_prm = parameter_interpeter.generate_RST_parameter()
-                    self.ids.document_variables_viewer.source = path_prm
-                    self.ids.document_parameters_viewer.source = path_prm
-                    self.ids.document_reforms_viewer.source = path_prm
-                elif (variable_interpeter.file_is_a_variable() and not(reform_interpeter.file_is_a_reform())):
-                    variable_interpeter.start_interpetration()
-                    path_rst = variable_interpeter.generate_RSTs_variables()
-                    self.ids.document_variables_viewer.source = path_rst
-                    self.ids.document_parameters_viewer.source = path_rst
-                    self.ids.document_reforms_viewer.source = path_rst
-                elif (reform_interpeter.file_is_a_reform()):
-                    reform_interpeter.start_interpetration_reforms()
-                    path_rst = reform_interpeter.generate_RST_reforms()
-                    self.ids.document_variables_viewer.source = path_rst
-                    self.ids.document_parameters_viewer.source = path_rst
-                    self.ids.document_reforms_viewer.source = path_rst
+                if file_extension =='.yaml':
+                    parameter_interpeter = ParameterInterpeter(path_file_scelto)
+                    if (parameter_interpeter.understand_type() == ParameterType.normal):
+                        parameter_interpeter.__interpeter_normal_parameter__()
+                        path_prm = parameter_interpeter.generate_RST_parameter()
+                        self.ids.document_variables_viewer.source = path_prm
+                        self.ids.document_parameters_viewer.source = path_prm
+                        self.ids.document_reforms_viewer.source = path_prm
+                    elif (parameter_interpeter.understand_type() == ParameterType.scale):
+                        parameter_interpeter.__interpeter_scale_parameter__()
+                        path_prm = parameter_interpeter.generate_RST_parameter()
+                        self.ids.document_variables_viewer.source = path_prm
+                        self.ids.document_parameters_viewer.source = path_prm
+                        self.ids.document_reforms_viewer.source = path_prm
+                elif file_extension =='.py':
+                    variable_interpeter = Variable_File_Interpeter(path_file_scelto)
+                    reform_interpeter = Reform_File_Interpeter(path_file_scelto)
+                    if (variable_interpeter.file_is_a_variable() and not(reform_interpeter.file_is_a_reform())):
+                        variable_interpeter.start_interpetration()
+                        path_rst = variable_interpeter.generate_RSTs_variables()
+                        self.ids.document_variables_viewer.source = path_rst
+                        self.ids.document_parameters_viewer.source = path_rst
+                        self.ids.document_reforms_viewer.source = path_rst
+                    elif (reform_interpeter.file_is_a_reform()):
+                        reform_interpeter.start_interpetration_reforms()
+                        path_rst = reform_interpeter.generate_RST_reforms()
+                        self.ids.document_variables_viewer.source = path_rst
+                        self.ids.document_parameters_viewer.source = path_rst
+                        self.ids.document_reforms_viewer.source = path_rst
                 else: # file for which the interpretation is not defined yet
                     self.ids.document_variables_viewer.source = path_file_scelto
                     self.ids.document_parameters_viewer.source = path_file_scelto
@@ -180,6 +183,7 @@ class VisualizeSystemScreen(Screen):
                 self.ids.current_path_reforms.text = self.ids.visualize_file_chooser_reforms.path
         except Exception as e:
             print "Some error ", e
+
 
     def go_to_home(self):
         if self.manager.current == 'visualize_system':
