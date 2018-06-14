@@ -237,6 +237,13 @@ class ScaleParameter():
             return PATH_RST_DOCUMENT
 
 
+class FancyIndexingParamater():
+    __values__ = None #dict
+    __parameter_name__ = None
+
+    def __init__(self,parameter_name=None,values=None):
+        self.__parameter_name__  = parameter_name
+        self.__values__ = values
 
 
 class ParameterInterpeter():
