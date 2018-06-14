@@ -24,7 +24,7 @@ Bracket group1
 
 In **2013-01-01** were defined both: 
  - The threshold for this rate: **0.0**; 
- - The value for this rate: **0.03****
+ - The value for this rate: **0.03**
 
 In **2015-01-01** it was defined the value for this rate as: **0.04**
 
@@ -37,19 +37,19 @@ Bracket group2
 
 In **2013-01-01** were defined both: 
  - The threshold for this rate: **12000.0**; 
- - The value for this rate: **0.1****
+ - The value for this rate: **0.1**
 
 In **2014-01-01** it was defined the threshold for this rate as: **12100.0**
 
 In **2015-01-01** were defined both: 
  - The threshold for this rate: **12200.0**; 
- - The value for this rate: **0.12****
+ - The value for this rate: **0.12**
 
 In **2016-01-01** it was defined the threshold for this rate as: **12300.0**
 
 In **2017-01-01** were defined both: 
  - The threshold for this rate: **6000.0**; 
- - The value for this rate: **0.06****
+ - The value for this rate: **0.06**
 
 
 
@@ -58,5 +58,5 @@ Bracket group3
 
 In **2017-01-01** were defined both: 
  - The threshold for this rate: **12400.0**; 
- - The value for this rate: **0.12****
+ - The value for this rate: **0.12**
 

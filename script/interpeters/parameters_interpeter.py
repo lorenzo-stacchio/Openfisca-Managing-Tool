@@ -237,24 +237,24 @@ class ScaleParameter():
                     # 1 value
                     if len(values)==1 and date < datetime.datetime.now().date():
                         if 'threshold' in values:
-                            to_write = str('In **' + str(date) +'** it was defined the threshold for this rate as: **' + str(values['threshold'])).strip() +'**\n\n'
+                            to_write = str('In **' + str(date) +'** it was defined the threshold for this rate as: **' + str(values['threshold']).strip()).strip() +'**\n\n'
                         else:
-                            to_write = str('In **' + str(date) +'** it was defined the value for this rate as: **' + str(values['rate'])).strip() +'**\n\n'
+                            to_write = str('In **' + str(date) +'** it was defined the value for this rate as: **' + str(values['rate']).strip()).strip() +'**\n\n'
                         rst.write(to_write)
                     if len(values)==1 and date >= datetime.datetime.now().date():
                         if 'threshold' in values:
-                            to_write = str('In **' + str(date) +'** it will be defined the threshold for this rate as: **' + str(values['threshold'])).strip() +'**\n\n'
+                            to_write = str('In **' + str(date) +'** it will be defined the threshold for this rate as: **' + str(values['threshold']).strip()).strip() +'**\n\n'
                         else:
-                            to_write = str('In **' + str(date) +'** it will be defined the value for this rate as: **' + str(values['rate'])).strip() +'**\n\n'
+                            to_write = str('In **' + str(date) +'** it will be defined the value for this rate as: **' + str(values['rate']).strip()).strip() +'**\n\n'
                         rst.write(to_write)
                     # 2 values
                     if len(values)==2 and date < datetime.datetime.now().date():
                         if 'threshold' in values:
-                            to_write = str('In **' + str(date) +'** were defined both: \n - The threshold for this rate: **' + str(values['threshold']) + '**; \n - The value for this rate: **'+ str(values['rate']) + '**').strip() +'**\n\n'
+                            to_write = str('In **' + str(date) +'** were defined both: \n - The threshold for this rate: **' + str(values['threshold']).strip() + '**; \n - The value for this rate: **'+ str(values['rate']).strip()).strip() +'**\n\n'
                         rst.write(to_write)
                     if len(values)==2 and date >= datetime.datetime.now().date():
                         if 'threshold' in values:
-                            to_write = str('In **' + str(date) +'** will be defined both: \n - The threshold for this rate: **' + str(values['threshold']) + '**; \n - The value for this rate: **'+ str(values['rate']) + '**').strip() +'**\n\n'
+                            to_write = str('In **' + str(date) +'** will be defined both: \n - The threshold for this rate: **' + str(values['threshold']).strip() + ' **; \n - The value for this rate: **'+ str(values['rate']).strip()).strip() +'**\n\n'
                         rst.write(to_write)
             return PATH_RST_DOCUMENT
 
@@ -311,11 +311,6 @@ class ParameterInterpeter():
                 self.__actual_parameter__.set_unit(self.__yaml_file__['unit'].encode('utf-8').strip())
 
 
-    def generate_RST_parameter(self):
-        if not (self.__parameter_type__ == ParameterType.non_parametro):
-            return self.__actual_parameter__.generate_RST()
-
-
     #SCALE PARAMETER
     def __interpeter_scale_parameter__(self):
         #print "In scala", self.__yaml_file__
@@ -328,6 +323,11 @@ class ParameterInterpeter():
             self.__actual_parameter__.set_reference(self.__yaml_file__['reference'].encode('utf-8').strip())
         if 'unit' in self.__yaml_file__:
             self.__actual_parameter__.set_unit(self.__yaml_file__['unit'].encode('utf-8').strip())
+
+
+    def generate_RST_parameter(self):
+        if not (self.__parameter_type__ == ParameterType.non_parametro):
+            return self.__actual_parameter__.generate_RST()
 
 
     def return_type(self):
