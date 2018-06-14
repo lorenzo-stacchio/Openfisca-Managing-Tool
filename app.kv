@@ -10,6 +10,7 @@
     MakeSimulation:
     OutputVariableScreen:
     ReformsScreen:
+    ExecuteSimulationScreen:
 
 <InitScreen>:
     name: "init"
@@ -89,9 +90,9 @@
                     rows: 1
                     cols: 2
                     Image:
-                        source: '/openfisca.png'
+                        source: 'img/openfisca.png'
                     Image:
-                        source: '/github.png'
+                        source: 'img/github.png'
 
             Label:
                 id: blablabla
@@ -362,16 +363,22 @@
     name: "make_simulation"
     fullscreen: True
 
-
     BoxLayout:
         orientation: 'horizontal'
         BoxLayout:
             orientation: 'vertical'
             Label:
-                text: 'Select input variable'
+                text: 'Select [b]input[/b] variable'
                 halign: 'right'
                 valign: 'top'
-                size_hint: (1.0,0.05)
+                markup: True
+                size_hint: (1.0,0.07)
+                canvas.before:
+                    Color:
+                        rgba: hex('#971640')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
             Label:
                 size_hint: (1.0,0.05)
             Spinner:
@@ -384,6 +391,7 @@
                 multiline: False
                 hint_text: 'Value of the selected variable'
                 size_hint: (1.0,0.1)
+
             Label:
                 size_hint: (1.0,0.05)
             Button:
@@ -406,6 +414,12 @@
                 halign: 'right'
                 valign: 'top'
                 size_hint: (1.0,0.05)
+                canvas.before:
+                    Color:
+                        rgba: hex('#971640')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
             ScrollView:
                 canvas.before:
                     Rectangle:
@@ -424,6 +438,7 @@
 
 
 <OutputVariableScreen>:
+    variable_added_output:variable_added_output
     name: "output_variable"
     fullscreen: True
     BoxLayout:
@@ -431,10 +446,17 @@
         BoxLayout:
             orientation: 'vertical'
             Label:
-                text: 'Select output variable'
+                text: 'Select [b]output[/b] variable'
                 halign: 'right'
                 valign: 'top'
-                size_hint: (1.0,0.05)
+                markup: True
+                size_hint: (1.0,0.07)
+                canvas.before:
+                    Color:
+                        rgba: hex('#971640')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
             Label:
                 size_hint: (1.0,0.05)
             Spinner
@@ -461,7 +483,7 @@
             Button:
                 text: 'Make Simulation!'
                 size_hint: (1.0,0.07)
-                on_press: root.go_to_output_variables()
+                on_press: root.go_to_execute_simulation()
         BoxLayout:
             id: boxlayout_addedvariables
             orientation: 'vertical'
@@ -470,6 +492,12 @@
                 halign: 'right'
                 valign: 'top'
                 size_hint: (1.0,0.05)
+                canvas.before:
+                    Color:
+                        rgba: hex('#971640')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
             ScrollView:
                 canvas.before:
                     Rectangle:
@@ -497,4 +525,45 @@
 <ReformsScreen>:
     name: "reforms"
     Label:
-        text: "Boooo"
+        text: "Qui verrà fatta la riforma"
+
+<ExecuteSimulationScreen>
+    name: "execute_simulation"
+    BoxLayout:
+        orientation: "horizontal"
+        LabelLeftTop:
+            id: "label_input"
+            #TODO text: root.manager.get_screen('output_variable').string_var_input + "aldo"
+        Label:
+            size_hint: 0.001,1
+            canvas.before:
+                Color:
+                    rgba: hex('#ffffff')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        LabelLeftTop:
+            id: "label_output"
+
+<LabelLeftTop>
+    padding_x: 20
+    halign: "left"
+    valign: "top"
+    text_size: self.size
+    markup: True
+    text: ""
+
+<ConfirmPopup>:
+    cols:1
+	Label:
+		text: root.text
+	GridLayout:
+		cols: 2
+		size_hint_y: None
+		height: '44sp'
+		Button:
+			text: 'Yes'
+			on_release: root.dispatch('on_answer','Yes')
+		Button:
+			text: 'No'
+			on_release: root.dispatch('on_answer', 'No')

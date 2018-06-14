@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import kivy
 kivy.require("1.10.0")
 from kivy.app import App
@@ -19,7 +21,8 @@ from script.interpeters.reforms_file_interpeter import *
 from kivy.config import Config
 from kivy.uix.spinner import Spinner
 from kivy.uix.button import Button
-
+from kivy.uix.popup import Popup
+from kivy.uix.boxlayout import BoxLayout
 
 
 # Screen
@@ -55,13 +58,13 @@ class HomeScreen(Screen):
     def ricevi_inizializza_path(self,path):
         self.dict_path = get_all_paths(path)
         self.ids.label_0_0.text = """[color=000000]
-[b][size=20sp]Hello ![/size][/b]\n
-Thanks for installing [size=20sp][b]OpenFisca Tool Manager[/b][/size]!\n
+[b][size=24sp]Hello ![/size][/b]\n
+[size=20sp]Thanks for installing [size=20sp][b]OpenFisca Tool Manager[/b][/size]!\n
 This software will help you to manage some feature provided by OpenFisca, in particular you can:
     - Visualize variables, reforms and parameters of the selected country;
     - Create and Execute a reform;
     - Execute a Simulation.
-Actually you are into """ +path[:path.rindex('\\')+1]+"[b]"+os.path.basename(path)+"[/b]"+".[/color]"
+You are selected this folder: [i]"""+path[:path.rindex('\\')+1]+"[b]"+os.path.basename(path)+"[/i][/b]"+".[/color][/size]\n\n"
 
 
     def go_to_visualize(self):
@@ -218,13 +221,19 @@ class MakeSimulation(Screen):
         if self.manager.current == 'make_simulation':
             #you can't go to output variable if you haven't insert nothing
             if len(self.ids.variable_added.children)!=0:
+                #change transition
+                self.manager.transition  = kivy.uix.screenmanager.SlideTransition(direction='left')
+                self.manager.transition.duration = 1
                 #Go to output_variable
                 self.manager.current = 'output_variable'
+                #reset transition
+                self.manager.transition  = kivy.uix.screenmanager.TransitionBase()
+                self.manager.transition.duration = .4
 
     def add_value_and_reset_form(self):
         if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
             self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_variabili.text+": "+self.ids.input_value_variable.text,
-                                                        on_release=self.destroy_button))
+                                                        on_release=self.destroy_button, background_color = (255,255,255, 0.9), color = (0,0,0,1)))
             #last_object = self.ids.variable_added.children[len(self.ids.variable_added.children)-1]
             #self.manager.get_screen('make_simulation').destroy_widget(last_object)
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
@@ -233,13 +242,83 @@ class MakeSimulation(Screen):
     def destroy_button(self,button):
         self.variable_added.remove_widget(button)
 
+
 class OutputVariableScreen(Screen):
+
+    string_var_input = ""
+    string_var_output = ""
+    variable_added_output = ObjectProperty()
+
+    def __init__(self,**kwargs):
+        super(OutputVariableScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._finish_init)
+
+    def _finish_init(self,dt):
+        valori = ['','Pluto','Paperino','Aldo','Rodo']
+        self.ids.menu_a_tendina_variabili_output.values = valori
+        self.ids.menu_a_tendina_variabili_output.text = valori[0]
+        self.ids.information.text = """
+[b]Instructions[/b]:
+    - Select a variable
+    - Insert into the text input form its value
+    - Click on "Add Variable"
+
+[b]Rules[/b]:
+    - You can't insert a blank variable
+    - You can't insert a blank variable value
+            """
+
     def go_to_home(self):
         if self.manager.current == 'output_variable':
+            #Reset when you go to home
+            self.ids.variable_added_output.clear_widgets()
+            self.ids.menu_a_tendina_variabili_output.text = ''
+            self.ids.input_value_variable_output.text = ''
+            #Reset also the variable of MakeSimulation
+            self.manager.get_screen('make_simulation').ids.variable_added.clear_widgets()
+            self.manager.get_screen('make_simulation').ids.menu_a_tendina_variabili.text = ''
+            self.manager.get_screen('make_simulation').ids.input_value_variable.text = ''
             self.manager.current = 'home'
-    def go_to_make_simulation(self):
+    def go_to_execute_simulation(self):
         if self.manager.current == 'output_variable':
-            self.manager.current = 'make_simulation'
+
+            string_var_input = "The situation is following:\nInput\n"
+            for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
+                string_var_input += "-"+str(el_input.text)+"\n"
+            string_var_output = "Output\n"
+            for el_output in self.ids.variable_added_output.children:
+                string_var_output += "-"+str(el_output.text)+"\n"
+            content = ConfirmPopup(text=str(string_var_input)+"\n"+str(string_var_output))
+            content.bind(on_answer=self._on_answer)
+            self.popup = Popup(title="Answer Question",content=content,size_hint=(None, None),size=(480,400),auto_dismiss= False)
+            self.popup.open()
+
+    def _on_answer(self, instance, answer):
+        print "Risposta: " , repr(answer)
+        if answer == 'Yes':
+            self.manager.current = 'execute_simulation'
+        self.popup.dismiss()
+
+    def add_value_and_reset_form(self):
+        if self.ids.menu_a_tendina_variabili_output.text != '' and self.ids.input_value_variable_output.text != '':
+            self.ids.variable_added_output.add_widget(Button(text=self.ids.menu_a_tendina_variabili_output.text+": "+self.ids.input_value_variable_output.text,
+                                                        on_release=self.destroy_button, background_color = (255,255,255, 0.9), color = (0,0,0,1)))
+            self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
+            self.ids.input_value_variable_output.text = ''
+
+    def destroy_button(self,button):
+        self.variable_added_output.remove_widget(button)
+
+
+
+
+class ExecuteSimulationScreen(Screen):
+    def __init__(self,**kwargs):
+        super(ExecuteSimulationScreen, self).__init__(**kwargs)
+
+
+class LabelLeftTop(Label):
+    pass
 
 class ReformsScreen(Screen):
     pass
@@ -247,6 +326,17 @@ class ReformsScreen(Screen):
 class MyScreenManager(ScreenManager):
     pass
 
+
+
+class ConfirmPopup(GridLayout):
+	text = StringProperty()
+
+	def __init__(self,**kwargs):
+		self.register_event_type('on_answer')
+		super(ConfirmPopup,self).__init__(**kwargs)
+
+	def on_answer(self, *args):
+		pass
 
 
 # App

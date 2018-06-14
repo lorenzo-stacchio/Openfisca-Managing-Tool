@@ -201,6 +201,11 @@ class Reform_File_Interpeter():
                                 line = (line[(line.find('(') + 1):line.find(')')].strip()).replace("self.","")
                                 dict_action[line] = "Aggiunge al sistema la seguente variabile: \n\n"
                                 current_reform.append_reform_action(dict_action)
+                            elif 'neutralize_variable' in line:
+                                # example of code line self.add_variable(income_tax)
+                                line = (line[(line.find('(') + 1):line.find(')')].strip()).replace("self.","")
+                                dict_action[line] = "Neutralizza la seguente variabile: \n\n"
+                                current_reform.append_reform_action(dict_action)
                     pieces = line.split('=')
                     if 'class' in pieces[0] and '(Reform):' in pieces[0]:
                         reform_found = True
