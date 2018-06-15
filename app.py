@@ -64,7 +64,7 @@ This software will help you to manage some feature provided by OpenFisca, in par
     - Visualize variables, reforms and parameters of the selected country;
     - Create and Execute a reform;
     - Execute a Simulation.
-You are selected this folder: [i]"""+path[:path.rindex('\\')+1]+"[b]"+os.path.basename(path)+"[/i][/b]"+".[/color][/size]\n\n"
+You have selected this folder: [i]"""+path[:path.rindex('\\')+1]+"[b]"+os.path.basename(path)+"[/i][/b]"+".[/color][/size]\n\n"
 
 
     def go_to_visualize(self):
