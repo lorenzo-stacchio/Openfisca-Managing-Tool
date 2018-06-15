@@ -15,6 +15,7 @@ class ParameterType(Enum):
     non_parametro = "The file doesn't contain a valid parameter"
     normal = "The parameter is a simple parameter"
     scale = "The parameter is a scale parameter"
+    fancy_indexing = "The parameter is a fancy indexing parameter"
 
 class NormalParameter():
     __description__ = None
@@ -50,6 +51,83 @@ class NormalParameter():
 
     def set_element_to_dict_key(self,key,value):
         self.__dict_data_value__[key] =  value
+
+    def string_RST(self):
+        string_RST = ""
+        #parameter name
+        for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+            string_RST = string_RST + ('#')
+        string_RST = string_RST +("\nParameter: " + self.__parameter_name__ + "\n")
+        for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+            string_RST = string_RST + ('#')
+        string_RST = string_RST +("\n")
+        # Description
+        if self.__description__:
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +('\nDescription:' + "\n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +("\n\n")
+            string_RST = string_RST +(self.__description__ + "\n\n")
+        else:
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +('\nDescription:' + "\n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +("\n\n")
+            string_RST = string_RST +("Not Specified" + "\n\n")
+        # Reference is an optional field
+        if self.__reference__:
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +('\nReference:' + "\n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +("\n\n")
+            string_RST = string_RST +(self.__reference__ + "\n\n")
+        else:
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +('\nReference:' + "\n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +("\n\n")
+            string_RST = string_RST +("Not Specified" + "\n\n")
+        # Reference is an optional field
+        if self.__unit__:
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +('\nUnit:' + "\n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +("\n\n")
+            string_RST = string_RST +(self.__unit__ + "\n\n")
+        else:
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +('\nUnit:' + "\n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST +('*')
+            string_RST = string_RST +("\n\n")
+            string_RST = string_RST +("Not Specified" + "\n\n")
+        #VALUES
+        for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+            string_RST = string_RST +('*')
+        string_RST = string_RST +('\nValues:' + "\n")
+        for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+            string_RST = string_RST +('*')
+        string_RST = string_RST +("\n")
+        # writing the formatted the dates
+        for date,value_dict in self.__dict_data_value__.iteritems(): #key are the dates
+            true_value = value_dict['value'] #is ever one element
+            if date <= datetime.datetime.now().date(): # check if the value is future or not
+                string_RST = string_RST +("- Dal **" + date.strftime('%Y/%m/%d') + "** il parametro é valso **" + str(true_value) + "**\n")
+            else:
+                string_RST = string_RST +("- Dal **" + date.strftime('%Y/%m/%d') + "** si presume che il parametro varrà **" + str(true_value) + "**\n")
+        return string_RST
+
 
     def generate_RST(self):
         if os.path.exists(PATH_RST_DOCUMENT):
@@ -262,12 +340,38 @@ class ScaleParameter():
 
 
 class FancyIndexingParamater():
-    __values__ = None #dict
     __parameter_name__ = None
+    __code_dict__ = None # contain key and normal parameter associated
 
-    def __init__(self,parameter_name=None,values=None):
+    def __init__(self,parameter_name=None,values=None,code_dict= None):
         self.__parameter_name__  = parameter_name
-        self.__values__ = values
+        self.__code_dict__ = code_dict
+
+    def set_code_dict(self,code_dict):
+        self.__code_dict__ = code_dict
+
+    def generate_RST(self):
+        if os.path.exists(PATH_RST_DOCUMENT):
+            os.remove(PATH_RST_DOCUMENT)
+        with open(PATH_RST_DOCUMENT,'a') as rst:
+            #parameter name
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                rst.write('#')
+            rst.write("\nParameter: " + self.__parameter_name__ + "\n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                rst.write('#')
+            rst.write("\n")
+            rst.write('\nIn this parameter it will be described the value of the various homogeneous parameters depending on the value of an external variable.\n\n')
+            print self.__code_dict__
+            for key_lv1, value_lv1 in self.__code_dict__.iteritems():
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                    rst.write('#')
+                rst.write("\nVariable_value: " + key_lv1 + "\n")
+                for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                    rst.write('#')
+                for key_lv2, value_lv2 in value_lv1.iteritems():
+                    rst.write("\n\n" + value_lv2.string_RST() + "\n")
+        return PATH_RST_DOCUMENT
 
 
 class ParameterInterpeter():
@@ -296,9 +400,23 @@ class ParameterInterpeter():
             self.__parameter_type__ = ParameterType.normal
         elif count_brackets_word >=1: #bracket parameter
             self.__parameter_type__ = ParameterType.scale
-        if (self.__parameter_type__ == ParameterType.non_parametro) : # could be a fancy indexing
+        elif (self.__parameter_type__ == ParameterType.non_parametro) : # could be a fancy indexing
+            key_value_dict = {}
+            base_case_fancy = []
             for key_lv_1, value_lv_1 in self.__yaml_file__.iteritems():
-                print "Roba del fancy", key_lv_1, value_lv_1
+                key_value_dict[key_lv_1] = []
+                if base_case_fancy == []:
+                    for key_lv_2, value_lv_2 in value_lv_1.iteritems():
+                        key_value_dict[key_lv_1].append(key_lv_2)
+                        base_case_fancy.append(key_lv_2)
+                else:
+                    for key_lv_2, value_lv_2 in value_lv_1.iteritems():
+                        key_value_dict[key_lv_1].append(key_lv_2)
+            valid_fancy_indexing = True
+            for key, value in  key_value_dict.iteritems(): #check if it is a correct fancy indexing
+                if not all(elem in base_case_fancy  for elem in value):
+                    valid_fancy_indexing = False
+            if valid_fancy_indexing: self.__parameter_type__ = ParameterType.fancy_indexing
         return self.__parameter_type__
 
 
@@ -318,16 +436,48 @@ class ParameterInterpeter():
 
     #SCALE PARAMETER
     def __interpeter_scale_parameter__(self):
-        #print "In scala", self.__yaml_file__
-        self.__actual_parameter__ = ScaleParameter()
-        self.__actual_parameter__.set_brackets(self.__yaml_file__['brackets'])
-        self.__actual_parameter__.set_parameter_name(os.path.basename(self.__parameter_path__))
-        if 'description' in self.__yaml_file__:
-            self.__actual_parameter__.set_description(self.__yaml_file__['description'].encode('utf-8').strip())
-        if 'reference' in self.__yaml_file__:
-            self.__actual_parameter__.set_reference(self.__yaml_file__['reference'].encode('utf-8').strip())
-        if 'unit' in self.__yaml_file__:
-            self.__actual_parameter__.set_unit(self.__yaml_file__['unit'].encode('utf-8').strip())
+        if (self.__parameter_type__ == ParameterType.scale):
+            #print "In scala", self.__yaml_file__
+            self.__actual_parameter__ = ScaleParameter()
+            self.__actual_parameter__.set_brackets(self.__yaml_file__['brackets'])
+            self.__actual_parameter__.set_parameter_name(os.path.basename(self.__parameter_path__))
+            if 'description' in self.__yaml_file__:
+                self.__actual_parameter__.set_description(self.__yaml_file__['description'].encode('utf-8').strip())
+            if 'reference' in self.__yaml_file__:
+                self.__actual_parameter__.set_reference(self.__yaml_file__['reference'].encode('utf-8').strip())
+            if 'unit' in self.__yaml_file__:
+                self.__actual_parameter__.set_unit(self.__yaml_file__['unit'].encode('utf-8').strip())
+
+
+    def __interpeter_normal_parameter_for_fancy_indexing__(self, normal_yaml_parameter = None, parameter_name = None):
+        if normal_yaml_parameter:
+            actual_normal = NormalParameter()
+            actual_normal.set_dict_data_value(normal_yaml_parameter['values'])
+            actual_normal.set_parameter_name(parameter_name)
+            if 'description' in normal_yaml_parameter:
+                actual_normal.set_description(normal_yaml_parameter['description'].encode('utf-8').strip())
+            if 'reference' in normal_yaml_parameter:
+                actual_normal.set_reference(normal_yaml_parameter['reference'].encode('utf-8').strip())
+            if 'unit' in normal_yaml_parameter:
+                actual_normal.set_unit(normal_yaml_parameter['unit'].encode('utf-8').strip())
+            return actual_normal
+
+
+    def __interpeter_fancy_indexing_parameter__(self):
+        print "Fancy indexing!"
+        if (self.__parameter_type__ == ParameterType.fancy_indexing):
+            self.__actual_parameter__ = FancyIndexingParamater(parameter_name = self.__parameter_name__)
+            formatted_dict = {}
+            # the fancy indexing is formed by many normal parameters
+            for key_lv1, value_lv1 in self.__yaml_file__.iteritems():
+                actual_inner_dict = {}
+                for key_lv2, value_lv2 in value_lv1.iteritems():
+                    #print "\nChiave attuale", key_lv2
+                    actual_normal_parameter = self.__interpeter_normal_parameter_for_fancy_indexing__(normal_yaml_parameter = value_lv2, parameter_name = key_lv2)
+                    actual_inner_dict[key_lv2] = actual_normal_parameter
+                formatted_dict[key_lv1] = actual_inner_dict
+            #print "Total", formatted_dict
+            self.__actual_parameter__.set_code_dict(formatted_dict)
 
 
     def generate_RST_parameter(self):

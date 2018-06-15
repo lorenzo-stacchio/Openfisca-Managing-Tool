@@ -159,6 +159,12 @@ class VisualizeSystemScreen(Screen):
                         self.ids.document_variables_viewer.source = path_prm
                         self.ids.document_parameters_viewer.source = path_prm
                         self.ids.document_reforms_viewer.source = path_prm
+                    elif (parameter_interpeter.understand_type() == ParameterType.fancy_indexing):
+                        parameter_interpeter.__interpeter_fancy_indexing_parameter__()
+                        path_prm = parameter_interpeter.generate_RST_parameter()
+                        self.ids.document_variables_viewer.source = path_prm
+                        self.ids.document_parameters_viewer.source = path_prm
+                        self.ids.document_reforms_viewer.source = path_prm
                 elif file_extension =='.py':
                     variable_interpeter = Variable_File_Interpeter(path_file_scelto)
                     reform_interpeter = Reform_File_Interpeter(path_file_scelto)
