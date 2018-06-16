@@ -1,5 +1,13 @@
 import json
 import imp
+import os
+import sys
+# Openfisca modules importing
+sys.path.append('C:\\Users\\Lorenzo Stacchio\\Desktop\\openfisca-italy\\openfisca_italy')
+from scenarios import *
+from entita import *
+from italy_taxbenefitsystem import ItalyTaxBenefitSystem
+import inspect
 
 
 class Variable_for_simulation():
@@ -50,11 +58,21 @@ class Simulation_generator():
         self.__path_to_openfisca_country__ = path_to_openfisca_country
 
     def generate_simulation(self):
-        scenarios = imp.load_source('scenarios', self.__path_to_openfisca_country__)
-        scenario = scenarios.Scenario()
-        print type(scenario)
+        pass
 
 
-#MAIN
-persona1 = Simulation_generator(path_to_openfisca_country = "C:\Users\Lorenzo Stacchio\Desktop\openfisca-italy\openfisca_italy" )
-persona1.generate_simulation()
+# main
+tax_benefit_system = ItalyTaxBenefitSystem() #prendi il sistema di tasse e benefici
+# scenario normale
+variables = tax_benefit_system.get_variables()
+
+for k,v in variables.iteritems():
+    if not (v.is_input_variable()):
+        print "\nVariable:", k
+        print v.value_type.__name__
+        print v.entity.__name__
+        if v.label:
+            print v.label.encode("utf-8")
+        print v.definition_period
+        lines = inspect.getsource(v.get_formula())  # get formula if the variable if exist
+        print lines
