@@ -23,7 +23,7 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
-
+from kivy.properties import DictProperty
 
 # Screen
 class InitScreen(Screen):
@@ -199,14 +199,23 @@ class VisualizeSystemScreen(Screen):
 class MakeSimulation(Screen):
 
     variable_added = ObjectProperty()
+    dict_entita = DictProperty()
+
     def __init__(self,**kwargs):
         super(MakeSimulation, self).__init__(**kwargs)
         Clock.schedule_once(self._finish_init)
 
     def _finish_init(self,dt):
-        valori = ['','Pluto','Paperino','Aldo','Rodo']
-        self.ids.menu_a_tendina_variabili.values = valori
-        self.ids.menu_a_tendina_variabili.text = valori[0]
+        self.dict_entita = {
+    		"Persona" : ['','Pluto','Paperino','Aldo','Rodo'],
+    		"Prova1" : ['','blablabla1'],
+    		"Prova2" : ['','blablabla2'],
+    		"Prova3" : ['','blablabla3']
+    	}
+        self.ids.menu_a_tendina_entita.values = self.dict_entita.keys()
+        self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
+        self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
+        self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
         self.ids.information.text = """
 [b]Instructions[/b]:
     - Select a variable
@@ -217,6 +226,11 @@ class MakeSimulation(Screen):
     - You can't insert a blank variable
     - You can't insert a blank variable value
             """
+
+    def update_spinner(self):
+        print "Hai selezionato "+self.ids.menu_a_tendina_entita.text
+        self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
+        self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
 
     def go_to_home(self):
         if self.manager.current == 'make_simulation':

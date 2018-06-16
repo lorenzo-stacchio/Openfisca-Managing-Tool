@@ -368,7 +368,28 @@
         BoxLayout:
             orientation: 'vertical'
             Label:
-                text: 'Select [b]input[/b] variable'
+                text: 'Select [b]entity[/b]'
+                halign: 'right'
+                valign: 'top'
+                markup: True
+                size_hint: (1.0,0.08)
+                canvas.before:
+                    Color:
+                        rgba: hex('#971640')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            Label:
+                size_hint: (1.0,0.05)
+            Spinner:
+                id: menu_a_tendina_entita
+                size_hint: (1.0,0.1)
+                on_text: root.update_spinner()
+            Label:
+                size_hint: (1.0,0.05)
+
+            Label:
+                text: 'Select [b]input variable[/b]'
                 halign: 'right'
                 valign: 'top'
                 markup: True
@@ -391,9 +412,11 @@
                 multiline: False
                 hint_text: 'Value of the selected variable'
                 size_hint: (1.0,0.1)
-
             Label:
                 size_hint: (1.0,0.05)
+
+
+
             Button:
                 text: 'Add variable'
                 size_hint: (0.5,0.05)
