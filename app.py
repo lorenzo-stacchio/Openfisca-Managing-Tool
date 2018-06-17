@@ -83,12 +83,14 @@ You have selected this folder: [i]"""+path[:path.rindex('\\')+1]+"[b]"+os.path.b
 
 class VisualizeSystemScreen(Screen):
     dict_path = ''
+    PATH_OPENFISCA = ''
 
     def __init__(self,**kwargs):
         super(VisualizeSystemScreen, self).__init__(**kwargs)
 
     def ricevi_inizializza_path(self,path):
         self.dict_path = get_all_paths(path)
+        self.PATH_OPENFISCA = self.dict_path['inner_system_folder']
         os.chdir(os.getcwd())
         self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
         self.ids.document_variables_viewer.colors["link"] = "33AAFFff"
@@ -166,7 +168,7 @@ class VisualizeSystemScreen(Screen):
                         self.ids.document_parameters_viewer.source = path_prm
                         self.ids.document_reforms_viewer.source = path_prm
                 elif file_extension =='.py':
-                    variable_interpeter = Variable_File_Interpeter(path_file_scelto)
+                    variable_interpeter = Variable_File_Interpeter(path_file_scelto, openfisca_system_path = self.PATH_OPENFISCA )
                     reform_interpeter = Reform_File_Interpeter(path_file_scelto)
                     if (variable_interpeter.file_is_a_variable() and not(reform_interpeter.file_is_a_reform())):
                         variable_interpeter.start_interpetration()

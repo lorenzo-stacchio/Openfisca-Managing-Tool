@@ -22,6 +22,7 @@ def get_all_paths(path_di_partenza):
             # print "sono in project folder",project_folder
             dict_path = {}
             dict_path['initial_path'] = str(path_di_partenza)
+            dict_path['inner_system_folder'] = str(project_folder)
             dict_path['reforms'] = str(project_folder + "/" + "reforms")
             dict_path['parameters'] =  str(project_folder + "/" + "parameters")
             dict_path['tests'] = str(project_folder + "/" + "tests")

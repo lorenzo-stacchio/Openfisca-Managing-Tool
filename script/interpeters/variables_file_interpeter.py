@@ -6,6 +6,10 @@ import datetime
 import collections
 import re
 import time
+import inspect
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
@@ -159,7 +163,7 @@ class Variable_for_writing():
                 rst.write("\n" + "``Periodo`` di definizione non definito\n")
 
             if self.set_input:
-                rst.write("\n" + "Il ``set_input`` di questa variabile vale: ``" + self.set_input + "``\n")
+                rst.write("\n" + "Il ``set_input`` di questa variabile vale: ``" + str(self.set_input) + "``\n")
             else:
                 rst.write("\n" + "Nessun ``set_input`` inserito\n")
 
@@ -184,9 +188,12 @@ class Variable_File_Interpeter():
     __variables_file_path__ = ""
     __variables__ = [] # will be a list
     __file_is_a_variable__ = False
+    __PATH_OPENFISCA_SYSTEM__ = ""
 
-    def __init__(self,variable_path):
+    def __init__(self,variable_path, openfisca_system_path = None):
         self.__variable_path__ = variable_path
+        self.__PATH_OPENFISCA_SYSTEM__ = openfisca_system_path
+        print "PATH:", self.__PATH_OPENFISCA_SYSTEM__
         # check if the file passed contains a variable
         with open(self.__variable_path__,'r') as content_variable:
             for line in content_variable.readlines():
@@ -199,55 +206,48 @@ class Variable_File_Interpeter():
     def file_is_a_variable(self):
         return self.__file_is_a_variable__
 
+
     def start_interpetration(self):
         self.__variables__ = []
-        formula_found = False
-        current_variable_index = -1
-        current_Variable = None
         with open(self.__variable_path__,'r') as content_variable:
             for line in content_variable.readlines():
                 line =  line.strip()
                 if '#' in line:
                     line = line[:line.find('#')]
-                if line:
-                    # if found a formula, we don't have to split the line
-                    if formula_found:
-                        if ('class' in line and '(Variable):' in line) or ('class' in line and '(Reform):' in line):
-                            formula_found = False
-                        else:
-                            current_Variable.set_formula(current_Variable.get_formula() + "\n   "+ line)
-                    pieces = line.split('=')
-                    if 'class' in pieces[0] and '(Variable):' in pieces[0]:
-                        formula_found = False
-                        current_variable_index = current_variable_index + 1
-                        variable_name = pieces[0]
+                if line: # found only the name of the variable
+                    if 'class' in line and '(Variable):' in line: # variable found
+                        variable_name = line
                         for chs in ['class','(Variable):']:
                             variable_name = variable_name.replace(chs,'')
                         current_Variable = Variable_for_writing(variable_name = variable_name.strip())
                         self.__variables__.append(current_Variable)
-                    if 'value_type' in pieces[0]:
-                        current_Variable.set_value_type(pieces[1].strip())
-                    if 'entity' in pieces[0]:
-                        current_Variable.set_entity(pieces[1].strip())
-                    if 'label' in pieces[0]:
-                        label = pieces[1]
-                        for chs in ['u"','\"']:
-                            label = label.replace(chs,'')
-                        current_Variable.set_label(label.strip())#label could be written with unicode
-                    if 'definition_period' in pieces[0]:
-                        current_Variable.set_definition_period(pieces[1].strip())
-                    if 'set_input' in pieces[0]:
-                        current_Variable.set_set_input(pieces[1].strip())
-                    if 'reference' in pieces[0]:
-                        reference = pieces[1]
-                        for chs in ['\"']:
-                            reference = reference.replace(chs,'')
-                        reference = re.search("(?P<url>https?://[^\s]+)", reference).group("url")
-                        current_Variable.set_reference(reference.strip())
-                    if 'formula' in pieces[0]:
-                        formula_found = True
-                        current_Variable.set_formula(' ' + pieces[0].strip())
-            #print self.__variables__
+        # found all the variables
+        # Openfisca modules importing, matching variables found
+        sys.path.append(self.__PATH_OPENFISCA_SYSTEM__)
+        print self.__PATH_OPENFISCA_SYSTEM__
+        from italy_taxbenefitsystem import *
+        from scenarios import *
+        from entita import *
+        tax_benefit_system = ItalyTaxBenefitSystem() #prendi il sistema di tasse e benefici
+        # scenario normale
+        variables = tax_benefit_system.get_variables()
+        for k,v in variables.iteritems():
+            for element in self.__variables__:
+                #print "Nome variabile trovata:", element.get_variable_name()
+                #print "Nome variabile attuale:",
+                if k == element.get_variable_name():
+                    element.set_value_type(v.value_type.__name__)
+                    element.set_entity(v.entity.__name__)
+                    if v.label:
+                        element.set_label(v.label.encode("utf-8"))
+                    element.set_definition_period(v.definition_period)
+                    if v.reference:
+                        element.set_reference(v.reference[0])
+                    if v.set_input :
+                        element.set_set_input(v.set_input.__name__)
+                    if not (v.is_input_variable()):
+                        lines = inspect.getsource(v.get_formula())  # get formula if the variable if exist
+                        element.set_formula(lines)
 
 
     def generate_RSTs_variables(self):
@@ -255,13 +255,3 @@ class Variable_File_Interpeter():
         for var in self.__variables__:
             path = var.generate_RST_variable() # the path is always the same
         return path
-
-# __main__
-
-#object = Variable_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\parameters\\benefici\\indennita_alloggio.yaml')
-#object = Variable_File_Interpeter('C:\\Users\\Stach\\Desktop\\aldo.rst')
-#object.start_interpetration()
-#if object.file_is_a_variable():
-#    object.generate_RSTs_variables()
-#else:
-#    print "Not a variable"

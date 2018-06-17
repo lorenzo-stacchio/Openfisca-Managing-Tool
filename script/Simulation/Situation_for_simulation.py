@@ -8,9 +8,11 @@ import time
 PATH_OPENFISCA_SYSTEM = 'C:\\Users\\Lorenzo Stacchio\\Desktop\\openfisca-italy\\openfisca_italy'
 # Openfisca modules importing
 sys.path.append(PATH_OPENFISCA_SYSTEM)
-from italy_taxbenefitsystem import ItalyTaxBenefitSystem
+from italy_taxbenefitsystem import *
 from scenarios import *
 from entita import *
+
+
 
 class Variable():
     __name__= None
@@ -118,8 +120,8 @@ class Simulation_generator(): #defined for Italy
         self.__period__ = period
 
 
-
-    def init_profile(self,scenario, entity_situation):
+    def init_profile(self, scenario, entity_situation):
+        print "Situation: ", entity_situation
         scenario.init_single_entity(
             period = self.__period__,
             parent1 = entity_situation
@@ -139,6 +141,7 @@ class Simulation_generator(): #defined for Italy
 tax_benefit_system = ItalyTaxBenefitSystem() #prendi il sistema di tasse e benefici
 situation = Situation(name_of_situation = "IRPEF_2017", period = '2017')
 person = Entity(name = 'Person' , openfisca_tax_benefit_system = tax_benefit_system)
+print "id persona:", id(Persona)
 #household = Entity(name = 'Household' , openfisca_tax_benefit_system = tax_benefit_system)
 #print "*************************PERSON***********************************"
 list_person_variables =  person.get_associated_variables()
