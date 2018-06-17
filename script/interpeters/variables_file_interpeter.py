@@ -52,14 +52,26 @@ class Variable_for_writing():
     def set_entity(self,entity):
         self.entity = entity
 
+    def get_entity(self):
+        return self.entity
+
     def set_definition_period(self,definition_period):
         self.definition_period = definition_period
+
+    def get_definition_period(self):
+        return self.definition_period
 
     def set_label(self,label):
         self.label = label
 
+    def get_label(self):
+        return self.label
+
     def set_value_type(self,value_type):
         self.value_type = value_type
+
+    def get_value_type(self):
+        return self.value_type
 
     def set_formula(self,formula):
         self.formula = formula
@@ -73,9 +85,14 @@ class Variable_for_writing():
     def set_set_input(self,set_input):
         self.set_input = set_input
 
+    def get_set_input(self):
+        return self.set_input
 
     def set_reference(self,reference):
         self.reference = reference
+
+    def get_reference(self):
+        return self.reference
 
     def RST_string(self):
         return self.__RST_string__
@@ -193,7 +210,6 @@ class Variable_File_Interpeter():
     def __init__(self,variable_path, openfisca_system_path = None):
         self.__variable_path__ = variable_path
         self.__PATH_OPENFISCA_SYSTEM__ = openfisca_system_path
-        print "PATH:", self.__PATH_OPENFISCA_SYSTEM__
         # check if the file passed contains a variable
         with open(self.__variable_path__,'r') as content_variable:
             for line in content_variable.readlines():
@@ -248,6 +264,56 @@ class Variable_File_Interpeter():
                     if not (v.is_input_variable()):
                         lines = inspect.getsource(v.get_formula())  # get formula if the variable if exist
                         element.set_formula(lines)
+
+    def __interpretation_variable_for_reform__(self):
+        self.__variables__ = []
+        formula_found = False
+        current_variable_index = -1
+        current_Variable = None
+        with open(self.__variable_path__,'r') as content_variable:
+            for line in content_variable.readlines():
+                line =  line.strip()
+                if '#' in line:
+                    line = line[:line.find('#')]
+                if line:
+                    # if found a formula, we don't have to split the line
+                    if formula_found:
+                        if ('class' in line and '(Variable):' in line) or ('class' in line and '(Reform):' in line):
+                            formula_found = False
+                        else:
+                            current_Variable.set_formula(current_Variable.get_formula() + "\n   "+ line)
+                    pieces = line.split('=')
+                    if 'class' in pieces[0] and '(Variable):' in pieces[0]:
+                        formula_found = False
+                        current_variable_index = current_variable_index + 1
+                        variable_name = pieces[0]
+                        for chs in ['class','(Variable):']:
+                            variable_name = variable_name.replace(chs,'')
+                        current_Variable = Variable_for_writing(variable_name = variable_name.strip())
+                        self.__variables__.append(current_Variable)
+                    if 'value_type' in pieces[0]:
+                        current_Variable.set_value_type(pieces[1].strip())
+                    if 'entity' in pieces[0]:
+                        current_Variable.set_entity(pieces[1].strip())
+                    if 'label' in pieces[0]:
+                        label = pieces[1]
+                        for chs in ['u"','\"']:
+                            label = label.replace(chs,'')
+                        current_Variable.set_label(label.strip())#label could be written with unicode
+                    if 'definition_period' in pieces[0]:
+                        current_Variable.set_definition_period(pieces[1].strip())
+                    if 'set_input' in pieces[0]:
+                        current_Variable.set_set_input(pieces[1].strip())
+                    if 'reference' in pieces[0]:
+                        reference = pieces[1]
+                        for chs in ['\"']:
+                            reference = reference.replace(chs,'')
+                        reference = re.search("(?P<url>https?://[^\s]+)", reference).group("url")
+                        current_Variable.set_reference(reference.strip())
+                    if 'formula' in pieces[0]:
+                        formula_found = True
+                        current_Variable.set_formula(' ' + pieces[0].strip())
+            #print self.__variables__
 
 
     def generate_RSTs_variables(self):

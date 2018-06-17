@@ -99,7 +99,7 @@ class Reform_for_writing():
             count_actions = 0
             for action in self.__reform_actions__: # action is ever a dict of one
                 for k,v in action.iteritems():
-                    rst.write("\n- Azione " + str(count_actions) +" : " + v + "\n")
+                    rst.write("\n\n- **Action " + str(count_actions + 1) +"** : " + v + "\n")
                     count_actions = count_actions + 1
             rst.write("\n\n")
         return PATH_RST_DOCUMENT
@@ -109,9 +109,11 @@ class Reform_File_Interpeter():
     __reforms_file_path__ = ""
     __reforms__ = [] # will be a list
     __file_is_a_reform__ = False
+    __PATH_OPENFISCA_SYSTEM__ = ""
 
-    def __init__(self,reform_path):
+    def __init__(self,reform_path, openfisca_system_path = None):
         self.__reforms_file_path__ = reform_path
+        self.__PATH_OPENFISCA_SYSTEM__ = openfisca_system_path
         # check if the file passed contains a variable
         with open(self.__reforms_file_path__,'r') as content_reform:
             for line in content_reform.readlines():
@@ -120,17 +122,88 @@ class Reform_File_Interpeter():
 
 
     def __find_and_bind_variables__(self):
-        var_interpeter = Variable_File_Interpeter(self.__reforms_file_path__)
-        var_interpeter.start_interpetration()
-        variables = var_interpeter.get_variables()
-        #print "Quante variabili?", len(variables)
+        sys.path.append(self.__PATH_OPENFISCA_SYSTEM__)
+        print "FIND BIND IN REFORM PATH: ", self.__PATH_OPENFISCA_SYSTEM__
+        from italy_taxbenefitsystem import *
+        from scenarios import *
+        from entita import *
+        tax_benefit_system = ItalyTaxBenefitSystem()
+        # Print actions
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():
                 for key,value in action.iteritems():
-                    # get the actions
-                    for var in variables:
-                        if key==var.get_variable_name():
-                            action[key] = action[key] + var.generate_RST_string_variable()
+                    if not (value == 'modify_parameters'):
+                        if value == 'neutralize_variable':
+                            for k_var, val_var in tax_benefit_system.get_variables().iteritems():
+                                if key==k_var:
+                                    variable = Variable_for_writing()
+                                    variable.set_variable_name(key)
+                                    variable.set_value_type(val_var.value_type.__name__)
+                                    variable.set_entity(val_var.entity.__name__)
+                                    if val_var.label:
+                                        variable.set_label(val_var.label.encode("utf-8"))
+                                    variable.set_definition_period(val_var.definition_period)
+                                    if val_var.reference:
+                                        variable.set_reference(val_var.reference[0])
+                                    if val_var.set_input :
+                                        variable.set_set_input(val_var.set_input.__name__)
+                                    if not (val_var.is_input_variable()):
+                                        lines = inspect.getsource(val_var.get_formula())  # get formula if the variable if exist
+                                        variable.set_formula(lines)
+                                    action[key] = action[key] + "\n\n" + variable.generate_RST_string_variable()
+                        elif value == 'add_variable':
+                            var_interpeter = Variable_File_Interpeter(self.__reforms_file_path__)
+                            var_interpeter.__interpretation_variable_for_reform__()
+                            variables_in_reform = var_interpeter.get_variables()
+                            for variable in variables_in_reform:
+                                if key == variable.get_variable_name():
+                                    action[key] = action[key] + "\n\n" + variable.generate_RST_string_variable()
+                        elif value == 'update_variable':
+                            var_interpeter = Variable_File_Interpeter(self.__reforms_file_path__)
+                            var_interpeter.__interpretation_variable_for_reform__()
+                            variables_in_reform = var_interpeter.get_variables()
+                            var_interpeter.start_interpetration() #get the existing variable
+                            variables_updated_if_exist = var_interpeter.get_variables()
+                            for variable_in_reform,variable_in_system in zip(variables_in_reform,variables_updated_if_exist):
+                                if key == variable_in_reform.get_variable_name():
+                                    variable_X = Variable_for_writing(variable_name = key)
+                                    print "VARIABILE RIFORMATA", variable_in_reform
+                                    print "Variabile normale", variable_in_system
+                                    if not (variable_in_reform.get_value_type() == None):
+                                        variable_X.set_value_type(variable_in_reform.get_value_type())
+                                    else:
+                                        variable_X.set_value_type(variable_in_system.get_value_type())
+                                    print "Tipo variabile finale", variable_X.get_value_type()
+                                    if not (variable_in_reform.get_entity() == None):
+                                        variable_X.set_entity(variable_in_reform.get_entity())
+                                    else:
+                                        variable_X.set_entity(variable_in_system.get_entity())
+
+                                    if not (variable_in_reform.get_definition_period() == None):
+                                        variable_X.set_definition_period(variable_in_reform.get_definition_period())
+                                    else:
+                                        variable_X.set_definition_period(variable_in_system.get_entity())
+
+                                    if not (variable_in_reform.get_label() == None):
+                                        variable_X.set_label(variable_in_reform.get_label())
+                                    else:
+                                        variable_X.set_label(variable_in_system.get_label())
+
+                                    if not (variable_in_reform.get_formula() == None):
+                                        variable_X.set_formula(variable_in_reform.get_formula())
+                                    else:
+                                        variable_X.set_formula(variable_in_system.get_formula())
+
+                                    if not (variable_in_reform.get_reference() == None):
+                                        variable_X.set_reference(variable_in_reform.get_reference())
+                                    else:
+                                        variable_X.set_reference(variable_in_system.get_reference())
+
+                                    if not (variable_in_reform.get_set_input() == None):
+                                        variable_X.set_set_input(variable_in_reform.get_set_input())
+                                    else:
+                                        variable_X.set_set_input(variable_in_system.get_set_input())
+                                    action[key] = action[key] + "\n\n" + variable_X.generate_RST_string_variable()
 
 
     def __find_and_bind_modifier_func__(self):
@@ -150,19 +223,20 @@ class Reform_File_Interpeter():
                         modifier_function_found = True
                         name = (line[:line.find('(')].replace("def","")).strip()
                         #print "Name of modifier function:", name
-                        modifier_function_dict[name] = "\n .. code:: python \n\n  " + line
+                        modifier_function_dict[name] = "\n\n .. code:: python \n\n  " + line
             #print "Dict", modifier_function_dict
 
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():
                 for key,value in action.iteritems():
+                    if(value == 'modify_parameters'):
                     #print "key", key
                     #print "value", value
                     # get the actions
-                    for name,value_name in modifier_function_dict.iteritems():
-                        print "name", name
-                        if key==name:
-                            action[key] = action[key] + value_name
+                        for name,value_name in modifier_function_dict.iteritems():
+                            print "name", name
+                            if key==name:
+                                action[key] = action[key] + value_name
         #for reform in self.__reforms__:
             #print "Riforme", reform.get_reform_actions()
 
@@ -189,22 +263,22 @@ class Reform_File_Interpeter():
                                 # example of code line self.modify_parameters(modifier_function = modifica_scaglioni_IRPEF), i suppose that all lines will be like this
                                 line = line.split('=')[1]
                                 line = (line[:line.find(')')].strip()).replace("self.","")
-                                dict_action[line] = "Modifica o aggiunge dei parametri tramite la seguente funzione: \n\n"
+                                dict_action[line] = "modify_parameters"
                                 current_reform.append_reform_action(dict_action)
                             elif 'update_variable' in line:
                                 # example of code line self.update_variable(income_tax)
                                 line = (line [(line.find('(') + 1):line.find(')')].strip()).replace("self.","") # start is inclusive, instead end is exclusive
-                                dict_action[line] = "Aggiorna la variabile esistente " + line + " rendendola:\n\n"
+                                dict_action[line] = "update_variable"
                                 current_reform.append_reform_action(dict_action)
                             elif 'add_variable' in line:
                                 # example of code line self.add_variable(income_tax)
                                 line = (line[(line.find('(') + 1):line.find(')')].strip()).replace("self.","")
-                                dict_action[line] = "Aggiunge al sistema la seguente variabile: \n\n"
+                                dict_action[line] = "add_variable"
                                 current_reform.append_reform_action(dict_action)
                             elif 'neutralize_variable' in line:
                                 # example of code line self.add_variable(income_tax)
-                                line = (line[(line.find('(') + 1):line.find(')')].strip()).replace("self.","")
-                                dict_action[line] = "Neutralizza la seguente variabile: \n\n"
+                                line = (line[(line.find('(\'') + 2):line.find('\')')].strip()).replace("self.","")
+                                dict_action[line] = "neutralize_variable"
                                 current_reform.append_reform_action(dict_action)
                     pieces = line.split('=')
                     if 'class' in pieces[0] and '(Reform):' in pieces[0]:
@@ -239,11 +313,3 @@ class Reform_File_Interpeter():
 
     def file_is_a_reform(self):
         return self.__file_is_a_reform__
-
-#object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\reforms\\IRPEF\\Quadro_Determinazione_Imposta\\Quadro_RN\\RN5\\aliquota_irpef_minore_redditi_minori_15000.py')
-#object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\rodino.txt')
-#object = Reform_File_Interpeter('C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy\\reforms\\IRPEF\\Quadro_Determinazione_Imposta\\Quadro_RN\\RN6\\riforma_detrazioni_per_figli_a_carico.py')
-#object.file_is_a_reform()
-#object.start_interpetration_reforms()
-#object.generate_RST_reforms()
-#object.start_interpetration()

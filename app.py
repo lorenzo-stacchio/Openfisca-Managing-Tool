@@ -46,7 +46,7 @@ class InitScreen(Screen):
                  self.manager.get_screen('visualize_system').ricevi_inizializza_path(PATH_OPENFISCA)
                  self.manager.get_screen('home').ricevi_inizializza_path(PATH_OPENFISCA)
         else:
-            print "Path errato"
+            #print "Path errato"
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
 
 
@@ -125,7 +125,7 @@ class VisualizeSystemScreen(Screen):
         path_reforms = str(os.path.normpath(self.dict_path['reforms']))
         path_parameter = str(os.path.normpath(self.dict_path['parameters']))
         if (path_variable in path_file_scelto) or (path_parameter in path_file_scelto) or (path_reforms in path_file_scelto):
-            print "Path ok"
+            #print "Path ok"
             return True
         else:
             self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
@@ -169,7 +169,7 @@ class VisualizeSystemScreen(Screen):
                         self.ids.document_reforms_viewer.source = path_prm
                 elif file_extension =='.py':
                     variable_interpeter = Variable_File_Interpeter(path_file_scelto, openfisca_system_path = self.PATH_OPENFISCA )
-                    reform_interpeter = Reform_File_Interpeter(path_file_scelto)
+                    reform_interpeter = Reform_File_Interpeter(path_file_scelto, openfisca_system_path = self.PATH_OPENFISCA )
                     if (variable_interpeter.file_is_a_variable() and not(reform_interpeter.file_is_a_reform())):
                         variable_interpeter.start_interpetration()
                         path_rst = variable_interpeter.generate_RSTs_variables()
@@ -230,7 +230,7 @@ class MakeSimulation(Screen):
             """
 
     def update_spinner(self):
-        print "Hai selezionato "+self.ids.menu_a_tendina_entita.text
+        #print "Hai selezionato "+self.ids.menu_a_tendina_entita.text
         self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
 
@@ -305,6 +305,7 @@ class OutputVariableScreen(Screen):
             self.manager.get_screen('make_simulation').ids.menu_a_tendina_variabili.text = ''
             self.manager.get_screen('make_simulation').ids.input_value_variable.text = ''
             self.manager.current = 'home'
+
     def go_to_execute_simulation(self):
         if self.manager.current == 'output_variable':
 
@@ -320,7 +321,7 @@ class OutputVariableScreen(Screen):
             self.popup.open()
 
     def _on_answer(self, instance, answer):
-        print "Risposta: " , repr(answer)
+        #print "Risposta: " , repr(answer)
         if answer == 'Yes':
             self.manager.current = 'execute_simulation'
         self.popup.dismiss()
