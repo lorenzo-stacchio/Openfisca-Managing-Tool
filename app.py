@@ -86,8 +86,7 @@ class ChooseEntityScreen(Screen):
 
     def __init__(self,**kwargs):
         super(ChooseEntityScreen, self).__init__(**kwargs)
-
-        layout = GridLayout(orientation='vertical', cols=2, rows=len(self.type_of_entity))
+        layout = GridLayout(orientation='vertical', cols=2, rows=len(self.type_of_entity)+1)
         self.add_widget(layout)
         for entity in self.type_of_entity:
             layout.add_widget(Label(text=entity))
@@ -95,7 +94,25 @@ class ChooseEntityScreen(Screen):
             #layout.add_widget(Label(id="id_contatore_"+entity,text=str(0)))
             #layout.add_widget(Button(text="<"), on_release=self.decrementa(self.ids["id_contatore_"+entity]))
             #layout.add_widget(Button(text=">"))
+        layout.add_widget(Label(text=""))
+        layout.add_widget(Button(id="button_go_to_insert_input_variables",text="Click"))
+        Clock.schedule_once(self._finish_init)
 
+    def _finish_init(self, dt):
+        #go to make_simulation
+        self.children[0].children[0].bind(on_release=self.go_to_insert_input_variables)
+
+    def go_to_insert_input_variables(self,instance):
+        #verify that there aren't all zeros
+        condition = False
+        for entity in self.type_of_entity:
+           for i in xrange(len(self.type_of_entity)):
+                if i!=0:
+                    if self.children[0].children[i*2].ids.value.text != "0":
+                        condition = True
+                        break
+        if condition:
+            self.manager.current = 'make_simulation'
 
 class LineOfChooser(BoxLayout):
     def decrementa(self):
