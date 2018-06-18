@@ -6,6 +6,7 @@
     transition: FadeTransition()
     InitScreen:
     HomeScreen:
+    ChooseEntityScreen:
     VisualizeSystemScreen:
     MakeSimulation:
     OutputVariableScreen:
@@ -201,6 +202,23 @@
                         size: self.size
 
 
+<ChooseEntityScreen>:
+    name: "choose_entity"
+
+
+<LineOfChooser>:
+    name: "line_chooser"
+    Label:
+        id: value
+        text: "0"
+    Button:
+        id: dec
+        text: "<"
+        on_release: root.decrementa()
+    Button:
+        id: inc
+        text: ">"
+        on_release: root.incrementa()
 
 <VisualizeSystemScreen>:
     name: "visualize_system"
