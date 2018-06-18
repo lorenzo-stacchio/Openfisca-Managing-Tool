@@ -261,7 +261,7 @@ class MakeSimulation(Screen):
 
         for k, v in self.manager.get_screen('choose_entity').number_of_entity.items():
             for index in xrange(1,int(v)+1):
-                self.dict_entita[k+str(index)] = ["blablabla","blablabla","blablabla","blablabla"] #TODO apposto di questo vettore ci andranno le variabili di persona
+                self.dict_entita[k+str(index)] = ["Var1","Var2","Var3","Var4"] #TODO apposto di questo vettore ci andranno le variabili di persona
 
 
         self.ids.menu_a_tendina_entita.values = self.dict_entita.keys()
@@ -313,23 +313,38 @@ class MakeSimulation(Screen):
                 self.manager.transition  = kivy.uix.screenmanager.TransitionBase()
                 self.manager.transition.duration = .4
 
-    def add_value_and_reset_form(self):
-        #TODO vedi se hai già aggiunto quel valore per quella variabile per quell'entità
-        if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
-            self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_entita.text+" - "+self.ids.menu_a_tendina_variabili.text+" - "+self.ids.input_value_variable.text,
-                                                        on_release=self.destroy_button, background_color = (255,255,255, 0.9), color = (0,0,0,1)))
-            #Add value
-            #EXAMPLE dict_of_entity_variable_value[Persona] = [reddito_totale,10000,prova,10,prova2,11]
-            #inizialize if key is not exists
-            if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
-                self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
-            #add name of variable and value
-            tuple = [self.ids.menu_a_tendina_variabili.text,self.ids.input_value_variable.text]
-            self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text].append(tuple)
+    def exist_tuple(self,dictionary, input_entity, input_variable):
+        #dictionary hasn't "input_entity" into its keys
+        if not input_entity in dictionary.keys():
+            return False
+        #Example I add something then I delete it
+        elif dictionary[input_entity] == []:
+            return False
+        else:
+            for tuple in dictionary[input_entity]:
+                if tuple[0] == input_variable:
+                    return True
+        #otherwise
+        return False
 
-            #Reset form
-            self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
-            self.ids.input_value_variable.text = ''
+    def add_value_and_reset_form(self):
+        #You can't add again a certain variable of a certain entity
+        if not self.exist_tuple(self.dict_of_entity_variable_value, self.ids.menu_a_tendina_entita.text, self.ids.menu_a_tendina_variabili.text):
+            if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
+                self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_entita.text+" - "+self.ids.menu_a_tendina_variabili.text+" - "+self.ids.input_value_variable.text,
+                                                            on_release=self.destroy_button, background_color = (255,255,255, 0.9), color = (0,0,0,1)))
+                #Add value
+                #EXAMPLE dict_of_entity_variable_value[Persona] = [reddito_totale,10000,prova,10,prova2,11]
+                #inizialize if key is not exists
+                if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
+                    self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
+                #add name of variable and value
+                tuple = [self.ids.menu_a_tendina_variabili.text,self.ids.input_value_variable.text]
+                self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text].append(tuple)
+
+                #Reset form
+                self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
+                self.ids.input_value_variable.text = ''
 
     def change_view_added_variables(self):
         pass
