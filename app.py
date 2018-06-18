@@ -336,6 +336,19 @@ class MakeSimulation(Screen):
 
 
     def destroy_button(self,button):
+        #Persona1 - Reddito - 1000
+        #entity = Persona1
+        #variable = Reddito
+        #value = 1000
+
+        #Splitting
+        entity,variable,value = button.text.split(" - ")
+        #Find the tuple to delete
+        for tuple in self.dict_of_entity_variable_value[entity]:
+            if tuple[0] == variable and tuple[1] == value:
+                #delete from dict
+                self.dict_of_entity_variable_value[entity].remove(tuple)
+        #now i can delete the button
         self.variable_added.remove_widget(button)
 
 
