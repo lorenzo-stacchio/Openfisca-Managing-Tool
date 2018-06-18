@@ -52,6 +52,7 @@ class InitScreen(Screen):
 
 class HomeScreen(Screen):
 
+
     def __init__(self,**kwargs):
         super(HomeScreen, self).__init__(**kwargs)
 
@@ -77,9 +78,18 @@ You have selected this folder: [i]"""+path[:path.rindex('\\')+1]+"[b]"+os.path.b
 
     def go_to_simulation(self):
         if self.manager.current == 'home':
-             self.manager.current = 'make_simulation'
+            self.manager.current = 'choose_entity'
 
 
+class ChooseEntityScreen(Screen):
+    type_of_entity = ['Persona','Famiglia']
+    def __init__(self,**kwargs):
+        super(ChooseEntityScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._finish_init)
+
+    def _finish_init(self, dt):
+        for entity in self.type_of_entity:
+            #TOFIX self.ids.id_box_layout_choose.add_widget(Label(text=entity))
 
 class VisualizeSystemScreen(Screen):
     dict_path = ''
@@ -258,10 +268,8 @@ class MakeSimulation(Screen):
 
     def add_value_and_reset_form(self):
         if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
-            self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_variabili.text+": "+self.ids.input_value_variable.text,
+            self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_entita.text+" - "+self.ids.menu_a_tendina_variabili.text+" - "+self.ids.input_value_variable.text,
                                                         on_release=self.destroy_button, background_color = (255,255,255, 0.9), color = (0,0,0,1)))
-            #last_object = self.ids.variable_added.children[len(self.ids.variable_added.children)-1]
-            #self.manager.get_screen('make_simulation').destroy_widget(last_object)
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.input_value_variable.text = ''
 
@@ -352,6 +360,10 @@ class ReformsScreen(Screen):
 
 class MyScreenManager(ScreenManager):
     pass
+
+
+class RigaSelezione(BoxLayout):
+    text = StringProperty()
 
 
 

@@ -6,6 +6,7 @@
     transition: FadeTransition()
     InitScreen:
     HomeScreen:
+    ChooseEntityScreen:
     VisualizeSystemScreen:
     MakeSimulation:
     OutputVariableScreen:
@@ -200,6 +201,12 @@
                         pos: self.pos
                         size: self.size
 
+
+<ChooseEntityScreen>:
+    name: "choose_entity"
+    BoxLayout:
+        id: "id_box_layout_choose"
+        orientation: "vertical"
 
 
 <VisualizeSystemScreen>:
