@@ -8,7 +8,6 @@ import re
 import time
 from variables_file_interpeter import *
 
-
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
 #PATH_RST_DOCUMENT = os.path.abspath(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), os.pardir)) + "\\messages\\rst_da_visualizzare.rst"
@@ -123,7 +122,7 @@ class Reform_File_Interpeter():
 
     def __find_and_bind_variables__(self):
         sys.path.append(self.__PATH_OPENFISCA_SYSTEM__)
-        print "FIND BIND IN REFORM PATH: ", self.__PATH_OPENFISCA_SYSTEM__
+        # print "FIND BIND IN REFORM PATH: ", self.__PATH_OPENFISCA_SYSTEM__
         from italy_taxbenefitsystem import *
         from scenarios import *
         from entita import *
@@ -167,13 +166,13 @@ class Reform_File_Interpeter():
                             for variable_in_reform,variable_in_system in zip(variables_in_reform,variables_updated_if_exist):
                                 if key == variable_in_reform.get_variable_name():
                                     variable_X = Variable_for_writing(variable_name = key)
-                                    print "VARIABILE RIFORMATA", variable_in_reform
-                                    print "Variabile normale", variable_in_system
+                                    # print "VARIABILE RIFORMATA", variable_in_reform
+                                    # print "Variabile normale", variable_in_system
                                     if not (variable_in_reform.get_value_type() == None):
                                         variable_X.set_value_type(variable_in_reform.get_value_type())
                                     else:
                                         variable_X.set_value_type(variable_in_system.get_value_type())
-                                    print "Tipo variabile finale", variable_X.get_value_type()
+                                    # print "Tipo variabile finale", variable_X.get_value_type()
                                     if not (variable_in_reform.get_entity() == None):
                                         variable_X.set_entity(variable_in_reform.get_entity())
                                     else:
@@ -234,7 +233,7 @@ class Reform_File_Interpeter():
                     #print "value", value
                     # get the actions
                         for name,value_name in modifier_function_dict.iteritems():
-                            print "name", name
+                            # print "name", name
                             if key==name:
                                 action[key] = action[key] + value_name
         #for reform in self.__reforms__:
