@@ -204,10 +204,21 @@
 
 <ChooseEntityScreen>:
     name: "choose_entity"
-    BoxLayout:
-        id: "id_box_layout_choose"
-        orientation: "vertical"
 
+
+<LineOfChooser>:
+    name: "line_chooser"
+    Label:
+        id: value
+        text: "0"
+    Button:
+        id: dec
+        text: "<"
+        on_release: root.decrementa()
+    Button:
+        id: inc
+        text: ">"
+        on_release: root.incrementa()
 
 <VisualizeSystemScreen>:
     name: "visualize_system"

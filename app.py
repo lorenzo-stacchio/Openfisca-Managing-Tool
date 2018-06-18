@@ -83,13 +83,28 @@ You have selected this folder: [i]"""+path[:path.rindex('\\')+1]+"[b]"+os.path.b
 
 class ChooseEntityScreen(Screen):
     type_of_entity = ['Persona','Famiglia']
+
     def __init__(self,**kwargs):
         super(ChooseEntityScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._finish_init)
 
-    def _finish_init(self, dt):
+        layout = GridLayout(orientation='vertical', cols=2, rows=len(self.type_of_entity))
+        self.add_widget(layout)
         for entity in self.type_of_entity:
-            #TOFIX self.ids.id_box_layout_choose.add_widget(Label(text=entity))
+            layout.add_widget(Label(text=entity))
+            layout.add_widget(LineOfChooser())
+            #layout.add_widget(Label(id="id_contatore_"+entity,text=str(0)))
+            #layout.add_widget(Button(text="<"), on_release=self.decrementa(self.ids["id_contatore_"+entity]))
+            #layout.add_widget(Button(text=">"))
+
+
+class LineOfChooser(BoxLayout):
+    def decrementa(self):
+        if int(self.ids.value.text)>0:
+            self.ids.value.text = str(int(self.ids.value.text)-1)
+
+    def incrementa(self):
+        self.ids.value.text = str(int(self.ids.value.text)+1)
+
 
 class VisualizeSystemScreen(Screen):
     dict_path = ''
