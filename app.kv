@@ -209,6 +209,8 @@
 <LineOfChooser>:
     name: "line_chooser"
     Label:
+        id: name
+    Label:
         id: value
         text: "0"
     Button:
@@ -402,7 +404,7 @@
             Spinner:
                 id: menu_a_tendina_entita
                 size_hint: (1.0,0.1)
-                on_text: root.update_spinner()
+                on_text: root.update_form()
             Label:
                 size_hint: (1.0,0.05)
 
