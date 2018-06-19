@@ -328,23 +328,54 @@ class MakeSimulation(Screen):
         return False
 
     def add_value_and_reset_form(self):
-        #You can't add again a certain variable of a certain entity
-        if not self.exist_tuple(self.dict_of_entity_variable_value, self.ids.menu_a_tendina_entita.text, self.ids.menu_a_tendina_variabili.text):
-            if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
+
+        #if exist value do nothing
+        for key in self.dict_of_entity_variable_value.keys():
+            for tuple in self.dict_of_entity_variable_value[key]:
+                if tuple[0] == self.ids.input_value_variable.text and tuple[1] == self.ids.input_value_variable.text:
+                    return
+
+        #If there are blank value
+        if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
+            # You can't add again a certain variable of a certain entity
+            if not self.exist_tuple(self.dict_of_entity_variable_value, self.ids.menu_a_tendina_entita.text,self.ids.menu_a_tendina_variabili.text):
+                #Add button
                 self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_entita.text+" - "+self.ids.menu_a_tendina_variabili.text+" - "+self.ids.input_value_variable.text,
                                                             on_release=self.destroy_button, background_color = (255,255,255, 0.9), color = (0,0,0,1)))
-                #Add value
+
                 #EXAMPLE dict_of_entity_variable_value[Persona] = [reddito_totale,10000,prova,10,prova2,11]
                 #inizialize if key is not exists
                 if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
                     self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
-                #add name of variable and value
-                tuple = [self.ids.menu_a_tendina_variabili.text,self.ids.input_value_variable.text]
+
+                # Add value
+                # add name of variable and value
+                tuple = [self.ids.menu_a_tendina_variabili.text, self.ids.input_value_variable.text]
                 self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text].append(tuple)
 
-                #Reset form
-                self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
-                self.ids.input_value_variable.text = ''
+            else:
+                i = 0
+                #In this case the tuple already exists
+                for el in self.ids.variable_added.children:
+                    #If "entity - variabile" in button text
+                    if self.ids.menu_a_tendina_entita.text+" - "+self.ids.menu_a_tendina_variabili.text in el.text:
+                        #splitting
+                        entity,variable,value = el.text.split(' - ')
+                        #update button value
+                        self.ids.variable_added.children[i].text = entity + " - " + variable + " - " +\
+                                                                   self.ids.input_value_variable.text
+                        break
+                    i+=1
+
+                #Replace value of variable
+                for tuple in self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text]:
+                    if self.ids.menu_a_tendina_variabili.text in tuple:
+                        tuple[1] = self.ids.input_value_variable.text
+                        break
+
+            # Reset form
+            self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
+            self.ids.input_value_variable.text = ''
 
     def change_view_added_variables(self):
         pass
@@ -363,6 +394,7 @@ class MakeSimulation(Screen):
             if tuple[0] == variable and tuple[1] == value:
                 #delete from dict
                 self.dict_of_entity_variable_value[entity].remove(tuple)
+                break
         #now i can delete the button
         self.variable_added.remove_widget(button)
 
