@@ -81,7 +81,6 @@ class Entity():
             raise ValueError("No valid date selected")
         # validates
         self.associated_variables = []
-        print self.period_to_filter_variables
         tax_benefit_system = italy_taxbenefitsystem.ItalyTaxBenefitSystem()
         for key_variable, variables_content in tax_benefit_system.get_variables(entity = self.entity).iteritems():
             if (self.period_to_filter_variables.name == variables_content.definition_period) or (variables_content.definition_period == TYPEOFDEFINITIONPERIOD.eternity.name) or (variables_content.set_input):
@@ -137,7 +136,6 @@ class Situation(): # defined for one entity
                 self.period = year + "-" + month
         else:
             raise ValueError("No valid date selected")
-        print self.period
 
     def get_period(self):
         return self.period
@@ -197,9 +195,6 @@ class Simulation_generator(): #defined for Italy
 
 
     def init_profile(self, scenario, situation_period, entity_situation):
-        print situation_period
-        print entity_situation
-        #print "Situation: ", entity_situation
         scenario.init_single_entity(
             period = situation_period,
             parent1 = entity_situation
@@ -219,7 +214,6 @@ class Simulation_generator(): #defined for Italy
                 self.period = year + "-" + month
         else:
             raise ValueError("No valid date selected")
-        print self.period
 
 
     def add_to_result(self, situation, name_of_variable_calculated, result):

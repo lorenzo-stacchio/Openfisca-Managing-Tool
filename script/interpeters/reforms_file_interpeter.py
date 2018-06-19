@@ -7,6 +7,7 @@ import collections
 import re
 import time
 from variables_file_interpeter import *
+from openfisca_italy import italy_taxbenefitsystem 
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
@@ -110,9 +111,8 @@ class Reform_File_Interpeter():
     __file_is_a_reform__ = False
     __PATH_OPENFISCA_SYSTEM__ = ""
 
-    def __init__(self,reform_path, openfisca_system_path = None):
+    def __init__(self,reform_path):
         self.__reforms_file_path__ = reform_path
-        self.__PATH_OPENFISCA_SYSTEM__ = openfisca_system_path
         # check if the file passed contains a variable
         with open(self.__reforms_file_path__,'r') as content_reform:
             for line in content_reform.readlines():
@@ -123,10 +123,7 @@ class Reform_File_Interpeter():
     def __find_and_bind_variables__(self):
         sys.path.append(self.__PATH_OPENFISCA_SYSTEM__)
         # print "FIND BIND IN REFORM PATH: ", self.__PATH_OPENFISCA_SYSTEM__
-        from italy_taxbenefitsystem import *
-        from scenarios import *
-        from entita import *
-        tax_benefit_system = ItalyTaxBenefitSystem()
+        tax_benefit_system = italy_taxbenefitsystem.ItalyTaxBenefitSystem()
         # Print actions
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():

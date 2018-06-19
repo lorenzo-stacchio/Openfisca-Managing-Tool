@@ -250,10 +250,8 @@ class VisualizeSystemScreen(Screen):
                         self.ids.document_parameters_viewer.source = path_prm
                         self.ids.document_reforms_viewer.source = path_prm
                 elif file_extension == '.py':
-                    variable_interpeter = Variable_File_Interpeter(path_file_scelto,
-                                                                   openfisca_system_path=self.PATH_OPENFISCA)
-                    reform_interpeter = Reform_File_Interpeter(path_file_scelto,
-                                                               openfisca_system_path=self.PATH_OPENFISCA)
+                    variable_interpeter = Variable_File_Interpeter(path_file_scelto)
+                    reform_interpeter = Reform_File_Interpeter(path_file_scelto)
                     if (variable_interpeter.file_is_a_variable() and not (reform_interpeter.file_is_a_reform())):
                         variable_interpeter.start_interpetration()
                         path_rst = variable_interpeter.generate_RSTs_variables()

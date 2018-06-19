@@ -10,9 +10,13 @@ import inspect
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
+from openfisca_italy import italy_taxbenefitsystem
+from openfisca_italy.entita import *
+
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
+
 
 class Variable_for_writing():
     variable_name = None
@@ -205,11 +209,9 @@ class Variable_File_Interpeter():
     __variables_file_path__ = ""
     __variables__ = [] # will be a list
     __file_is_a_variable__ = False
-    __PATH_OPENFISCA_SYSTEM__ = ""
 
-    def __init__(self,variable_path, openfisca_system_path = None):
+    def __init__(self,variable_path):
         self.__variable_path__ = variable_path
-        self.__PATH_OPENFISCA_SYSTEM__ = openfisca_system_path
         # check if the file passed contains a variable
         with open(self.__variable_path__,'r') as content_variable:
             for line in content_variable.readlines():
@@ -239,12 +241,7 @@ class Variable_File_Interpeter():
                         self.__variables__.append(current_Variable)
         # found all the variables
         # Openfisca modules importing, matching variables found
-        sys.path.append(self.__PATH_OPENFISCA_SYSTEM__)
-        print self.__PATH_OPENFISCA_SYSTEM__
-        from italy_taxbenefitsystem import *
-        from scenarios import *
-        from entita import *
-        tax_benefit_system = ItalyTaxBenefitSystem() #prendi il sistema di tasse e benefici
+        tax_benefit_system = italy_taxbenefitsystem.ItalyTaxBenefitSystem() #prendi il sistema di tasse e benefici
         # scenario normale
         variables = tax_benefit_system.get_variables()
         for k,v in variables.iteritems():
