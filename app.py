@@ -25,6 +25,7 @@ from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import DictProperty
+from kivy.uix.textinput import TextInput
 
 
 # Screen
@@ -85,24 +86,27 @@ You have selected this folder: [i]""" + path[:path.rindex('\\') + 1] + "[b]" + o
 class ChooseEntityScreen(Screen):
     type_of_entity = ['Persona', 'Famiglia']
     number_of_entity = {}
-
+    period = ""
     def __init__(self, **kwargs):
         super(ChooseEntityScreen, self).__init__(**kwargs)
         layout = BoxLayout(orientation='vertical')
         self.add_widget(layout)
         for entity in self.type_of_entity:
-            # self.ids.name.text = entity
             layout.add_widget(LineOfChooser())
             layout.children[0].children[-1].text = entity
-            # layout.add_widget(Label(id="id_contatore_"+entity,text=str(0)))
-            # layout.add_widget(Button(text="<"), on_release=self.decrementa(self.ids["id_contatore_"+entity]))
-            # layout.add_widget(Button(text=">"))
-        layout.add_widget(Label(text=""))
+
+        layout_period = BoxLayout(orientation = "horizontal")
+        layout_period.add_widget(Label(text="Period", markup=True))
+        txt_input = TextInput(id="txt_period")
+        layout_period.add_widget(txt_input)
+
+        layout.add_widget(layout_period)
+        layout.add_widget(Label(text="You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD"))
         layout.add_widget(Button(id="button_go_to_insert_input_variables", text="Click"))
         Clock.schedule_once(self._finish_init)
 
     def _finish_init(self, dt):
-        # go to make_simulation
+        # go to make_simulation bind button
         self.children[0].children[0].bind(on_release=self.go_to_insert_input_variables)
 
     def go_to_insert_input_variables(self, instance):
@@ -116,10 +120,40 @@ class ChooseEntityScreen(Screen):
                 if el.children[2].text != "0":
                     condition = True
 
+        #save period
+        self.period = box_layout[2].children[0].text
+
+
+
+        if not self.check_data(self.period):
+            self.period = ""
+            condition = False
+
         if condition:
             self.manager.get_screen('make_simulation').inizializza_make_simulation()
             self.manager.current = 'make_simulation'
 
+    def check_data(self, data):
+        if(len(data)==4):
+            try:
+                datetime.date(int(data),01,01)
+            except:
+                return False
+        elif (len(data)==7):
+            try:
+                year,month = data.split("-")
+                datetime.date(int(year),int(month),01)
+            except:
+                return False
+        elif (len(data)==10):
+            try:
+                year,month,day = data.split("-")
+                datetime.date(int(year), int(month), int(day))
+            except:
+                return False
+        else:
+            return False
+        return True
 
 class LineOfChooser(BoxLayout):
     name_label = StringProperty()
@@ -304,6 +338,7 @@ class MakeSimulation(Screen):
             self.ids.variable_added.clear_widgets()
             self.ids.menu_a_tendina_variabili.text = ''
             self.ids.input_value_variable.text = ''
+            #TODO: Resetta bene le variabili
             # Go to home
             self.manager.current = 'home'
 
