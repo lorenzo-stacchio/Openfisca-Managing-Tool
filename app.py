@@ -83,14 +83,15 @@ You have selected this folder: [i]"""+path[:path.rindex('\\')+1]+"[b]"+os.path.b
 
 class ChooseEntityScreen(Screen):
     type_of_entity = ['Persona','Famiglia']
-
+    number_of_entity = {}
     def __init__(self,**kwargs):
         super(ChooseEntityScreen, self).__init__(**kwargs)
-        layout = GridLayout(orientation='vertical', cols=2, rows=len(self.type_of_entity)+1)
+        layout = BoxLayout(orientation='vertical')
         self.add_widget(layout)
         for entity in self.type_of_entity:
-            layout.add_widget(Label(text=entity))
+            #self.ids.name.text = entity
             layout.add_widget(LineOfChooser())
+            layout.children[0].children[-1].text = entity
             #layout.add_widget(Label(id="id_contatore_"+entity,text=str(0)))
             #layout.add_widget(Button(text="<"), on_release=self.decrementa(self.ids["id_contatore_"+entity]))
             #layout.add_widget(Button(text=">"))
@@ -105,16 +106,21 @@ class ChooseEntityScreen(Screen):
     def go_to_insert_input_variables(self,instance):
         #verify that there aren't all zeros
         condition = False
-        for entity in self.type_of_entity:
-           for i in xrange(len(self.type_of_entity)):
-                if i!=0:
-                    if self.children[0].children[i*2].ids.value.text != "0":
-                        condition = True
-                        break
+        box_layout = self.children[0].children
+        for el in box_layout:
+            if isinstance(el,LineOfChooser):
+                #value of this lineOfChooser
+                self.number_of_entity[el.children[3].text] = el.children[2].text
+                if el.children[2].text != "0":
+                    condition = True
+
         if condition:
+            self.manager.get_screen('make_simulation').inizializza_make_simulation()
             self.manager.current = 'make_simulation'
 
 class LineOfChooser(BoxLayout):
+    name_label = StringProperty()
+
     def decrementa(self):
         if int(self.ids.value.text)>0:
             self.ids.value.text = str(int(self.ids.value.text)-1)
@@ -237,25 +243,27 @@ class VisualizeSystemScreen(Screen):
 
     def go_to_home(self):
         if self.manager.current == 'visualize_system':
-             self.manager.current = 'home'
+            self.manager.current = 'home'
 
 
 class MakeSimulation(Screen):
 
     variable_added = ObjectProperty()
     dict_entita = DictProperty()
-
+    dict_of_entity_variable_value = {}
     def __init__(self,**kwargs):
         super(MakeSimulation, self).__init__(**kwargs)
-        Clock.schedule_once(self._finish_init)
 
-    def _finish_init(self,dt):
-        self.dict_entita = {
-    		"Persona" : ['','Pluto','Paperino','Aldo','Rodo'],
-    		"Prova1" : ['','blablabla1'],
-    		"Prova2" : ['','blablabla2'],
-    		"Prova3" : ['','blablabla3']
-    	}
+    def inizializza_make_simulation(self):
+        #i take the dict with association of enitites
+        print self.manager.get_screen('choose_entity').number_of_entity
+        self.dict_entita = {}
+
+        for k, v in self.manager.get_screen('choose_entity').number_of_entity.items():
+            for index in xrange(1,int(v)+1):
+                self.dict_entita[k+str(index)] = ["Var1","Var2","Var3","Var4"] #TODO apposto di questo vettore ci andranno le variabili di persona
+
+
         self.ids.menu_a_tendina_entita.values = self.dict_entita.keys()
         self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
         self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
@@ -268,13 +276,20 @@ class MakeSimulation(Screen):
 
 [b]Rules[/b]:
     - You can't insert a blank variable
-    - You can't insert a blank variable value
-            """
+    - You can't insert a blank variable value"""
 
-    def update_spinner(self):
+    def update_form(self):
         #print "Hai selezionato "+self.ids.menu_a_tendina_entita.text
         self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
+        self.ids.variable_added.clear_widgets()
+        #If the selected entity exists
+        if self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
+            #cycle it
+            for tuple in self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text]:
+                #add all variable and value of this entity
+                self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_entita.text+" - "+tuple[0]+" - "+tuple[1],
+                                                            on_release=self.destroy_button, background_color = (255,255,255, 0.9), color = (0,0,0,1)))
 
     def go_to_home(self):
         if self.manager.current == 'make_simulation':
@@ -298,14 +313,89 @@ class MakeSimulation(Screen):
                 self.manager.transition  = kivy.uix.screenmanager.TransitionBase()
                 self.manager.transition.duration = .4
 
+    def exist_tuple(self,dictionary, input_entity, input_variable):
+        #dictionary hasn't "input_entity" into its keys
+        if not input_entity in dictionary.keys():
+            return False
+        #Example I add something then I delete it
+        elif dictionary[input_entity] == []:
+            return False
+        else:
+            for tuple in dictionary[input_entity]:
+                if tuple[0] == input_variable:
+                    return True
+        #otherwise
+        return False
+
     def add_value_and_reset_form(self):
+
+        #if exist value do nothing
+        for key in self.dict_of_entity_variable_value.keys():
+            for tuple in self.dict_of_entity_variable_value[key]:
+                if tuple[0] == self.ids.input_value_variable.text and tuple[1] == self.ids.input_value_variable.text:
+                    return
+
+        #If there are blank value
         if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
-            self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_entita.text+" - "+self.ids.menu_a_tendina_variabili.text+" - "+self.ids.input_value_variable.text,
-                                                        on_release=self.destroy_button, background_color = (255,255,255, 0.9), color = (0,0,0,1)))
+            # You can't add again a certain variable of a certain entity
+            if not self.exist_tuple(self.dict_of_entity_variable_value, self.ids.menu_a_tendina_entita.text,self.ids.menu_a_tendina_variabili.text):
+                #Add button
+                self.ids.variable_added.add_widget(Button(text=self.ids.menu_a_tendina_entita.text+" - "+self.ids.menu_a_tendina_variabili.text+" - "+self.ids.input_value_variable.text,
+                                                            on_release=self.destroy_button, background_color = (255,255,255, 0.9), color = (0,0,0,1)))
+
+                #EXAMPLE dict_of_entity_variable_value[Persona] = [reddito_totale,10000,prova,10,prova2,11]
+                #inizialize if key is not exists
+                if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
+                    self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
+
+                # Add value
+                # add name of variable and value
+                tuple = [self.ids.menu_a_tendina_variabili.text, self.ids.input_value_variable.text]
+                self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text].append(tuple)
+
+            else:
+                i = 0
+                #In this case the tuple already exists
+                for el in self.ids.variable_added.children:
+                    #If "entity - variabile" in button text
+                    if self.ids.menu_a_tendina_entita.text+" - "+self.ids.menu_a_tendina_variabili.text in el.text:
+                        #splitting
+                        entity,variable,value = el.text.split(' - ')
+                        #update button value
+                        self.ids.variable_added.children[i].text = entity + " - " + variable + " - " +\
+                                                                   self.ids.input_value_variable.text
+                        break
+                    i+=1
+
+                #Replace value of variable
+                for tuple in self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text]:
+                    if self.ids.menu_a_tendina_variabili.text in tuple:
+                        tuple[1] = self.ids.input_value_variable.text
+                        break
+
+            # Reset form
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.input_value_variable.text = ''
 
+    def change_view_added_variables(self):
+        pass
+
+
     def destroy_button(self,button):
+        #Persona1 - Reddito - 1000
+        #entity = Persona1
+        #variable = Reddito
+        #value = 1000
+
+        #Splitting
+        entity,variable,value = button.text.split(" - ")
+        #Find the tuple to delete
+        for tuple in self.dict_of_entity_variable_value[entity]:
+            if tuple[0] == variable and tuple[1] == value:
+                #delete from dict
+                self.dict_of_entity_variable_value[entity].remove(tuple)
+                break
+        #now i can delete the button
         self.variable_added.remove_widget(button)
 
 
