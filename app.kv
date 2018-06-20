@@ -1,6 +1,7 @@
 #:kivy 1.10.0
 #: import FadeTransition kivy.uix.screenmanager.FadeTransition
-#:import hex kivy.utils.get_color_from_hex
+#: import hex kivy.utils.get_color_from_hex
+#: import utils kivy.utils
 
 <MyScreenManager>:
     transition: FadeTransition()
@@ -96,7 +97,9 @@
                         source: 'img/github.png'
 
             Label:
-                text: "Select one openfisca-system"
+                id: instructions_downloading_repos
+                text: "[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]"
+                markup: True
                 canvas.before:
                     Color:
                         rgba: hex('#FFFFFF')
@@ -104,14 +107,16 @@
                         pos: self.pos
                         size: self.size
 
-            BoxLayout:
-                id: box_layout_countries
+            GridLayout:
+                id: grid_layout_countries
                 pos: self.parent.pos
                 size: self.parent.size
+                rows: 1
+                cols: 4
                 Button:
                     id: button_barcelona
                     background_normal: "ffffff"
-                    on_press: root.download_system(self)
+                    on_release: root.download_system(self)
                     Image:
                         source: 'img/flags/spain-flag.png'
                         pos: self.parent.pos
@@ -120,7 +125,7 @@
                 Button:
                     id: button_italy
                     background_normal: "ffffff"
-                    on_press: root.download_system(self)
+                    on_release: root.download_system(self)
                     Image:
                         source: 'img/flags/italy-flag.png'
                         pos: self.parent.pos
@@ -128,7 +133,7 @@
                 Button:
                     id: button_senegal
                     background_normal: "ffffff"
-                    on_press: root.download_system(self)
+                    on_release: root.download_system(self)
                     Image:
                         source: 'img/flags/senegal-flag.png'
                         pos: self.parent.pos
@@ -136,12 +141,11 @@
                 Button:
                     id: button_tunisia
                     background_normal: "ffffff"
-                    on_press: root.download_system(self)
+                    on_release: root.download_system(self)
                     Image:
                         source: 'img/flags/tunisia-flag.jpg'
                         pos: self.parent.pos
                         size: self.parent.size
-
 
             Label:
                 canvas.before:

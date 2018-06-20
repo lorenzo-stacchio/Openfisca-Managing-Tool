@@ -10,6 +10,8 @@ import inspect
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
+# The import depenends on the system selected
+
 from openfisca_italy import italy_taxbenefitsystem
 from openfisca_italy.entita import *
 
