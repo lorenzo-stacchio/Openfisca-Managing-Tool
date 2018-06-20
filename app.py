@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import kivy
-
+import json
 kivy.require("1.10.0")
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -14,11 +14,6 @@ from kivy.properties import StringProperty, ObjectProperty
 from kivy.utils import get_color_from_hex
 from kivy.graphics import Rectangle, Color
 from kivy.uix.progressbar import ProgressBar
-import os, sys
-from script.get_parameters_reforms_tests_variables_folder_paths import *
-from script.interpeters.variables_file_interpeter import *
-from script.interpeters.parameters_interpeter import *
-from script.interpeters.reforms_file_interpeter import *
 from kivy.config import Config
 from kivy.uix.spinner import Spinner
 from kivy.uix.button import Button
@@ -26,6 +21,13 @@ from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import DictProperty
 from kivy.uix.textinput import TextInput
+import os, sys
+from script.get_parameters_reforms_tests_variables_folder_paths import *
+from script.interpeters.variables_file_interpeter import *
+from script.interpeters.parameters_interpeter import *
+from script.interpeters.reforms_file_interpeter import *
+from script.download_openfisca_system import download_and_install as download_and_install_openfisca
+
 
 
 # Screen
@@ -51,6 +53,32 @@ class InitScreen(Screen):
         else:
             # print "Path errato"
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
+
+
+    def download_system(self,btn_instance):
+        #print str(btn_instance.text)
+        id_button = self.get_id(btn_instance)
+        with open('messages\\config_import.json') as f:
+            data_config = json.load(f)
+        system_selected = id_button.replace("button","openfisca")
+        user_desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
+
+        github_link = data_config[system_selected]["link"]
+        project_name = data_config[system_selected]["project_name"]
+        download_and_install_openfisca(path_to_save = user_desktop , project_name = project_name, github_link = github_link)
+        popup = Popup(title='System saved!',
+                content = Label(text='The system\n [b]' + system_selected + '[\b] \n was saved in:' + user_desktop, halign="left", valign="middle"),
+                size_hint=(None, None),
+                size=(400, 400))
+        popup.open()
+
+
+    def get_id(self, instance):
+            for id, widget in self.ids.items():
+                print id, widget
+                if widget.__self__ == instance:
+                    return id
+
 
 
 class HomeScreen(Screen):

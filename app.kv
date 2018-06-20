@@ -63,7 +63,7 @@
 
         GridLayout:
             cols: 1
-            rows: 4
+            rows: 5
             Label:
                 canvas.before:
                     Color:
@@ -96,21 +96,53 @@
                         source: 'img/github.png'
 
             Label:
-                id: blablabla
-                valign: 'middle'
-                halign: 'center'
-                markup: True
-                font_size: 25
-                text: "[color=000000]Download it from [ref=some][u]Openfisca repositories[/u][/ref][/color]"
-                on_ref_press:
-                    import webbrowser
-                    webbrowser.open('https://github.com/openfisca')
+                text: "Select one openfisca-system"
                 canvas.before:
                     Color:
                         rgba: hex('#FFFFFF')
                     Rectangle:
                         pos: self.pos
                         size: self.size
+
+            BoxLayout:
+                id: box_layout_countries
+                pos: self.parent.pos
+                size: self.parent.size
+                Button:
+                    id: button_barcelona
+                    background_normal: "ffffff"
+                    on_press: root.download_system(self)
+                    Image:
+                        source: 'img/flags/spain-flag.png'
+                        pos: self.parent.pos
+                        size: self.parent.size
+
+                Button:
+                    id: button_italy
+                    background_normal: "ffffff"
+                    on_press: root.download_system(self)
+                    Image:
+                        source: 'img/flags/italy-flag.png'
+                        pos: self.parent.pos
+                        size: self.parent.size
+                Button:
+                    id: button_senegal
+                    background_normal: "ffffff"
+                    on_press: root.download_system(self)
+                    Image:
+                        source: 'img/flags/senegal-flag.png'
+                        pos: self.parent.pos
+                        size: self.parent.size
+                Button:
+                    id: button_tunisia
+                    background_normal: "ffffff"
+                    on_press: root.download_system(self)
+                    Image:
+                        source: 'img/flags/tunisia-flag.jpg'
+                        pos: self.parent.pos
+                        size: self.parent.size
+
+
             Label:
                 canvas.before:
                     Color:

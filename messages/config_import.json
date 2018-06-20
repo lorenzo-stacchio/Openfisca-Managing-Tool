@@ -1,0 +1,72 @@
+{
+"openfisca_italy": {
+                  "link": "https://github.com/openfisca/openfisca-italy/",
+                  "project_name": "openfisca-italy",
+                  "tax_benefit_system": {
+                    "italy_taxbenefitsystem.py": "ItalyTaxBenefitSystem()"
+                  },
+                  "scenarios" :{
+                    "scenarios.py": "Scenario()"
+                  },
+                  "entities" :{
+                    "entita.py": {
+                      "household": "Famiglia",
+                      "person":"Persona"
+                    }
+                  }
+              },
+
+"openfisca_senegal":
+                  {
+                  "link": "https://github.com/openfisca/senegal",
+                  "project_name": "senegal",
+                  "tax_benefit_system": {
+                    "senegal_taxbenefitsystem.py": "SenegalTaxBenefitSystem()"
+                  },
+                  "scenarios" :{
+                    "scenarios.py": "Scenario()"
+                  },
+                  "entities" : {
+                    "entities.py": {
+                      "household": "Famille",
+                      "person":"Individu"
+                    }
+                  }
+            },
+
+"openfisca_tunisia":
+                  {
+                  "link": "https://github.com/openfisca/openfisca-tunisia",
+                  "project_name": "openfisca-tunisia",
+                  "tax_benefit_system": {
+                    "tunisia_taxbenefitsystem.py": "TunisiaTaxBenefitSystem()"
+                  },
+                  "scenarios" :{
+                    "scenarios.py": "Scenario()"
+                  },
+                  "entities" :{
+                    "entities.py": {
+                      "household": "Ménage",
+                      "person":"Individu"
+                    }
+                  }
+                },
+
+"openfisca_barcelona":
+                  {
+                  "link": "https://github.com/jvalduvieco/openfisca-barcelona",
+                  "project_name": "openfisca-barcelona",
+                  "tax_benefit_system": {
+                    "barcelona_taxbenefitsystem.py": "BarcelonaTaxBenefitSystem()"
+                  },
+                  "scenarios" :{
+                    "scenarios.py": "Scenario()"
+                  },
+                  "entities" :{
+                    "entities.py": {
+                      "household": "Familia",
+                      "person":"Persona"
+                    }
+                  }
+                }
+}
