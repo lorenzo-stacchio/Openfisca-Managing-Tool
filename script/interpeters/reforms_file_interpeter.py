@@ -6,8 +6,13 @@ import datetime
 import collections
 import re
 import time
-#from variables_file_interpeter import *
-#from openfisca_italy import italy_taxbenefitsystem 
+import importlib
+import sys
+import site
+reload(sys)
+sys.setdefaultencoding('utf8')
+from variables_file_interpeter import *
+#from openfisca_italy import italy_taxbenefitsystem
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
@@ -109,7 +114,8 @@ class Reform_File_Interpeter():
     __reforms_file_path__ = ""
     __reforms__ = [] # will be a list
     __file_is_a_reform__ = False
-    __PATH_OPENFISCA_SYSTEM__ = ""
+    tax_benefit_system_class = None
+    tax_benefit_system = None
 
     def __init__(self,reform_path):
         self.__reforms_file_path__ = reform_path
@@ -119,18 +125,32 @@ class Reform_File_Interpeter():
                 if 'class' in line and '(Reform):' in line:
                     self.__file_is_a_reform__ = True
 
+    @staticmethod
+    def import_depending_on_system(system_selected, json_config_path_object):
+        # The import depenends on the system selected
+        print system_selected
+        system_selected = os.path.basename(system_selected)
+        for key, value in json_config_path_object[system_selected].items():
+                if key == 'tax_benefit_system':
+                    for key_tax, value_tax in value.items():
+                        tax_benefit_system_module,ext = os.path.splitext(key_tax)
+                        tax_benefit_system_class = value_tax
+        Reform_File_Interpeter.tax_benefit_system_class = tax_benefit_system_class
+        reload(site)
+        Reform_File_Interpeter.tax_benefit_system = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
+        print type(Reform_File_Interpeter.tax_benefit_system), Reform_File_Interpeter.tax_benefit_system
+
 
     def __find_and_bind_variables__(self):
-        sys.path.append(self.__PATH_OPENFISCA_SYSTEM__)
-        # print "FIND BIND IN REFORM PATH: ", self.__PATH_OPENFISCA_SYSTEM__
-        tax_benefit_system = italy_taxbenefitsystem.ItalyTaxBenefitSystem()
+        tax_benefit_system = getattr(Reform_File_Interpeter.tax_benefit_system, str(Reform_File_Interpeter.tax_benefit_system_class))
+        current_system  = tax_benefit_system()
         # Print actions
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():
                 for key,value in action.iteritems():
                     if not (value == 'modify_parameters'):
                         if value == 'neutralize_variable':
-                            for k_var, val_var in tax_benefit_system.get_variables().iteritems():
+                            for k_var, val_var in current_system.get_variables().iteritems():
                                 if key==k_var:
                                     variable = Variable_for_writing()
                                     variable.set_variable_name(key)
