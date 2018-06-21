@@ -11,10 +11,10 @@ import importlib
 import inspect
 import sys
 import site
-from subprocess import check_output
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+# TODO: optimize importing
 
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000

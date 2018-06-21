@@ -26,6 +26,8 @@ from script.interpeters.variables_file_interpeter import *
 from script.interpeters.parameters_interpeter import *
 from script.interpeters.reforms_file_interpeter import *
 from script.download_openfisca_system import download_and_install as download_and_install_openfisca
+from script.Simulation.Situation_for_simulation import *
+
 from multiprocessing.pool import ThreadPool
 
 
@@ -212,6 +214,8 @@ class LineOfChooser(BoxLayout):
 
 class VisualizeSystemScreen(Screen):
 
+    ENTITY_MODULE = ""
+
     def __init__(self, **kwargs):
         super(VisualizeSystemScreen, self).__init__(**kwargs)
 
@@ -220,7 +224,13 @@ class VisualizeSystemScreen(Screen):
         self.PATH_OPENFISCA = self.dict_path['inner_system_folder']
         with open('messages\\config_import.json') as f:
             data_config = json.load(f)
+        # init dynamic loading in classes
         Variable_File_Interpeter.import_depending_on_system(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config) #static method
+        Reform_File_Interpeter.import_depending_on_system(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config) #static method
+        # entity of situation for simulator
+        Entity.import_depending_on_system_entity_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
+
+
         os.chdir(os.getcwd())
         self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
         self.ids.document_variables_viewer.colors["link"] = "33AAFFff"
@@ -228,6 +238,21 @@ class VisualizeSystemScreen(Screen):
         self.ids.document_variables_viewer.colors["bullet"] = "000000ff"
         self.ids.document_variables_viewer.colors["title"] = "971640ff"
         self.ids.document_variables_viewer.underline_color = "971640ff"
+
+
+
+    def import_entity_module(self, system_selected, json_config_path_object):
+        system_selected = os.path.basename(system_selected)
+        for key, value in json_config_path_object[system_selected].items():
+                if key == 'entities':
+                    for key_tax, value_tax in value.items():
+                        entity_module,ext = os.path.splitext(key_tax)
+        reload(site)
+        #TAX_BENEFIT_SYSTEM_MODULE = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
+        self.ENTITY_MODULE = importlib.import_module(str(system_selected) + "." + str(entity_module))
+        #print type(TAX_BENEFIT_SYSTEM_MODULE), TAX_BENEFIT_SYSTEM_MODULE
+        print self.ENTITY_MODULE
+
 
     def show_variables(self):
         self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
@@ -466,6 +491,7 @@ class MakeSimulation(Screen):
 
     def change_view_added_variables(self):
         pass
+
 
     def destroy_button(self, button):
         # Persona1 - Reddito - 1000

@@ -5,11 +5,20 @@ import datetime
 import time
 import importlib
 import re
-from openfisca_italy import italy_taxbenefitsystem
-from openfisca_italy.entita import Persona, Famiglia
-from openfisca_italy import scenarios
+import site
+reload(sys)
+sys.setdefaultencoding('utf8')
 from enum import Enum
 from datetime import date
+
+
+#from openfisca_italy import italy_taxbenefitsystem
+#from openfisca_italy.entita import Persona, Famiglia
+#from openfisca_italy import scenarios
+
+
+
+
 # show the names in GUI
 class TYPEOFVARIABLE(Enum):
     float = "Float type"
@@ -30,8 +39,6 @@ class TYPEOFDEFINITIONPERIOD(Enum):
     year = "Year variable"
     eternity = "Eternal variable"
 
-## TODO: FAI IL CHECK DEI TIPI
-
 
 class Variable():
 
@@ -47,14 +54,20 @@ class Variable():
     def __repr__(self):
         return "\n\nName: " + self.name + "\nType: " + self.type + "\nEntity: " + self.entity + "\nDefinition period: " + self.definition_period
 
+
     def set_value(self,value):
         self.value = value
 
 
 class Entity():
 
+    tax_benefit_system_module = None
+    tax_benefit_system_module_class = None
+    entity_module = None
+    all_entities_names = None
+
     def __init__(self, entity = None):
-        if (entity is Persona) or (entity is Famiglia) : # assign variables to entity
+        if entity in getattr(Entity.entity_module, "entities"): # assign variables to entity
             self.entity = entity
             self.entity_name = entity.label
         else:
@@ -62,6 +75,34 @@ class Entity():
 
     def __repr__(self):
         return str("\nEntity name: " + self.entity + "\nNumber of variables: " + str(len(self.associated_variables)))
+
+
+
+    @staticmethod
+    def import_depending_on_system_entity_for_simulation(system_selected, json_config_path_object):
+        # The import depenends on the system selected
+        print system_selected
+        system_selected = os.path.basename(system_selected)
+        for key, value in json_config_path_object[system_selected].items():
+                if key == 'tax_benefit_system':
+                    for key_tax, value_tax in value.items():
+                        tax_benefit_system_module,ext = os.path.splitext(key_tax)
+                        tax_benefit_system_class = value_tax
+                if key == 'entities':
+                    for key_tax, value_tax in value.items():
+                        entity_module,ext = os.path.splitext(key_tax)
+                        for key_entity, value_entity in value_tax.items():
+                            if key_entity == 'all_entities':
+                                all_entities = value_entity
+        #assign to global variable
+        Entity.all_entities_names = all_entities
+        Entity.tax_benefit_system_module_class = tax_benefit_system_class
+        reload(site)
+        Entity.tax_benefit_system_module = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
+        Entity.entity_module = importlib.import_module(str(system_selected) + "." + str(entity_module))
+        Entity.all_entities_names = getattr(Entity.entity_module, all_entities)
+        print type(Entity.tax_benefit_system_module), Entity.tax_benefit_system_module
+        print "MODULE ENTITY", Entity.entity_module
 
     def generate_associated_variable_filter(self, year = None, month = None, day = None):
         if year and not month and not day:
@@ -81,8 +122,10 @@ class Entity():
             raise ValueError("No valid date selected")
         # validates
         self.associated_variables = []
-        tax_benefit_system = italy_taxbenefitsystem.ItalyTaxBenefitSystem()
-        for key_variable, variables_content in tax_benefit_system.get_variables(entity = self.entity).iteritems():
+        tax_benefit_system = getattr(Entity.tax_benefit_system_module, str(Entity.tax_benefit_system_module_class))
+        current_system  = tax_benefit_system()
+
+        for key_variable, variables_content in current_system.get_variables(entity = self.entity).iteritems():
             if (self.period_to_filter_variables.name == variables_content.definition_period) or (variables_content.definition_period == TYPEOFDEFINITIONPERIOD.eternity.name) or (variables_content.set_input):
                 self.associated_variables.append(Variable(name = key_variable,type = variables_content.value_type.__name__, entity = variables_content.entity.__name__, definition_period = variables_content.definition_period))
 
@@ -90,8 +133,9 @@ class Entity():
     def generate_all_associated_variable(self):
         # validates
         self.associated_variables = []
-        tax_benefit_system = italy_taxbenefitsystem.ItalyTaxBenefitSystem()
-        for key_variable, variables_content in tax_benefit_system.get_variables(entity = self.entity).iteritems():
+        tax_benefit_system = getattr(Entity.tax_benefit_system_module, str(Entity.tax_benefit_system_module_class))
+        current_system  = tax_benefit_system()
+        for key_variable, variables_content in current_system.get_variables(entity = self.entity).iteritems():
             self.associated_variables.append(Variable(name = key_variable,type = variables_content.value_type.__name__, entity = variables_content.entity.__name__, definition_period = variables_content.definition_period))
 
 
@@ -116,9 +160,6 @@ class Situation(): # defined for one entity
 
     def set_entity_choose(self, entity_choose):
         if isinstance(entity_choose, Entity):
-            if not(entity_choose.entity is Persona) and not(entity_choose.entity is Famiglia):
-                raise ValueError("One of the inserted entity doesn't exist")
-            else:
                 self.entity_choose = entity_choose
         else:
             raise TypeError("The object used is not an entity")
@@ -187,6 +228,8 @@ class Situation(): # defined for one entity
 
 class Simulation_generator(): #defined for Italy
 
+    tax_benefit_system_module = None
+    tax_benefit_system_module_class = None
 
     def __init__(self):
         self.situations = None #take n situations
@@ -239,11 +282,12 @@ class Simulation_generator(): #defined for Italy
 
     def generate_simulation(self):
         # import dinamically
-        tax_benefit_system = italy_taxbenefitsystem.ItalyTaxBenefitSystem()
+        tax_benefit_system = getattr(Simulation_generator.tax_benefit_system_module, str(Simulation_generator.tax_benefit_system_module_class))
+        current_system  = tax_benefit_system()
         if not (self.situations == []) and not (self.situations is None):
             for situation in self.situations:
                 # RICORDA CHE DEVI FARE PRATICAMETE UNA SIMULAZIONE PER OGNI PERSONA, NEL SENSO CHE INIZIALIZZI TRE VOLTE LO SCENARIO E POI RUNNI per il problema dello scenario
-                scenario = tax_benefit_system.new_scenario()
+                scenario = current_system.new_scenario()
                 scenario = self.init_profile(scenario = scenario, situation_period = situation.get_period(), entity_situation = situation.get_choosen_input_variables())
                 simulation = scenario.new_simulation() # nuova simulazione per lo scenario normale
                 for element in situation.get_choosen_output_variables():
@@ -251,41 +295,58 @@ class Simulation_generator(): #defined for Italy
         else:
             raise ValueError("To trigger a simulation, at least a situation it's needed")
 
+
+    @staticmethod
+    def import_depending_on_system_situation_for_simulation(system_selected, json_config_path_object):
+        # The import depenends on the system selected
+        print system_selected
+        system_selected = os.path.basename(system_selected)
+        for key, value in json_config_path_object[system_selected].items():
+                if key == 'tax_benefit_system':
+                    for key_tax, value_tax in value.items():
+                        tax_benefit_system_module,ext = os.path.splitext(key_tax)
+                        tax_benefit_system_class = value_tax
+        Simulation_generator.tax_benefit_system_module_class = tax_benefit_system_class
+        reload(site)
+        Simulation_generator.tax_benefit_system_module = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
+
+
+
 # main
-path = 'C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy'
-person = Entity(entity = Persona)
-person.generate_associated_variable_filter(year = '2017')
+#path = 'C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy'
+#person = Entity(entity = Persona)
+#person.generate_associated_variable_filter(year = '2017')
 
-situation_IRPEF_1 = Situation(name_of_situation = "IRPEF1_2017")
-situation_IRPEF_1.set_entity_choose(person)
-situation_IRPEF_1.set_period(year = '2017')
+#situation_IRPEF_1 = Situation(name_of_situation = "IRPEF1_2017")
+#situation_IRPEF_1.set_entity_choose(person)
+#situation_IRPEF_1.set_period(year = '2017')
 # input variables
-situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN1_reddito_complessivo', value = 25000)
-situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN2_deduzione_abitazione_principale', value = 2000)
-situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN3_oneri_deducibili_totali', value = 1500)
-situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN22_totale_detrazioni_imposta', value = 2000)
-situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN25_totale_altre_detrazioni_crediti_imposta', value = 1000)
+#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN1_reddito_complessivo', value = 25000)
+#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN2_deduzione_abitazione_principale', value = 2000)
+#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN3_oneri_deducibili_totali', value = 1500)
+#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN22_totale_detrazioni_imposta', value = 2000)
+#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN25_totale_altre_detrazioni_crediti_imposta', value = 1000)
 # output
-situation_IRPEF_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN4_reddito_imponibile')
-situation_IRPEF_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN5_irpef_lorda')
-situation_IRPEF_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN26_irpef_netta')
-print "IRPEF",  situation_IRPEF_1
+#situation_IRPEF_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN4_reddito_imponibile')
+#situation_IRPEF_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN5_irpef_lorda')
+#situation_IRPEF_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN26_irpef_netta')
+#print "IRPEF",  situation_IRPEF_1
 
 
-situation_IRPEF_2 = Situation(name_of_situation = "IRPEF2_2017")
-situation_IRPEF_2.set_entity_choose(person)
-situation_IRPEF_2.set_period(year = '2017')
+#situation_IRPEF_2 = Situation(name_of_situation = "IRPEF2_2017")
+#situation_IRPEF_2.set_entity_choose(person)
+#situation_IRPEF_2.set_period(year = '2017')
 # input variables
-situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN1_reddito_complessivo', value = 15000)
-situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN2_deduzione_abitazione_principale', value = 1000)
-situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN3_oneri_deducibili_totali', value = 1000)
-situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN22_totale_detrazioni_imposta', value = 500)
-situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN25_totale_altre_detrazioni_crediti_imposta', value = 400)
+#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN1_reddito_complessivo', value = 15000)
+#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN2_deduzione_abitazione_principale', value = 1000)
+#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN3_oneri_deducibili_totali', value = 1000)
+#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN22_totale_detrazioni_imposta', value = 500)
+#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN25_totale_altre_detrazioni_crediti_imposta', value = 400)
 # output
-situation_IRPEF_2.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN4_reddito_imponibile')
-situation_IRPEF_2.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN5_irpef_lorda')
-situation_IRPEF_2.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN26_irpef_netta')
-print "IRPEF",  situation_IRPEF_2
+#situation_IRPEF_2.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN4_reddito_imponibile')
+#situation_IRPEF_2.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN5_irpef_lorda')
+#situation_IRPEF_2.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN26_irpef_netta')
+#print "IRPEF",  situation_IRPEF_2
 #print id(situation_IRPEF_1)
 #situation_IMU_1 = Situation(name_of_situation = "IMU_2017")
 #situation_IMU_1.set_period(year = '2017' , month ='01')
@@ -302,12 +363,12 @@ print "IRPEF",  situation_IRPEF_2
 #situation_IMU_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'importo_imu')
 #print "IMU",  situation_IMU_1
 #print id(situation_IMU_1)
-simulation_IRPEF = Simulation_generator()
-simulation_IRPEF.set_period('2017')
-simulation_IRPEF.add_situation_to_simulator(situation_IRPEF_1)
-simulation_IRPEF.add_situation_to_simulator(situation_IRPEF_2)
-simulation_IRPEF.generate_simulation()
-print simulation_IRPEF.get_results()
+#simulation_IRPEF = Simulation_generator()
+#simulation_IRPEF.set_period('2017')
+#simulation_IRPEF.add_situation_to_simulator(situation_IRPEF_1)
+#simulation_IRPEF.add_situation_to_simulator(situation_IRPEF_2)
+#simulation_IRPEF.generate_simulation()
+#print simulation_IRPEF.get_results()
 #simulation_IMU = Simulation_generator(situations = [situation_IMU_1], period='2017-01')
 #simulation_IMU.generate_simulation()
 #simulation_IMU.get_results()
