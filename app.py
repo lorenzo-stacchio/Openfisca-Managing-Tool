@@ -469,10 +469,10 @@ class MakeSimulation(Screen):
                 i = 0
                 # In this case the tuple already exists
                 for el in self.ids.variable_added.children:
+                    # splitting
+                    entity, variable, value = el.text.split(' - ')
                     # If "entity - variabile" in button text
-                    if self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text in el.text:
-                        # splitting
-                        entity, variable, value = el.text.split(' - ')
+                    if (self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text) == (entity + " - " + variable):
                         # update button value
                         self.ids.variable_added.children[i].text = entity + " - " + variable + " - " + \
                                                                    self.ids.input_value_variable.text
