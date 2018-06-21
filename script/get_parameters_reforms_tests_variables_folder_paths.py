@@ -26,8 +26,11 @@ def get_all_paths(path_di_partenza):
             dict_path['reforms'] = str(project_folder + "/" + "reforms")
             dict_path['parameters'] =  str(project_folder + "/" + "parameters")
             dict_path['tests'] = str(project_folder + "/" + "tests")
-            dict_path['variables'] = str(project_folder + "/" + "variables")
-
+            if os.path.exists(str(project_folder + "/" + "variables")):
+                dict_path['variables'] = str(project_folder + "/" + "variables")
+            elif os.path.exists(str(project_folder + "/" + "model")):
+                dict_path['variables'] = str(project_folder + "/" + "model")
+            print dict_path
             if are_all_folders(dict_path):
                 return dict_path
             else:
