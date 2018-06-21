@@ -6,8 +6,8 @@ import datetime
 import collections
 import re
 import time
-from variables_file_interpeter import *
-from openfisca_italy import italy_taxbenefitsystem 
+#from variables_file_interpeter import *
+#from openfisca_italy import italy_taxbenefitsystem 
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import kivy
 import json
 kivy.require("1.10.0")
@@ -28,7 +27,6 @@ from script.interpeters.parameters_interpeter import *
 from script.interpeters.reforms_file_interpeter import *
 from script.download_openfisca_system import download_and_install as download_and_install_openfisca
 from multiprocessing.pool import ThreadPool
-
 
 
 # Screen
@@ -213,8 +211,6 @@ class LineOfChooser(BoxLayout):
 
 
 class VisualizeSystemScreen(Screen):
-    dict_path = ''
-    PATH_OPENFISCA = ''
 
     def __init__(self, **kwargs):
         super(VisualizeSystemScreen, self).__init__(**kwargs)
@@ -222,6 +218,9 @@ class VisualizeSystemScreen(Screen):
     def ricevi_inizializza_path(self, path):
         self.dict_path = get_all_paths(path)
         self.PATH_OPENFISCA = self.dict_path['inner_system_folder']
+        with open('messages\\config_import.json') as f:
+            data_config = json.load(f)
+        Variable_File_Interpeter.import_depending_on_system(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config) #static method
         os.chdir(os.getcwd())
         self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
         self.ids.document_variables_viewer.colors["link"] = "33AAFFff"

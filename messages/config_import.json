@@ -3,7 +3,7 @@
                   "link": "https://github.com/openfisca/openfisca-italy/",
                   "project_name": "openfisca-italy",
                   "tax_benefit_system": {
-                    "italy_taxbenefitsystem.py": "ItalyTaxBenefitSystem()"
+                    "italy_taxbenefitsystem.py": "ItalyTaxBenefitSystem"
                   },
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
@@ -21,7 +21,7 @@
                   "link": "https://github.com/openfisca/senegal",
                   "project_name": "senegal",
                   "tax_benefit_system": {
-                    "senegal_taxbenefitsystem.py": "SenegalTaxBenefitSystem()"
+                    "senegal_taxbenefitsystem.py": "SenegalTaxBenefitSystem"
                   },
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
@@ -39,7 +39,7 @@
                   "link": "https://github.com/openfisca/openfisca-tunisia",
                   "project_name": "openfisca-tunisia",
                   "tax_benefit_system": {
-                    "tunisia_taxbenefitsystem.py": "TunisiaTaxBenefitSystem()"
+                    "tunisia_taxbenefitsystem.py": "TunisiaTaxBenefitSystem"
                   },
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
@@ -57,7 +57,7 @@
                   "link": "https://github.com/jvalduvieco/openfisca-barcelona",
                   "project_name": "openfisca-barcelona",
                   "tax_benefit_system": {
-                    "barcelona_taxbenefitsystem.py": "BarcelonaTaxBenefitSystem()"
+                    "barcelona_taxbenefitsystem.py": "BarcelonaTaxBenefitSystem"
                   },
                   "scenarios" :{
                     "scenarios.py": "Scenario()"

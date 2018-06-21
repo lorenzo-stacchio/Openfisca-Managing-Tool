@@ -19,7 +19,6 @@ def download_and_install(path_to_save, project_name, github_link):
 
         if project_name == 'openfisca-italy':
             check_output("git checkout Initizialize_open-fisca-italy", shell=True).decode()
-
         check_output("pip install --editable " + path_to_save + "\\"+ project_name, shell=True).decode()
         os.chdir(current_path)
         return True
