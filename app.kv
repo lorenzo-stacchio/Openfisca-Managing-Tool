@@ -56,7 +56,7 @@
                 dirselect: True
                 canvas.before:
                     Color:
-                        rgba: hex('#326C97')
+                        rgba: hex('#6153CC')
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -268,7 +268,7 @@
         #pos_hint: {'center_x': .5, 'center_y': .5}
         canvas.before:
             Color:
-                rgb: hex("8F021F")
+                rgb: hex("9C2542")
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -282,7 +282,7 @@
                 orientation: 'vertical'
                 canvas.before:
                     Color:
-                        rgb: hex("5F021F")
+                        rgb: hex("771C33")
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -318,6 +318,7 @@
                         size_hint: (0.3,1.0)
                         on_press: root.go_to_home()
                         text: 'Come back to home'
+                        background_color: hex('971640')
 
         TabbedPanelItem:
             id: tabbed_parameters
@@ -329,7 +330,7 @@
                 orientation: 'vertical'
                 canvas.before:
                     Color:
-                        rgb: hex("5F021F")
+                        rgb: hex("771C33")
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -374,7 +375,7 @@
                 orientation: 'vertical'
                 canvas.before:
                     Color:
-                        rgb: hex("5F021F")
+                        rgb: hex("771C33")
                     Rectangle:
                         pos: self.pos
                         size: self.size
@@ -421,6 +422,12 @@
     BoxLayout:
         orientation: 'horizontal'
         BoxLayout:
+            canvas.before:
+                Color:
+                    rgba: hex('#B48291')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
             orientation: 'vertical'
             Label:
                 text: 'Select [b]entity[/b]'
@@ -436,10 +443,13 @@
                         size: self.size
             Label:
                 size_hint: (1.0,0.05)
+
             Spinner:
                 id: menu_a_tendina_entita
-                size_hint: (1.0,0.1)
+                size_hint: (0.8,0.1)
+                pos_hint: {'center_x': .5, 'center_y': .5}
                 on_text: root.update_form()
+                background_color: (0, 0.278, 0.172, 0.294)
             Label:
                 size_hint: (1.0,0.05)
 
@@ -459,14 +469,17 @@
                 size_hint: (1.0,0.05)
             Spinner:
                 id: menu_a_tendina_variabili
-                size_hint: (1.0,0.1)
+                size_hint: (0.8,0.1)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                background_color: (0, 0.278, 0.172, 0.294)
             Label:
                 size_hint: (1.0,0.05)
             TextInput:
                 id: input_value_variable
                 multiline: False
-                hint_text: 'Value of the selected variable'
-                size_hint: (1.0,0.1)
+                hint_text: 'Insert a value'
+                size_hint: (0.8,0.1)
+                pos_hint: {'center_x': .5, 'center_y': .5}
             Label:
                 size_hint: (1.0,0.05)
 
@@ -477,14 +490,21 @@
                 size_hint: (0.5,0.05)
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 on_press: root.add_value_and_reset_form()
+                background_color: hex('B48291')
+
             Label:
                 id: information
                 markup: True
                 valign: 'center'
+                text_size: self.width, None
+                height: self.texture_size[1]
+                padding_x: 50
             Button:
                 text: 'Go to Output variable Screen'
-                size_hint: (1.0,0.07)
+                size_hint: (1.0,0.085)
                 on_press: root.go_to_output_variables()
+                background_color: hex('971640')
+
         BoxLayout:
             orientation: 'vertical'
             Label:
@@ -512,7 +532,7 @@
                 size_hint: (1.0,0.05)
                 on_press: root.go_to_home()
                 text: 'Come back to home'
-
+                background_color: hex('971640')
 
 
 <OutputVariableScreen>:
@@ -540,6 +560,7 @@
             Spinner
                 id: menu_a_tendina_variabili_output
                 size_hint: (1.0,0.1)
+                pos_hint: {'center_x': .5, 'center_y': .5}
             Label:
                 size_hint: (1.0,0.05)
             TextInput:
@@ -547,6 +568,8 @@
                 multiline: False
                 hint_text: 'Value of the selected variable'
                 size_hint: (1.0,0.1)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+
             Label:
                 size_hint: (1.0,0.05)
             Button:
@@ -554,6 +577,7 @@
                 size_hint: (0.5,0.05)
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 on_press: root.add_value_and_reset_form()
+
             Label:
                 id: information
                 markup: True
@@ -594,11 +618,18 @@
                     size_hint: (0.5,0.05)
                     on_press: root.go_to_home()
                     text: 'Come back to home'
+                    canvas.before:
+                        Color:
+                            rgba: hex('#971640')
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
                 Button:
                     id: back_to_make_simulation
                     size_hint: (0.5,0.05)
                     on_press: root.go_to_make_simulation()
                     text: 'Come back to input variables'
+
 
 <ReformsScreen>:
     name: "reforms"
