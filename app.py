@@ -819,19 +819,37 @@ class SelectVariableScreen(Screen):
         self.ids.id_spinner_select_variable_screen.dropdown_cls.max_height = self.ids.id_spinner_select_variable_screen.height*3
 
         variable = []
-
-        ###TO CHANGE FROM HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+        ###TODO CHANGE FROM HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
         import random
         import string
         #genera 10 stringhe lunghe 10 casualmente
         for i in xrange(1,21):
             variable.append(''.join(random.choice(string.ascii_uppercase) for _ in range(10)))
-        #####TO HEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHERE
+        #####TODO HEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHERE
 
         #Ordina alfabeticamente
         variable.sort()
         self.ids.id_spinner_select_variable_screen.values = variable
 
+    def select_variable(self):
+        if self.manager.get_screen('select_variable_screen').choice == "Neutralize variable":
+            # Create a popup
+            content = ConfirmPopup(text=str("Are you sure to neutralize?"))
+            content.bind(on_answer=self._on_answer)
+            self.popup = Popup(title="Answer Question", content=content, size_hint=(None, None), size=(480, 400),
+                               auto_dismiss=False)
+            self.popup.open()
+        elif self.manager.get_screen('select_variable_screen').choice == "Update variable":
+            pass
+        else:
+            pass
+
+    def _on_answer(self, instance, answer):
+        if answer == 'Yes':
+            pass
+            # TODO HERE YOU MUSH NEUTRALIZE VARIABLE
+        self.popup.dismiss()
+        self.manager.current = 'reforms'
 
 class MyScreenManager(ScreenManager):
     pass
