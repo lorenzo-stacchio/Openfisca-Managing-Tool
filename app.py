@@ -54,7 +54,7 @@ class InitScreen(Screen):
                 self.manager.current = 'home'
                 self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
                 self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
-                with open('messages\\config_import.json') as f:
+                with open('./messages/config_import.json') as f:
                     data_config = json.load(f)
                 self.manager.get_screen('choose_entity').import_entities_system(self.PATH_OPENFISCA,data_config)
 
@@ -256,7 +256,7 @@ class VisualizeSystemScreen(Screen):
     def ricevi_inizializza_path(self, path):
         self.dict_path = get_all_paths(path)
         self.PATH_OPENFISCA = self.dict_path['inner_system_folder']
-        with open('messages\\config_import.json') as f:
+        with open('./messages/config_import.json') as f:
             data_config = json.load(f)
         # init dynamic loading in classes
         Variable_File_Interpeter.import_depending_on_system(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config) #static method
@@ -403,13 +403,19 @@ class MakeSimulation(Screen):
 
         self.dict_entita = {}
 
-        # ciclo per beccare le variabili per le entità
+        # Cicla il dizionario contenente l'input fornito in precedenza
+        #Esempio "person":1,"household":2
         for k, v in self.manager.get_screen('choose_entity').number_of_entity.items():
+            #Per ogni oggetto entità esistente in type_of_entity
             for entity in self.manager.get_screen('choose_entity').type_of_entity:
+                #Se la chiave dell'oggetto è uguale a k
                 if entity.key == k:
+                    #Per ogni indice da 1 a numero di elementi di quell'entità
                     for index in xrange(1, int(v) + 1):
+                        #ostruisco l'entità
                         real_entity = Entity(entity = entity)
                         real_entity.generate_associated_variable_filter(str(self.manager.get_screen('choose_entity').period))
+                        #Salvo nel dizionario id="NomeEntitaNumeroProgressivo" value="variabili associate"
                         self.dict_entita[k + str(index)] = real_entity.get_associated_variables()  # TODO apposto di questo vettore ci andranno le variabili di persona
 
         self.ids.menu_a_tendina_entita.values = self.dict_entita.keys()
@@ -678,8 +684,8 @@ class ConfirmPopup(GridLayout):
 # App
 class openfisca_managing_tool(App):
     def build(self):
-        Builder.load_file('.././folder_kv/app.kv')
-        Builder.load_file('.././folder_kv/reforms.kv')
+        Builder.load_file('./folder_kv/app.kv')
+        Builder.load_file('./folder_kv/reforms.kv')
         self.icon = 'img/openfisca.ico'
         self.title = 'Openfisca Managing Tool'
         return MyScreenManager()
