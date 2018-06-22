@@ -606,14 +606,6 @@
                 size_hint: (0.8,0.1)
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 background_color: (0, 0.278, 0.172, 0.294)
-            Label:
-                size_hint: (1.0,0.05)
-            TextInput:
-                id: input_value_variable_output
-                multiline: False
-                hint_text: 'Value of the selected variable'
-                size_hint: (1.0,0.1)
-                pos_hint: {'center_x': .5, 'center_y': .5}
 
             Label:
                 size_hint: (1.0,0.05)
@@ -685,7 +677,7 @@
         orientation: "horizontal"
         LabelLeftTop:
             id: "label_input"
-            #TODO text: root.manager.get_screen('output_variable').string_var_input + "aldo"
+            text: root.content_input
         Label:
             size_hint: 0.001,1
             canvas.before:
@@ -696,6 +688,7 @@
                     size: self.size
         LabelLeftTop:
             id: "label_output"
+            text: root.content_output
 
 <LabelLeftTop>
     padding_x: 20
