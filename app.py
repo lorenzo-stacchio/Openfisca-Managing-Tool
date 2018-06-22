@@ -642,6 +642,8 @@ class LabelLeftTop(Label):
 
 
 class ReformsScreen(Screen):
+    choice = StringProperty()
+
     def __init__(self, **kwargs):
         super(ReformsScreen, self).__init__(**kwargs)
 
@@ -649,7 +651,21 @@ class ReformsScreen(Screen):
         if self.manager.current == 'reforms':
             self.manager.current = 'home'
 
+    def go_to_add_variable(self):
+        pass
+
+    def go_to_update_variable(self):
+        self.manager.get_screen('select_variable_screen').choice = "Update variable"
+        self.manager.current = 'select_variable_screen'
+
+    def go_to_neutralize_variable(self):
+        self.manager.get_screen('select_variable_screen').choice = "Neutralize variable"
+        self.manager.current = 'select_variable_screen'
+
+
 class SelectVariableScreen(Screen):
+    choice = StringProperty()
+
     def __init__(self, **kwargs):
         super(SelectVariableScreen, self).__init__(**kwargs)
         Clock.schedule_once(self._finish_init)
@@ -657,9 +673,24 @@ class SelectVariableScreen(Screen):
     def _finish_init(self, dt):
         self.inizialize_form()
 
+    def go_to_home(self):
+        if self.manager.current == 'select_variable_screen':
+            self.manager.current = 'home'
 
     def inizialize_form(self):
-        pass
+        self.ids.id_spinner_select_variable_screen.dropdown_cls.max_height = self.ids.id_spinner_select_variable_screen.height*3
+
+        variable = []
+
+        import random
+        import string
+        #genera 10 stringhe lunghe 10 casualmente
+        for i in xrange(1,21):
+            variable.append(''.join(random.choice(string.ascii_uppercase) for _ in range(10)))
+
+        #Ordina alfabeticamente
+        variable.sort()
+        self.ids.id_spinner_select_variable_screen.values = variable
 
 
 class MyScreenManager(ScreenManager):
@@ -684,8 +715,8 @@ class ConfirmPopup(GridLayout):
 # App
 class openfisca_managing_tool(App):
     def build(self):
-        Builder.load_file('./folder_kv/app.kv')
         Builder.load_file('./folder_kv/reforms.kv')
+        Builder.load_file('./folder_kv/app.kv')
         self.icon = 'img/openfisca.ico'
         self.title = 'Openfisca Managing Tool'
         return MyScreenManager()

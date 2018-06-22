@@ -11,12 +11,15 @@
             Button:
                 id: button_add_variable
                 text: "Add variable"
+                on_press: root.go_to_add_variable()
             Button:
                 id: button_update_variable
                 text: "Update variable"
+                on_press: root.go_to_update_variable()
             Button:
                 id: button_neutralize_variable
                 text: "Neutralize variable"
+                on_press: root.go_to_neutralize_variable()
             Button:
                 id: button_add_parameter
                 text: "Add parameter"
@@ -36,14 +39,12 @@
     name: "select_variable_screen"
     BoxLayout:
         orientation: "vertical"
-        Spinner:
-            id: menu_a_tendina_variabili
-            size_hint: (0.8,0.1)
+        Spinner
+            id: id_spinner_select_variable_screen
+            size_hint: (0.8,None)
             pos_hint: {'center_x': .5, 'center_y': .5}
-            background_color: (0, 0.278, 0.172, 0.294)
         BoxLayout:
             orientation: "horizontal"
-
             Button:
                 size_hint: (1.0,0.2)
                 text: 'Select'
