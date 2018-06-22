@@ -4,6 +4,9 @@ import inspect
 import datetime
 import time
 import importlib
+import json
+import site
+import re
 from enum import Enum
 
 # show the names in GUI
@@ -28,12 +31,17 @@ class TYPEOFDEFINITIONPERIOD(Enum):
 
 class Variable_To_Reform():
 
-    def __init__(self, name = None, entity = None, type = None, reference = None, openfisca_tax_benefit_system_path = None,  formula = None, label = None, set_input = None, definition_period = None):
+    tax_benefit_system_class = None
+    tax_benefit_system = None
+    entity_module = None
+    type_of_entity = None
+
+
+    def __init__(self, name = None, entity = None, type = None, reference = None,  formula = None, label = None, set_input = None, definition_period = None):
         self.__name__ = name
-        self.__entity__ = entity
+        self.entity = entity
         self.__type__ = type
         self.__reference__ = reference
-        self.__openfisca_tax_benefit_system_path__ = openfisca_tax_benefit_system_path
         self.__label__ = label
         self.__definition_period__ = definition_period
         self.__set_input__ = set_input
@@ -52,25 +60,26 @@ class Variable_To_Reform():
             raise ValueError("The type choosen for the variable is not an openfisca type")
 
     def set_entity(self, entity):
-        sys.path.append(self.__openfisca_tax_benefit_system_path__)
-        entita = importlib.import_module('entita')
-        self.entities = []
-        for entity_real in entita.entities:
-            self.entities.append(entity_real.__name__)
-        if entity in self.entities:
-            self.__entity__ = entity
-        else:
+        entity_names = []
+        self.entity = None
+        for entity_name in Variable_To_Reform.type_of_entity:
+            entity_names.append(entity)
+        print entity_names
+        for entity_name in entity_names:
+            if entity == entity_name:
+                self.entity = entity
+        if self.entity is None:
             raise ValueError("The entity choosen doesn't exist in openfisca")
-        self.__entity__ = entity
 
     def set_reference(self, reference):
         self.__reference__ = reference
 
     def set_formula(self, formula):
-        self.__formula__ = formula
-
-    def set_openfisca_tax_benefit_system_path(self, openfisca_tax_benefit_system_path):
-        self.__openfisca_tax_benefit_system_path__ = openfisca_tax_benefit_system_path
+        f = re.compile("def formula\(([a-zA-Z\, ]*)\)\:")
+        if f.match(formula):
+            self.__formula__ = formula
+        else:
+            raise ValueError("The text you insert is not a valid formula")
 
     def set_label(self, label):
         self.__label__ = label
@@ -93,8 +102,35 @@ class Variable_To_Reform():
         else:
             raise ValueError("The set_input choosen for the variable is not an openfisca set_input")
 
+
+    @staticmethod
+    def import_depending_on_system(system_selected, json_config_path_object):
+        # The import depenends on the system selected
+        print system_selected
+        system_selected = os.path.basename(system_selected)
+        for key, value in json_config_path_object[system_selected].items():
+                if key == 'tax_benefit_system':
+                    for key_tax, value_tax in value.items():
+                        tax_benefit_system_module,ext = os.path.splitext(key_tax)
+                        tax_benefit_system_class = value_tax
+                if key == 'entities':
+                    for key_entity, value_entity in value.items():
+                        entity_module,ext = os.path.splitext(key_entity)
+                        for key_attribute_entity, value_attribute_entity in value_entity.items():
+                            if key_attribute_entity == 'all_entities':
+                                all_entities_name = value_attribute_entity
+
+        Variable_To_Reform.tax_benefit_system_class = tax_benefit_system_class
+        reload(site)
+        Variable_To_Reform.entity_module = importlib.import_module(str(system_selected) + "." + str(entity_module))
+        Variable_To_Reform.tax_benefit_system = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
+        Variable_To_Reform.type_of_entity = getattr(Variable_To_Reform.entity_module, all_entities_name)
+
+        print type(Variable_To_Reform.tax_benefit_system), Variable_To_Reform.tax_benefit_system
+
+
     def __repr__(self):
-        return "\n\nName: " + self.__name__ + "\nType: " + self.__type__ + "\nEntity: " + self.__entity__ + "\nDefinition period: " + self.__definition_period__ + "\nLabel: " + self.__label__ +  "\nSet_input: " + self.__set_input__ +  "\nReference: " + self.__reference__
+        return "\n\nName: " + self.__name__ + "\nType: " + self.__type__ + "\nEntity: " + self.entity + "\nDefinition period: " + self.__definition_period__ + "\nLabel: " + self.__label__ +  "\nSet_input: " + self.__set_input__ +  "\nReference: " + self.__reference__
 
 class TYPEOFREFORMVARIABILE(Enum):
     update_variable = "Update an existing variable"
@@ -135,15 +171,37 @@ class Variable_reform_manager():
         if self.__reform_name__ is None:
             self.__reform_name__ = "no_named_reform"
         # check the necessary fields, which are name, type, definition_period and entity
-        if (self.__variable_to_add__.__name__ is None) or (self.__variable_to_add__.__entity__ is None) or (self.__variable_to_add__.__definition_period__ is None) or (self.__variable_to_add__.__entity__ is None):
+        if (self.__variable_to_add__.__name__ is None) or (self.__variable_to_add__.entity is None) or (self.__variable_to_add__.__definition_period__ is None) or (self.__variable_to_add__.entity is None):
             raise ValueError("You doesn't insert a necessary field")
         path_new_reform = self.__path_to_save_reform__ + "\\" + self.__reform_name__ + ".py"
         if os.path.exists(path_new_reform):
             os.remove(path_new_reform)
         with open(path_new_reform, 'a') as new_reform:
             new_reform.write("# -*- coding: utf-8 -*-") # to avoid erros
-            new_reform.write("\nfrom openfisca_core.model_api import *\n\n")
-            new_reform.write("\nfrom openfisca_core.model_api import *\n\n")
+            new_reform.write("\nfrom openfisca_core.model_api import *")
+            new_reform.write("\nfrom openfisca_core.model_api import *\n")
+            # required fields
+            new_reform.write("\nclass " + self.__variable_to_add__.__name__ + "(Variable):")
+            new_reform.write("\n\tvalue_type = " + self.__variable_to_add__.__type__)
+            new_reform.write("\n\tentity = " + self.__variable_to_add__.entity)
+            new_reform.write("\n\tdefinition_period = " + self.__variable_to_add__.__definition_period__)
+            # facultative fields
+            if self.__variable_to_add__.__reference__:
+                new_reform.write("\n\treference = " + self.__variable_to_add__.__reference__)
+
+            if self.__variable_to_add__.__label__:
+                new_reform.write("\n\tlabel = " + self.__variable_to_add__.__label__)
+
+            if self.__variable_to_add__.__set_input__:
+                new_reform.write("\n\tset_input = " + self.__variable_to_add__.__set_input__)
+
+            if self.__variable_to_add__.__formula__:
+                new_reform.write("\n\n\t" + self.__variable_to_add__.__formula__)
+            # write reform
+            new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
+            new_reform.write("\n\tdef apply(self):\n\t\tself.add_variable(\'" + self.__variable_to_add__.__name__ + "\')")
+
+
 
     def __update_variable__(self):
         print "SONO IN UP"
@@ -152,11 +210,16 @@ class Variable_reform_manager():
     def __neutralize_variable__(self):
         print "SONO IN NEUT"
 
-v = Variable_To_Reform(openfisca_tax_benefit_system_path = 'C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy')
+
+with open('config_import.json') as f:
+    data_config = json.load(f)
+Variable_To_Reform.import_depending_on_system("openfisca_italy", data_config)
+v = Variable_To_Reform()
 v.set_name("Prova")
 v.set_type("float")
-v.set_entity("Person")
+v.set_entity("person")
 v.set_definition_period("month")
 v.set_set_input("set_input_divide_by_period")
-manager = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Stach\\Desktop', variable_to_add = v )
+v.set_formula("def formula(person, period, parameters):\n\t\treturn person('reddito_lavoro_dipendente_annuale', period) * parameters(period).tasse.aliquota_IRPEF")
+manager = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Lorenzo Stacchio\\Desktop', variable_to_add = v )
 manager.do_reform("add_variable")
