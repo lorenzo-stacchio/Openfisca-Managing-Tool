@@ -111,8 +111,17 @@
                 id: grid_layout_countries
                 pos: self.parent.pos
                 size: self.parent.size
-                rows: 1
-                cols: 4
+                rows: 2
+                cols: 3
+                Button:
+                    id: button_france
+                    background_normal: "ffffff"
+                    on_release: root.download_system(self)
+                    Image:
+                        source: 'img/flags/france-flag.png'
+                        pos: self.parent.pos
+                        size: self.parent.size
+
                 Button:
                     id: button_barcelona
                     background_normal: "ffffff"
@@ -146,6 +155,9 @@
                         source: 'img/flags/tunisia-flag.jpg'
                         pos: self.parent.pos
                         size: self.parent.size
+                Button:
+                    id: empty_button
+                    background_normal: "ffffff"
 
             Label:
                 canvas.before:
