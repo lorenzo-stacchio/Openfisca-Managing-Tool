@@ -555,9 +555,39 @@
     BoxLayout:
         orientation: 'horizontal'
         BoxLayout:
+			canvas.before:
+                Color:
+                    rgba: hex('#B48291')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
             orientation: 'vertical'
             Label:
-                text: 'Select [b]output[/b] variable'
+                text: 'Select [b]entity[/b]'
+                halign: 'right'
+                valign: 'top'
+                markup: True
+                size_hint: (1.0,0.08)
+                canvas.before:
+                    Color:
+                        rgba: hex('#971640')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            Label:
+                size_hint: (1.0,0.05)
+
+            Spinner:
+                id: menu_a_tendina_entita_output
+                size_hint: (0.8,0.1)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_text: root.update_form()
+                background_color: (0, 0.278, 0.172, 0.294)
+            Label:
+                size_hint: (1.0,0.05)
+
+            Label:
+                text: 'Select [b]output variable[/b]'
                 halign: 'right'
                 valign: 'top'
                 markup: True
@@ -570,10 +600,11 @@
                         size: self.size
             Label:
                 size_hint: (1.0,0.05)
-            Spinner
+            Spinner:
                 id: menu_a_tendina_variabili_output
-                size_hint: (1.0,0.1)
+                size_hint: (0.8,0.1)
                 pos_hint: {'center_x': .5, 'center_y': .5}
+                background_color: (0, 0.278, 0.172, 0.294)
             Label:
                 size_hint: (1.0,0.05)
             TextInput:
@@ -592,13 +623,17 @@
                 on_press: root.add_value_and_reset_form()
 
             Label:
-                id: information
+                id: information_output
                 markup: True
                 valign: 'center'
+				text_size: self.width, None
+                height: self.texture_size[1]
+                padding_x: 50
             Button:
                 text: 'Make Simulation!'
-                size_hint: (1.0,0.07)
+                size_hint: (1.0,0.085)
                 on_press: root.go_to_execute_simulation()
+				background_color: hex('971640')
         BoxLayout:
             id: boxlayout_addedvariables
             orientation: 'vertical'
@@ -631,17 +666,13 @@
                     size_hint: (0.5,0.05)
                     on_press: root.go_to_home()
                     text: 'Come back to home'
-                    canvas.before:
-                        Color:
-                            rgba: hex('#971640')
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
+                    background_color: hex('971640')
                 Button:
                     id: back_to_make_simulation
                     size_hint: (0.5,0.05)
                     on_press: root.go_to_make_simulation()
                     text: 'Come back to input variables'
+                    background_color: hex('971640')
 
 
 
