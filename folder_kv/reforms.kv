@@ -55,3 +55,41 @@
                 text: 'Come back to home'
                 background_color: hex('971640')
                 on_press: root.go_to_home()
+
+<FormVariableScreen>:
+    name: "form_variable_screen"
+
+    GridLayout:
+        cols: 2
+        Label:
+            text: "Value type"
+        TextInput:
+            id: value_type_input
+        Label:
+            text: "Entity"
+        TextInput:
+            id: entity_input
+        Label:
+            text: "Label"
+        TextInput:
+            id: label_input
+        Label:
+            text: "Definition period"
+        TextInput:
+            id: definition_period_input
+        Label:
+            text: "Reference"
+        TextInput:
+            id: reference_input
+        Button:
+            text: "Run operation"
+            size_hint: (1.0,0.3)
+            background_color: hex('971640')
+        Button:
+            text: "Come back to home"
+            on_press: root.go_to_home()
+            size_hint: (1.0,0.3)
+            background_color: hex('971640')
+
+
+

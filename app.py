@@ -840,7 +840,8 @@ class SelectVariableScreen(Screen):
                                auto_dismiss=False)
             self.popup.open()
         elif self.manager.get_screen('select_variable_screen').choice == "Update variable":
-            pass
+            self.manager.get_screen('form_variable_screen').setting_up_form_variable()
+            self.manager.current = 'form_variable_screen'
         else:
             pass
 
@@ -850,6 +851,29 @@ class SelectVariableScreen(Screen):
             # TODO HERE YOU MUSH NEUTRALIZE VARIABLE
         self.popup.dismiss()
         self.manager.current = 'reforms'
+
+
+class FormVariableScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super(FormVariableScreen, self).__init__(**kwargs)
+
+    def setting_up_form_variable(self):
+        if self.manager.get_screen('select_variable_screen').choice == "Update variable":
+            self.ids.value_type_input.text = "x"
+            self.ids.entity_input.text = "x"
+            self.ids.label_input.text = "x"
+            self.ids.definition_period_input.text = "x"
+            self.ids.reference_input.text = "x"
+        elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+            self.ids.value_type_input.text = ""
+            self.ids.entity_input.text = ""
+            self.ids.label_input.text = ""
+            self.ids.definition_period_input.text = ""
+            self.ids.reference_input.text = ""
+        else:
+            pass
+
 
 class MyScreenManager(ScreenManager):
     pass
