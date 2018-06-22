@@ -33,7 +33,7 @@ from multiprocessing.pool import ThreadPool
 
 # Screen
 class InitScreen(Screen):
-
+    download_information = StringProperty("[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]")
     def __init__(self, **kwargs):
         super(InitScreen, self).__init__(**kwargs)
         Clock.schedule_once(self._finish_init)
@@ -76,21 +76,16 @@ class InitScreen(Screen):
         project_name = data_config[system_selected]["project_name"]
         # waiting popup
         # TODO: AGGIUSTA IL CAMBIAMENTO DELLA LABEL
-        pool = ThreadPool(processes=1)
-        async_result = pool.apply_async(download_and_install_openfisca, (user_desktop, project_name, github_link))
-        result = async_result.get()
+        self.download_information= "[color=FF033D] [b] [size=20] [u] Downloading and installing the system[/size] [u] [b] [/color]"
 
-        self.ids.instructions_downloading_repos.text = "[color=FF033D] [b] [size=20] [u] Downloading and installing the system[/size] [u] [b] [/color]"
-
+        result = download_and_install_openfisca(user_desktop, project_name, github_link)
         if result:
-            self.ids.instructions_downloading_repos.text = "[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]"
             self.generate_pop_up( title = 'System saved!',
                                     content = Label(text='The system [b]' + system_selected + '[b] was saved in:' + user_desktop, size = self.parent.size, halign="left", valign="middle"))
         else:
-            self.ids.instructions_downloading_repos.text = "[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]"
             self.generate_pop_up( title = 'System already exist!',
                             content = Label(text='The system [b]' + system_selected + '[b] already exist in:' + user_desktop + "\n If you want to download a newest version, please erase it!", size = self.parent.size, halign="left", valign="middle"))
-
+        #self.download_information = "[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]"
     def get_id(self, instance):
             for id, widget in self.ids.items():
                 print id, widget
