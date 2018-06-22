@@ -487,7 +487,7 @@ class MakeSimulation(Screen):
             if len(self.ids.variable_added.children) != 0:
                 # change transition
                 self.manager.transition = kivy.uix.screenmanager.SlideTransition(direction='left')
-                self.manager.transition.duration = 1
+                self.manager.transition.duration = .6
                 self.manager.get_screen('output_variable').inizializza_output_variable()
                 # Go to output_variable
                 self.manager.current = 'output_variable'
