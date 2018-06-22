@@ -613,6 +613,7 @@ class ConfirmPopup(GridLayout):
 class openfisca_managing_tool(App):
     def build(self):
         Builder.load_file('app.kv')
+        Builder.load_file('reforms.kv')
         self.icon = 'openfisca.ico'
         self.title = 'Openfisca Managing Tool'
         return MyScreenManager()
