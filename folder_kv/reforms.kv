@@ -62,9 +62,14 @@
     GridLayout:
         cols: 2
         Label:
-            text: "Value type"
+            text: "Name"
         TextInput:
+            id: name_input
+        Label:
+            text: "Value type"
+        Spinner:
             id: value_type_input
+            values: ["int","float","bool","str","date","Enum"]
         Label:
             text: "Entity"
         TextInput:
@@ -75,8 +80,9 @@
             id: label_input
         Label:
             text: "Definition period"
-        TextInput:
+        Spinner:
             id: definition_period_input
+            values: ["MONTH","YEAR","ETERNITY"]
         Label:
             text: "Reference"
         TextInput:
@@ -85,6 +91,7 @@
             text: "Run operation"
             size_hint: (1.0,0.3)
             background_color: hex('971640')
+            on_press: root.run_operation()
         Button:
             text: "Come back to home"
             on_press: root.go_to_home()
