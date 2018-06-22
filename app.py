@@ -427,6 +427,7 @@ class MakeSimulation(Screen):
                             string_name_list = []
                             for variable in variables:
                                 string_name_list.append(variable.name)
+                            string_name_list.sort()
                         self.dict_entita[k + str(index)] = string_name_list
                         # CREATE SITUATIONS
                         app_situation = Situation(name_of_situation = str(k + str(index)))
