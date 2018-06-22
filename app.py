@@ -694,6 +694,13 @@ class OutputVariableScreen(Screen):
                     text=self.ids.menu_a_tendina_entita_output.text + " - " + self.ids.menu_a_tendina_variabili_output.text + " - " + self.ids.input_value_variable_output.text,
                     on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
+                # CORRADOOOOOOO
+                # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
+                # PERCHE' LE AGGIUNTO VOLTA VOLTA, QUINDI SE LE RAGGRUPPAVI IN QUALCHE DICT PUOI ANCHE TOGLIERLO
+
+                self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
+                print self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text ].get_choosen_output_variables()
+
                 # EXAMPLE dict_of_entity_variable_value[Persona] = [reddito_totale,10000,prova,10,prova2,11]
                 # inizialize if key is not exists
                 if not self.ids.menu_a_tendina_entita_output.text in self.dict_of_entity_variable_value_output.keys():
@@ -707,6 +714,12 @@ class OutputVariableScreen(Screen):
             else:
                 i = 0
                 # In this case the tuple already exists
+                # CORRADOOOOOOO
+                # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
+                # PERCHE' LE AGGIUNTO VOLTA VOLTA, QUINDI SE LE RAGGRUPPAVI IN QUALCHE DICT PUOI ANCHE TOGLIERLO
+                self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
+                print self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text ].get_choosen_output_variables()
+
                 for el in self.ids.variable_added_output.children:
                     # splitting
                     entity, variable, value = el.text.split(' - ')
