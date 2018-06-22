@@ -4,7 +4,6 @@ import time
 import sys
 from subprocess import check_output
 
-# TODO: message if directory exist yet
 def download_and_install(path_to_save, project_name, github_link):
     current_path = os.getcwd()
     full_path = str(path_to_save + "\\"+ project_name)

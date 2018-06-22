@@ -34,21 +34,29 @@ from multiprocessing.pool import ThreadPool
 # Screen
 class InitScreen(Screen):
 
+    PATH_OPENFISCA = None
+
+
     def __init__(self, **kwargs):
         super(InitScreen, self).__init__(**kwargs)
         Clock.schedule_once(self._finish_init)
+
 
     def _finish_init(self, dt):
         self.ids.home_file_chooser.path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
 
     def selected_file(self, *args):
-        PATH_OPENFISCA = args[1][0]
-        dict = get_all_paths(PATH_OPENFISCA)
+        self.PATH_OPENFISCA = args[1][0]
+        dict = get_all_paths(self.PATH_OPENFISCA)
         if dict:
             if self.manager.current == 'init':
                 self.manager.current = 'home'
-                self.manager.get_screen('visualize_system').ricevi_inizializza_path(PATH_OPENFISCA)
-                self.manager.get_screen('home').ricevi_inizializza_path(PATH_OPENFISCA)
+                self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
+                self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
+                with open('messages\\config_import.json') as f:
+                    data_config = json.load(f)
+                self.manager.get_screen('choose_entity').import_entities_system(self.PATH_OPENFISCA,data_config)
+
         else:
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
 
@@ -71,9 +79,12 @@ class InitScreen(Screen):
         with open('messages\\config_import.json') as f:
             data_config = json.load(f)
         system_selected = id_button.replace("button","openfisca")
+        # get system info depending on the choice
         user_desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
         github_link = data_config[system_selected]["link"]
         project_name = data_config[system_selected]["project_name"]
+
+
         # waiting popup
         # TODO: AGGIUSTA IL CAMBIAMENTO DELLA LABEL
         pool = ThreadPool(processes=1)
@@ -126,34 +137,62 @@ class HomeScreen(Screen):
 
     def go_to_simulation(self):
         if self.manager.current == 'home':
+            # initialize the simulator entity manager
+            self.manager.get_screen('choose_entity').init_content_screen()
             self.manager.current = 'choose_entity'
 
 
 class ChooseEntityScreen(Screen):
-    type_of_entity = ['Persona', 'Famiglia']
+    entity_module = None
+    type_of_entity = None
     number_of_entity = {}
-    period = ""
+    period = None
+    global_box_layout = None
+
     def __init__(self, **kwargs):
         super(ChooseEntityScreen, self).__init__(**kwargs)
-        layout = BoxLayout(orientation='vertical')
-        self.add_widget(layout)
+        self.entity_box_layout = BoxLayout(orientation='vertical')
+        self.add_widget(self.entity_box_layout)
+
+
+    def init_content_screen(self):
         for entity in self.type_of_entity:
-            layout.add_widget(LineOfChooser())
-            layout.children[0].children[-1].text = entity
+            self.entity_box_layout.add_widget(LineOfChooser())
+            self.entity_box_layout.children[0].children[-1].text = entity.key
 
         layout_period = BoxLayout(orientation = "horizontal")
         layout_period.add_widget(Label(text="Period", markup=True))
         txt_input = TextInput(id="txt_period")
         layout_period.add_widget(txt_input)
 
-        layout.add_widget(layout_period)
-        layout.add_widget(Label(text="You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD"))
-        layout.add_widget(Button(id="button_go_to_insert_input_variables", text="Click"))
+        self.entity_box_layout.add_widget(layout_period)
+        self.entity_box_layout.add_widget(Label(text="You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD"))
+        self.entity_box_layout.add_widget(Button(id="button_go_to_insert_input_variables", text="Click"))
         Clock.schedule_once(self._finish_init)
+
+
+    def import_entities_system(self, system_selected, json_config_path_object):
+        # The import depenends on the system selected
+        print system_selected
+        system_selected = os.path.basename(system_selected)
+        system_selected = system_selected.replace("-","_")
+        for key, value in json_config_path_object[system_selected].items():
+                if key == 'entities':
+                    for key_entity, value_entity in value.items():
+                        entity_module,ext = os.path.splitext(key_entity)
+                        for key_attribute_entity, value_attribute_entity in value_entity.items():
+                            if key_attribute_entity == 'all_entities':
+                                all_entities_name = value_attribute_entity
+        self.entity_module = importlib.import_module(str(system_selected) + "." + str(entity_module))
+        reload(site)
+        self.type_of_entity = getattr(self.entity_module, all_entities_name)
+
+
 
     def _finish_init(self, dt):
         # go to make_simulation bind button
         self.children[0].children[0].bind(on_release=self.go_to_insert_input_variables)
+
 
     def go_to_insert_input_variables(self, instance):
         # verify that there aren't all zeros
@@ -169,8 +208,6 @@ class ChooseEntityScreen(Screen):
         #save period
         self.period = box_layout[2].children[0].text
 
-
-
         if not self.check_data(self.period):
             self.period = ""
             condition = False
@@ -178,6 +215,7 @@ class ChooseEntityScreen(Screen):
         if condition:
             self.manager.get_screen('make_simulation').inizializza_make_simulation()
             self.manager.current = 'make_simulation'
+
 
     def check_data(self, data):
         if(len(data)==4):
@@ -357,24 +395,32 @@ class MakeSimulation(Screen):
     def __init__(self, **kwargs):
         super(MakeSimulation, self).__init__(**kwargs)
 
+
     def inizializza_make_simulation(self):
         #Resize max height of dropdown
         self.ids.menu_a_tendina_entita.dropdown_cls.max_height = self.ids.menu_a_tendina_entita.height*30
         self.ids.menu_a_tendina_variabili.dropdown_cls.max_height = self.ids.menu_a_tendina_variabili.height*30
 
-
         # i take the dict with association of enitites
         print self.manager.get_screen('choose_entity').number_of_entity
+        print self.manager.get_screen('choose_entity').period
+
         self.dict_entita = {}
 
+        # ciclo per beccare le variabili per le entità
         for k, v in self.manager.get_screen('choose_entity').number_of_entity.items():
-            for index in xrange(1, int(v) + 1):
-                self.dict_entita[k + str(index)] = ["Var", "Var2", "Var3",
-                                                    "Var4",]  # TODO apposto di questo vettore ci andranno le variabili di persona
+            for entity in self.manager.get_screen('choose_entity').type_of_entity:
+                if entity.key == k:
+                    for index in xrange(1, int(v) + 1):
+                        real_entity = Entity(entity = entity)
+                        real_entity.generate_associated_variable_filter(str(self.manager.get_screen('choose_entity').period))
+                        self.dict_entita[k + str(index)] = real_entity.get_associated_variables()  # TODO apposto di questo vettore ci andranno le variabili di persona
 
         self.ids.menu_a_tendina_entita.values = self.dict_entita.keys()
         self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
-        self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
+        print self.dict_entita[self.ids.menu_a_tendina_entita.text] # CORR QUA CI SONO I VALORI GIUSTI
+
+        self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text] # NON COMPAIONO QUA PERO'
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
         self.ids.information.text = """
 [b]Instructions[/b]:
@@ -400,6 +446,7 @@ class MakeSimulation(Screen):
                     Button(text=self.ids.menu_a_tendina_entita.text + " - " + tuple[0] + " - " + tuple[1],
                            on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
+
     def go_to_home(self):
         if self.manager.current == 'make_simulation':
             # Reset when you go to home
@@ -409,6 +456,7 @@ class MakeSimulation(Screen):
             #TODO: Resetta bene le variabili
             # Go to home
             self.manager.current = 'home'
+
 
     def go_to_output_variables(self):
         if self.manager.current == 'make_simulation':
@@ -423,6 +471,7 @@ class MakeSimulation(Screen):
                 self.manager.transition = kivy.uix.screenmanager.TransitionBase()
                 self.manager.transition.duration = .4
 
+
     def exist_tuple(self, dictionary, input_entity, input_variable):
         # dictionary hasn't "input_entity" into its keys
         if not input_entity in dictionary.keys():
@@ -436,6 +485,7 @@ class MakeSimulation(Screen):
                     return True
         # otherwise
         return False
+
 
     def add_value_and_reset_form(self):
 

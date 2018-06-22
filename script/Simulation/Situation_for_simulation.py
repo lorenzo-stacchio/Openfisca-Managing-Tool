@@ -11,14 +11,6 @@ sys.setdefaultencoding('utf8')
 from enum import Enum
 from datetime import date
 
-
-#from openfisca_italy import italy_taxbenefitsystem
-#from openfisca_italy.entita import Persona, Famiglia
-#from openfisca_italy import scenarios
-
-
-
-
 # show the names in GUI
 class TYPEOFVARIABLE(Enum):
     float = "Float type"
