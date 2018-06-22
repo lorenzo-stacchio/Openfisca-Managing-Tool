@@ -148,7 +148,8 @@ class Situation(): # defined for one entity
 
 
     def __repr__(self):
-        return "\nSituation name: " + str(self.name_of_situation) + "\nSituation period: " + str(self.period) + "\nNumber of input variables: " + str(len(self.choosen_input_variables)) + "\nNumber of output variables: " + str(len(self.choosen_output_variables))
+        return "\nSituation name: " + str(self.name_of_situation) + "\nSituation period: " + str(self.period) + "\nNumber of input variables: " + str(len(self.choosen_input_variables)) #+ "\nNumber of output variables: " + str(len(self.choosen_output_variables))
+
 
     def set_entity_choose(self, entity_choose):
         if isinstance(entity_choose, Entity):
@@ -184,8 +185,6 @@ class Situation(): # defined for one entity
         variable_match = False
         for entity, associated_variables in self.entity_choose.get_associated_variables().iteritems():
             for variable in associated_variables:
-                #print "Variable exist", variable.name
-                #print "Variable choose", choosen_input_variable
                 if str(variable.name) == choosen_input_variable:
                     self.choosen_input_variables[choosen_input_variable] = value
                     variable_match = True

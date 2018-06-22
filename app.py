@@ -402,7 +402,7 @@ class MakeSimulation(Screen):
         print self.manager.get_screen('choose_entity').period
 
         self.dict_entita = {}
-
+        self.situations = {}
         # Cicla il dizionario contenente l'input fornito in precedenza
         #Esempio "person":1,"household":2
         for k, v in self.manager.get_screen('choose_entity').number_of_entity.items():
@@ -414,13 +414,34 @@ class MakeSimulation(Screen):
                     for index in xrange(1, int(v) + 1):
                         #ostruisco l'entità
                         real_entity = Entity(entity = entity)
-                        real_entity.generate_associated_variable_filter(str(self.manager.get_screen('choose_entity').period))
-                        #Salvo nel dizionario id="NomeEntitaNumeroProgressivo" value="variabili associate"
-                        self.dict_entita[k + str(index)] = real_entity.get_associated_variables()
-        # ENTITA' SETTING UP
+                        period =  str(self.manager.get_screen('choose_entity').period).split("-")
+
+                        if len(period) == 1:
+                            real_entity.generate_associated_variable_filter(year = period[0])
+                        elif len(period) == 2:
+                            real_entity.generate_associated_variable_filter(year = period[0],month = period[1])
+                        elif len(period) == 3:
+                            real_entity.generate_associated_variable_filter(year = period[0],month = period[1],day = period[2])
+
+                        for name_ent, variables in real_entity.get_associated_variables().iteritems():
+                            string_name_list = []
+                            for variable in variables:
+                                string_name_list.append(variable.name)
+                        self.dict_entita[k + str(index)] = string_name_list
+                        # CREATE SITUATIONS
+                        app_situation = Situation(name_of_situation = str(k + str(index)))
+                        app_situation.set_entity_choose(real_entity)
+                        if len(period) == 1:
+                            app_situation.set_period(year = period[0])
+                        elif len(period) == 2:
+                            app_situation.set_period(year = period[0],month = period[1])
+                        elif len(period) == 3:
+                            app_situation.set_period(year = period[0],month = period[1],day = period[2])
+                        self.situations[str(k + str(index))] = app_situation
+
         self.ids.menu_a_tendina_entita.values = self.dict_entita.keys()
         self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
-        # VARIABILI SETTING UP
+
         self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
         self.ids.information.text = """
@@ -507,6 +528,12 @@ class MakeSimulation(Screen):
                     text=self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text + " - " + self.ids.input_value_variable.text,
                     on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
+                # CORRADOOOOOOO
+                # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
+                # PERCHE' LE AGGIUNTO VOLTA VOLTA, QUINDI SE LE RAGGRUPPAVI IN QUALCHE DICT PUOI ANCHE TOGLIERLO
+                self.situations[self.ids.menu_a_tendina_entita.text ].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
+                print self.situations[self.ids.menu_a_tendina_entita.text ].get_choosen_input_variables()
+
                 # EXAMPLE dict_of_entity_variable_value[Persona] = [reddito_totale,10000,prova,10,prova2,11]
                 # inizialize if key is not exists
                 if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
@@ -520,6 +547,13 @@ class MakeSimulation(Screen):
             else:
                 i = 0
                 # In this case the tuple already exists
+
+                # CORRADOOOOOOO
+                # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
+                # PERCHE' LE AGGIUNTO VOLTA VOLTA, QUINDI SE LE RAGGRUPPAVI IN QUALCHE DICT PUOI ANCHE TOGLIERLO
+                self.situations[self.ids.menu_a_tendina_entita.text].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
+
+                # ROBA DI CORRADO
                 for el in self.ids.variable_added.children:
                     # splitting
                     entity, variable, value = el.text.split(' - ')
@@ -540,6 +574,7 @@ class MakeSimulation(Screen):
             # Reset form
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.input_value_variable.text = ''
+
 
     def change_view_added_variables(self):
         pass
