@@ -120,11 +120,11 @@ class Variable_To_Reform():
                             if key_attribute_entity == 'all_entities':
                                 all_entities_name = value_attribute_entity
 
-        Variable_To_Reform.tax_benefit_system_class = tax_benefit_system_class
         reload(site)
         Variable_To_Reform.entity_module = importlib.import_module(str(system_selected) + "." + str(entity_module))
         Variable_To_Reform.tax_benefit_system = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
         Variable_To_Reform.type_of_entity = getattr(Variable_To_Reform.entity_module, all_entities_name)
+        Variable_To_Reform.tax_benefit_system_class = getattr(Variable_To_Reform.tax_benefit_system, tax_benefit_system_class)
 
         print type(Variable_To_Reform.tax_benefit_system), Variable_To_Reform.tax_benefit_system
 
@@ -204,22 +204,106 @@ class Variable_reform_manager():
 
 
     def __update_variable__(self):
-        print "SONO IN UP"
+        if self.__reform_name__ is None:
+            self.__reform_name__ = "no_named_reform"
+
+        if (self.__variable_to_add__.__name__ is None) or ((self.__variable_to_add__.__type__ is None) and (self.__variable_to_add__.entity is None) and (self.__variable_to_add__.__definition_period__ is None) and (self.__variable_to_add__.__set_input__ is None) and (self.__variable_to_add__.__label__ is None) and (self.__variable_to_add__.__reference__ is None) and (self.__variable_to_add__.__formula__ is None)):
+            raise ValueError("You doesn't insert a necessary field")
+        #check if variable exist
+        tax_benefit_system = Variable_To_Reform.tax_benefit_system_class()
+        print "TBS", tax_benefit_system
+        all_variables = tax_benefit_system.get_variables()
+
+        variable_exist = False
+
+        for key,var in all_variables.iteritems():
+            print key
+            if self.__variable_to_add__.__name__ == key:
+                variable_exist = True
+
+        if variable_exist == False:
+            raise ValueError("The variable you want update doesn't exist")
+
+        path_new_reform = self.__path_to_save_reform__ + "\\" + self.__reform_name__ + ".py"
+
+        if os.path.exists(path_new_reform):
+            os.remove(path_new_reform)
+        with open(path_new_reform, 'a') as new_reform:
+            new_reform.write("# -*- coding: utf-8 -*-") # to avoid erros
+            new_reform.write("\nfrom openfisca_core.model_api import *")
+            new_reform.write("\nfrom openfisca_core.model_api import *\n")
+            # facultative fields
+            new_reform.write("\nclass " + self.__variable_to_add__.__name__ + "(Variable):")
+
+            if self.__variable_to_add__.__type__:
+                new_reform.write("\n\tvalue_type = " + self.__variable_to_add__.__type__)
+
+            if self.__variable_to_add__.entity:
+                new_reform.write("\n\tentity = " + self.__variable_to_add__.entity)
+
+            if self.__variable_to_add__.__definition_period__:
+                new_reform.write("\n\tdefinition_period = " + self.__variable_to_add__.__definition_period__)
+
+            if self.__variable_to_add__.__reference__:
+                new_reform.write("\n\treference = " + self.__variable_to_add__.__reference__)
+
+            if self.__variable_to_add__.__label__:
+                new_reform.write("\n\tlabel = " + self.__variable_to_add__.__label__)
+
+            if self.__variable_to_add__.__set_input__:
+                new_reform.write("\n\tset_input = " + self.__variable_to_add__.__set_input__)
+
+            if self.__variable_to_add__.__formula__:
+                new_reform.write("\n\n\t" + self.__variable_to_add__.__formula__)
+            # write reform
+            new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
+            new_reform.write("\n\tdef apply(self):\n\t\tself.update_variable(\'" + self.__variable_to_add__.__name__ + "\')")
 
 
     def __neutralize_variable__(self):
-        print "SONO IN NEUT"
+        if self.__reform_name__ is None:
+            self.__reform_name__ = "no_named_reform"
+
+        if (self.__variable_to_add__.__name__ is None):
+            raise ValueError("You doesn't insert a necessary field")
+
+        #check if variable exist
+        tax_benefit_system = Variable_To_Reform.tax_benefit_system_class()
+        print "TBS", tax_benefit_system
+        all_variables = tax_benefit_system.get_variables()
+
+        variable_exist = False
+
+        for key,var in all_variables.iteritems():
+            print key
+            if self.__variable_to_add__.__name__ == key:
+                variable_exist = True
+
+        if variable_exist == False:
+            raise ValueError("The variable you want update doesn't exist")
+
+        path_new_reform = self.__path_to_save_reform__ + "\\" + self.__reform_name__ + ".py"
+
+        if os.path.exists(path_new_reform):
+            os.remove(path_new_reform)
+        with open(path_new_reform, 'a') as new_reform:
+            new_reform.write("# -*- coding: utf-8 -*-") # to avoid erros
+            new_reform.write("\nfrom openfisca_core.model_api import *")
+            new_reform.write("\nfrom openfisca_core.model_api import *\n")
+            # write reform
+            new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
+            new_reform.write("\n\tdef apply(self):\n\t\tself.neutralize_variable(\'" + self.__variable_to_add__.__name__ + "\')")
 
 
 with open('config_import.json') as f:
     data_config = json.load(f)
 Variable_To_Reform.import_depending_on_system("openfisca_italy", data_config)
 v = Variable_To_Reform()
-v.set_name("Prova")
-v.set_type("float")
-v.set_entity("person")
-v.set_definition_period("month")
-v.set_set_input("set_input_divide_by_period")
+v.set_name("RP62_periodo_2013")
+#v.set_type("float")
+#v.set_entity("person")
+#v.set_definition_period("month")
+#v.set_set_input("set_input_divide_by_period")
 v.set_formula("def formula(person, period, parameters):\n\t\treturn person('reddito_lavoro_dipendente_annuale', period) * parameters(period).tasse.aliquota_IRPEF")
 manager = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Lorenzo Stacchio\\Desktop', variable_to_add = v )
-manager.do_reform("add_variable")
+manager.do_reform("neutralize_variable")
