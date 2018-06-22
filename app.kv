@@ -98,8 +98,8 @@
 
             Label:
                 id: instructions_downloading_repos
-                text: "[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]"
                 markup: True
+                text: root.download_information
                 canvas.before:
                     Color:
                         rgba: hex('#FFFFFF')
@@ -643,10 +643,8 @@
                     text: 'Come back to input variables'
 
 
-<ReformsScreen>:
-    name: "reforms"
-    Label:
-        text: "Qui verrà fatta la riforma"
+
+
 
 <ExecuteSimulationScreen>
     name: "execute_simulation"

@@ -1,0 +1,56 @@
+#:kivy 1.10.0
+
+<ReformsScreen>:
+    name: "reforms"
+    BoxLayout:
+        orientation: "vertical"
+        GridLayout:
+            cols: 2
+            rows: 3
+            orientation: "horizontal"
+            Button:
+                id: button_add_variable
+                text: "Add variable"
+            Button:
+                id: button_update_variable
+                text: "Update variable"
+            Button:
+                id: button_neutralize_variable
+                text: "Neutralize variable"
+            Button:
+                id: button_add_parameter
+                text: "Add parameter"
+            Button:
+                id: button_modify_parameter
+                text: "Modify variable"
+            Button:
+                id: button_make_reform
+                text: "Make reform"
+        Button:
+            size_hint: (1.0,0.2)
+            text: 'Come back to home'
+            background_color: hex('971640')
+            on_press: root.go_to_home()
+
+<SelectVariableScreen>
+    name: "select_variable_screen"
+    BoxLayout:
+        orientation: "vertical"
+        Spinner:
+            id: menu_a_tendina_variabili
+            size_hint: (0.8,0.1)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            background_color: (0, 0.278, 0.172, 0.294)
+        BoxLayout:
+            orientation: "horizontal"
+
+            Button:
+                size_hint: (1.0,0.2)
+                text: 'Select'
+                background_color: hex('971640')
+                #on_press: root.go_to_home()
+            Button:
+                size_hint: (1.0,0.2)
+                text: 'Come back to home'
+                background_color: hex('971640')
+                on_press: root.go_to_home()
