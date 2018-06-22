@@ -790,7 +790,8 @@ class ReformsScreen(Screen):
             self.manager.current = 'home'
 
     def go_to_add_variable(self):
-        pass
+        self.manager.get_screen('select_variable_screen').choice = "Add variable"
+        self.manager.current = 'form_variable_screen'
 
     def go_to_update_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Update variable"
@@ -840,16 +841,65 @@ class SelectVariableScreen(Screen):
                                auto_dismiss=False)
             self.popup.open()
         elif self.manager.get_screen('select_variable_screen').choice == "Update variable":
-            pass
+            self.manager.get_screen('form_variable_screen').setting_up_form_variable()
+            self.manager.current = 'form_variable_screen'
         else:
             pass
 
     def _on_answer(self, instance, answer):
         if answer == 'Yes':
             pass
-            # TODO HERE YOU MUSH NEUTRALIZE VARIABLE
+            # TODO HERE YOU MUSH NEUTRALIZE VARIABLE, CONTROLLA PRIMA CHE NON SIA GIA NEUTRALIZZATA
         self.popup.dismiss()
         self.manager.current = 'reforms'
+
+
+class FormVariableScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super(FormVariableScreen, self).__init__(**kwargs)
+
+    def setting_up_form_variable(self):
+        if self.manager.get_screen('select_variable_screen').choice == "Update variable":
+            self.ids.value_type_input.text = self.ids.value_type_input.values[0] #TODO cambia con quella della variabile
+            self.ids.entity_input.text = "x" #TODO Mettere dinamicamente l'entità
+            self.ids.label_input.text = "x"
+            self.ids.definition_period_input.text = self.ids.definition_period_input.values[0]
+            self.ids.reference_input.text = "x"
+        elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+            self.ids.value_type_input.text = self.ids.value_type_input.values[0]
+            self.ids.entity_input.text = "" #TODO Mettere dinamicamente l'entità
+            self.ids.label_input.text = ""
+            self.ids.definition_period_input.text = self.ids.definition_period_input.values[0]
+            self.ids.reference_input.text = ""
+        else:
+            pass
+
+    def run_operation(self):
+        if self.manager.get_screen('select_variable_screen').choice == "Update variable":
+            #TODO Operazione di aggiornamento
+            #Cerca la variabile selezionata (qui sotto troviamo il testo della variabile)
+            print "Hai aggiornato "+self.ids.name_input.text
+            #Aggiornala
+            pass
+        elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+            #TODO Operazione di aggiunta
+            #Aggiungi la variabile
+            print "Hai aggiunto "+self.ids.name_input.text
+            pass
+        #Print di quello che hai aggiunto/aggiornato
+        print " ".join([self.ids.name_input.text,
+                        self.ids.value_type_input.text,
+                        self.ids.entity_input.text,
+                        self.ids.label_input.text,
+                        self.ids.definition_period_input.text,
+                        self.ids.reference_input.text])
+    def go_to_home(self):
+        if self.manager.current == 'form_variable_screen':
+            #TODO Resetta variabili
+            self.manager.current = 'home'
+
+
 
 class MyScreenManager(ScreenManager):
     pass
