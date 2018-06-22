@@ -30,3 +30,27 @@
             size_hint: (1.0,0.2)
             text: 'Come back to home'
             background_color: hex('971640')
+            on_press: root.go_to_home()
+
+<SelectVariableScreen>
+    name: "select_variable_screen"
+    BoxLayout:
+        orientation: "vertical"
+        Spinner:
+            id: menu_a_tendina_variabili
+            size_hint: (0.8,0.1)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            background_color: (0, 0.278, 0.172, 0.294)
+        BoxLayout:
+            orientation: "horizontal"
+
+            Button:
+                size_hint: (1.0,0.2)
+                text: 'Select'
+                background_color: hex('971640')
+                #on_press: root.go_to_home()
+            Button:
+                size_hint: (1.0,0.2)
+                text: 'Come back to home'
+                background_color: hex('971640')
+                on_press: root.go_to_home()

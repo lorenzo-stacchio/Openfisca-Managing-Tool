@@ -585,9 +585,24 @@ class LabelLeftTop(Label):
 
 
 class ReformsScreen(Screen):
-    pass
+    def __init__(self, **kwargs):
+        super(ReformsScreen, self).__init__(**kwargs)
+
+    def go_to_home(self):
+        if self.manager.current == 'reforms':
+            self.manager.current = 'home'
+
+class SelectVariableScreen(Screen):
+    def __init__(self, **kwargs):
+        super(SelectVariableScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._finish_init)
+
+    def _finish_init(self, dt):
+        self.inizialize_form()
 
 
+    def inizialize_form(self):
+        pass
 
 
 class MyScreenManager(ScreenManager):
