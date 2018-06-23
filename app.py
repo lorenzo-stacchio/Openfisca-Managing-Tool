@@ -776,6 +776,7 @@ class OutputVariableScreen(Screen):
     def _on_answer(self, instance, answer):
         # print "Risposta: " , repr(answer)
         if answer == 'Yes':
+            self.manager.get_screen('execute_simulation').run_simulation()
             self.manager.current = 'execute_simulation'
         self.popup.dismiss()
 
@@ -784,9 +785,23 @@ class OutputVariableScreen(Screen):
             self.manager.current = 'make_simulation'
 
 class ExecuteSimulationScreen(Screen):
+
     def __init__(self, **kwargs):
         super(ExecuteSimulationScreen, self).__init__(**kwargs)
 
+    def run_simulation(self):
+        situations =  self.manager.get_screen('make_simulation').situations
+        period =  str(self.manager.get_screen('choose_entity').period).split("-")
+        simulation_generator = Simulation_generator()
+        if len(period) == 1:
+            simulation_generator.set_period(year = period[0])
+        elif len(period) == 2:
+            simulation_generator.set_period(year = period[0],month = period[1])
+        elif len(period) == 3:
+            simulation_generator.set_period(year = period[0],month = period[1],day = period[2])
+        for situation in situations:
+            simulation_generator.add_situation_to_simulator(situation)
+        print simulation_generator
 
 class LabelLeftTop(Label):
     pass
@@ -907,6 +922,7 @@ class FormVariableScreen(Screen):
                         self.ids.label_input.text,
                         self.ids.definition_period_input.text,
                         self.ids.reference_input.text])
+
     def go_to_home(self):
         if self.manager.current == 'form_variable_screen':
             #TODO Resetta variabili

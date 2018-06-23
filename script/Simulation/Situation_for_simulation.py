@@ -257,6 +257,8 @@ class Simulation_generator(): #defined for Italy
             self.results[situation] = {} #initialize inner dict
         self.results[situation][name_of_variable_calculated] = result
 
+    def __repr__(self):
+        return "\nNumber of situations: " + len(self.situations) + "\nPeriod: " + self.period()
 
     def get_results(self):
         return self.results
