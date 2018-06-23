@@ -97,6 +97,9 @@ class Entity():
         print "MODULE ENTITY", Entity.entity_module
 
     def generate_associated_variable_filter(self, year = None, month = None, day = None):
+        print str(year)
+        print str(month)
+        print str(day)
         if year and not month and not day:
             if re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4:
                 self.period_to_filter_variables = TYPEOFDEFINITIONPERIOD.year
@@ -104,12 +107,16 @@ class Entity():
             else:
                 raise ValueError("No valid date selected")
         elif year and month and not day:
-            if re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4 and re.match(r'.*([1-12])', month) and len(month) == 2:
+            if re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4 and re.match(r'.*([01-12])', month) and (len(month) == 2):
                 self.period_to_filter_variables = TYPEOFDEFINITIONPERIOD.month
             # i'll get however all the eternity variables
             else:
                 raise ValueError("No valid date selected")
-        # i'll get however all the eternity variables
+        elif year and month and day:
+            if re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4 and re.match(r'.*([01-12])', month) and (len(month) == 2) and re.match(r'.*([01-31])', day) and (len(day) == 2):
+                self.period_to_filter_variables = TYPEOFDEFINITIONPERIOD.month
+            else:
+                raise ValueError("No valid date selected")
         else:
             raise ValueError("No valid date selected")
         # validates
@@ -164,10 +171,15 @@ class Situation(): # defined for one entity
             else:
                 self.period = year
         elif year and month and not day:
-            if not (re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4) or not(re.match(r'.*([1-12])', month) and len(month) == 2):
+            if not (re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4) or not(re.match(r'.*([01-12])', month) and (len(month) == 2 or len(month) == 1)):
                 raise ValueError("No valid date selected")
             else:
                 self.period = year + "-" + month
+        elif year and month and day:
+            if re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4 and re.match(r'.*([01-12])', month) and (len(month) == 2) and re.match(r'.*([01-31])', day) and (len(day) == 2):
+                self.period_to_filter_variables = TYPEOFDEFINITIONPERIOD.month
+            else:
+                self.period = year + "-" + month + "-" + day
         else:
             raise ValueError("No valid date selected")
 
@@ -257,6 +269,8 @@ class Simulation_generator(): #defined for Italy
             self.results[situation] = {} #initialize inner dict
         self.results[situation][name_of_variable_calculated] = result
 
+    def __repr__(self):
+        return "\nNumber of situations: " + str(len(self.situations)) + "\nPeriod: " + str(self.period)
 
     def get_results(self):
         return self.results
