@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import kivy
 import json
+import os, sys
 kivy.require("1.10.0")
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -20,28 +21,27 @@ from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import DictProperty
 from kivy.uix.textinput import TextInput
-import os, sys
 from script.get_parameters_reforms_tests_variables_folder_paths import *
 from script.interpeters.variables_file_interpeter import *
 from script.interpeters.parameters_interpeter import *
 from script.interpeters.reforms_file_interpeter import *
 from script.download_openfisca_system import download_and_install as download_and_install_openfisca
 from script.Simulation.Situation_for_simulation import *
-
 from multiprocessing.pool import ThreadPool
+
+
+TAX_BENEFIT_SYSTEM_MODULE_CLASS = None
+ENTITY_MODULE_CLASS = None
 
 
 # Screen
 class InitScreen(Screen):
     download_information = StringProperty("[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]")
-
     PATH_OPENFISCA = None
-
 
     def __init__(self, **kwargs):
         super(InitScreen, self).__init__(**kwargs)
         Clock.schedule_once(self._finish_init)
-
 
     def _finish_init(self, dt):
         self.ids.home_file_chooser.path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
@@ -52,15 +52,37 @@ class InitScreen(Screen):
         if dict:
             if self.manager.current == 'init':
                 self.manager.current = 'home'
-                self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
-                self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
                 with open('./messages/config_import.json') as f:
                     data_config = json.load(f)
+                self.init_import_tax_benefit_system(self.PATH_OPENFISCA,data_config)
+                global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+                print TAX_BENEFIT_SYSTEM_MODULE_CLASS
+                global ENTITY_MODULE
+                print ENTITY_MODULE
+                time.sleep(10)
+                self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
+                self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
                 self.manager.get_screen('choose_entity').import_entities_system(self.PATH_OPENFISCA,data_config)
-
         else:
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
 
+
+    def init_import_tax_benefit_system(self, system_selected, json_config_path_object):
+        system_name = str(os.path.basename(system_selected)).replace("-","_")
+        for key, value in json_config_path_object[system_name].items():
+                if key == 'tax_benefit_system':
+                    for key_tax, value_tax in value.items():
+                        tbs_module,ext = os.path.splitext(key_tax)
+                        tbs_module_class = value_tax
+                if key == 'entities':
+                    for key_ent, value_ent in value.items():
+                        entity_module,ext = os.path.splitext(key_ent)
+        reload(site)
+        tax_benefit_system_module = importlib.import_module(system_name + "." + str(tbs_module))
+        global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+        TAX_BENEFIT_SYSTEM_MODULE_CLASS = getattr(tax_benefit_system_module, tbs_module_class)
+        global ENTITY_MODULE
+        ENTITY_MODULE = importlib.import_module(system_name + "." + str(entity_module))
 
     def generate_pop_up(self, title, content):
         popup = Popup(title = title,
@@ -72,10 +94,7 @@ class InitScreen(Screen):
 
 
     def download_system(self,btn_instance):
-        #print str(btn_instance.text)
         id_button = self.get_id(btn_instance)
-        #previous_color = btn_instance.background_color
-        #btn_instance.background_color = 1.0, 0.0, 0.0, 1.0
         # read documents
         with open('messages\\config_import.json') as f:
             data_config = json.load(f)
@@ -84,8 +103,6 @@ class InitScreen(Screen):
         user_desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
         github_link = data_config[system_selected]["link"]
         project_name = data_config[system_selected]["project_name"]
-
-
         # waiting popup
         # TODO: AGGIUSTA IL CAMBIAMENTO DELLA LABEL
         self.download_information= "[color=FF033D] [b] [size=20] [u] Downloading and installing the system[/size] [u] [b] [/color]"
@@ -97,7 +114,8 @@ class InitScreen(Screen):
         else:
             self.generate_pop_up( title = 'System already exist!',
                             content = Label(text='The system [b]' + system_selected + '[b] already exist in:' + user_desktop + "\n If you want to download a newest version, please erase it!", size = self.parent.size, halign="left", valign="middle"))
-        #self.download_information = "[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]"
+
+
     def get_id(self, instance):
             for id, widget in self.ids.items():
                 print id, widget
@@ -111,7 +129,6 @@ class HomeScreen(Screen):
         super(HomeScreen, self).__init__(**kwargs)
 
     def ricevi_inizializza_path(self, path):
-        print path
         self.dict_path = get_all_paths(path)
         self.ids.label_0_0.text = """[color=000000]
         [b][size=24sp]Hello ![/size][/b]\n
@@ -234,6 +251,7 @@ class ChooseEntityScreen(Screen):
         else:
             return False
         return True
+
 
 class LineOfChooser(BoxLayout):
     name_label = StringProperty()
@@ -396,10 +414,6 @@ class MakeSimulation(Screen):
         #Resize max height of dropdown
         self.ids.menu_a_tendina_entita.dropdown_cls.max_height = self.ids.menu_a_tendina_entita.height*30
         self.ids.menu_a_tendina_variabili.dropdown_cls.max_height = self.ids.menu_a_tendina_variabili.height*30
-
-        # i take the dict with association of enitites
-        print self.manager.get_screen('choose_entity').number_of_entity
-        print self.manager.get_screen('choose_entity').period
 
         self.dict_entita = {}
         self.situations = {}
@@ -782,26 +796,10 @@ class OutputVariableScreen(Screen):
             self.manager.current = 'make_simulation'
 
 class ExecuteSimulationScreen(Screen):
-    #content_input = StringProperty("")
-    #content_output = StringProperty("")
 
 
     def __init__(self, **kwargs):
         super(ExecuteSimulationScreen, self).__init__(**kwargs)
-
-    #def summary_input(self):
-    #    entity_variable_value = []
-    #    for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
-    #        entity,variable,value = el_input.text.split(" - ")
-    #        entity_variable_value.append([entity,variable,value])
-    #        entity_variable_value= sorted(entity_variable_value, key=lambda x: x[0])
-    #    previous_entity = ""
-    #    for entity,variable,value in entity_variable_value:
-    #        if(previous_entity != entity):
-    #            self.content_input += "[b]"+entity+"[/b]\n"
-    #        previous_entity = entity
-    #        self.content_input += "> [i]"+variable+"[/i]"+": "+"[color=ff0000]"+value+"[/color]\n"
-
 
     def run_simulation(self):
         # situations
@@ -837,10 +835,6 @@ class ExecuteSimulationScreen(Screen):
             self.current_index = self.current_index -1
         self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
 
-#    def summary_output(self):
-#        #TODO Migliora visualizzazione anche qui (scopri però gli output variable)
-#        for el_output in self.manager.get_screen('output_variable').ids.variable_added_output.children:
-#            self.content_output += "-" + str(el_output.text) + "\n"
 
 class LabelLeftTop(Label):
     pass
