@@ -467,7 +467,11 @@ class MakeSimulation(Screen):
                 # add all variable and value of this entity
                 self.ids.variable_added.add_widget(
                     Button(text=self.ids.menu_a_tendina_entita.text + " - " + tuple[0] + " - " + tuple[1],
-                           on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
+
+                           font_size='14sp',
+                           on_release=self.destroy_button,
+                           background_color=(255, 255, 255, 0.9),
+                           color=(0, 0, 0, 1)))
 
 
     def go_to_home(self):
@@ -527,7 +531,10 @@ class MakeSimulation(Screen):
                 # Add button
                 self.ids.variable_added.add_widget(Button(
                     text=self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text + " - " + self.ids.input_value_variable.text,
-                    on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
+                    on_release=self.destroy_button,
+                    font_size= '14sp',
+                    background_color=(255, 255, 255, 0.9),
+                    color=(0, 0, 0, 1)))
 
                 # CORRADOOOOOOO
                 # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
@@ -658,6 +665,8 @@ class OutputVariableScreen(Screen):
                 # add all variable and value of this entity
                 self.ids.variable_added_output.add_widget(
                     Button(text=self.ids.menu_a_tendina_entita_output.text + " - " + tuple[0] + " - " + tuple[1],
+
+                           font_size='14sp',
                            on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
     def exist_tuple(self, dictionary, input_entity, input_variable):
@@ -763,6 +772,7 @@ class OutputVariableScreen(Screen):
     def _on_answer(self, instance, answer):
         # print "Risposta: " , repr(answer)
         if answer == 'Yes':
+            self.popup.dismiss()
             self.manager.current = 'execute_simulation'
         self.popup.dismiss()
 

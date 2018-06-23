@@ -59,48 +59,86 @@
 <FormVariableScreen>:
     name: "form_variable_screen"
 
-    GridLayout:
-        cols: 2
-        Label:
-            text: "Name"
-        TextInput:
-            id: name_input
-            multiline: False
-        Label:
-            text: "Value type"
-        Spinner:
-            id: value_type_input
-            values: ["int","float","bool","str","date","Enum"]
-        Label:
-            text: "Entity"
-        TextInput:
-            id: entity_input
-            multiline: False
-        Label:
-            text: "Label"
-        TextInput:
-            id: label_input
-            multiline: False
-        Label:
-            text: "Definition period"
-        Spinner:
-            id: definition_period_input
-            values: ["MONTH","YEAR","ETERNITY"]
-        Label:
-            text: "Reference"
-        TextInput:
-            id: reference_input
-            multiline: False
-        Button:
-            text: "Run operation"
-            size_hint: (1.0,0.3)
-            background_color: hex('971640')
-            on_press: root.run_operation()
-        Button:
-            text: "Come back to home"
-            on_press: root.go_to_home()
-            size_hint: (1.0,0.3)
-            background_color: hex('971640')
+    BoxLayout:
+        orientation: "vertical"
+        BoxLayout:
+
+            padding: (30,30,30,0)
+            orientation: "horizontal"
+            Label:
+                text: "Name"
+                size_hint:(0.3,1)
+            TextInput:
+                id: name_input
+                multiline: False
+                size_hint:(0.7,1)
+
+        BoxLayout:
+            padding: (30,30,30,0)
+            orientation: "horizontal"
+            Label:
+                text: "Value type"
+                size_hint:(0.3,1)
+            Spinner:
+                id: value_type_input
+                values: ["int","float","bool","str","date","Enum"]
+                size_hint:(0.7,1)
+
+        BoxLayout:
+            padding: (30,30,30,0)
+            orientation: "horizontal"
+            Label:
+                text: "Entity"
+                size_hint:(0.3,1)
+            TextInput:
+                id: entity_input
+                multiline: False
+                size_hint:(0.7,1)
+
+        BoxLayout:
+            padding: (30,30,30,0)
+            orientation: "horizontal"
+            Label:
+                text: "Label"
+                size_hint:(0.3,1)
+            TextInput:
+                id: label_input
+                multiline: False
+                size_hint:(0.7,1)
+
+        BoxLayout:
+            padding: (30,30,30,0)
+            orientation: "horizontal"
+            Label:
+                text: "Definition period"
+                size_hint:(0.3,1)
+            Spinner:
+                id: definition_period_input
+                values: ["MONTH","YEAR","ETERNITY"]
+                size_hint:(0.7,1)
+
+        BoxLayout:
+            padding: (30,30,30,0)
+            orientation: "horizontal"
+            Label:
+                text: "Reference"
+                size_hint:(0.3,1)
+            TextInput:
+                id: reference_input
+                multiline: False
+                size_hint:(0.7,1)
+
+        BoxLayout:
+            padding: (0,30,0,0)
+            orientation: "horizontal"
+            Button:
+                text: "Run operation"
+                background_color: hex('971640')
+                on_press: root.run_operation()
+            Button:
+                text: "Come back to home"
+                on_press: root.go_to_home()
+                background_color: hex('971640')
 
 
 
