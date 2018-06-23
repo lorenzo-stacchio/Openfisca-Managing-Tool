@@ -113,7 +113,6 @@
                 id: grid_layout_countries
                 pos: self.parent.pos
                 size: self.parent.size
-                rows: 2
                 cols: 3
                 Button:
                     id: button_france
@@ -141,6 +140,29 @@
                         source: 'img/flags/italy-flag.png'
                         pos: self.parent.pos
                         size: self.parent.size
+
+                Label:
+                    canvas.before:
+                        Color:
+                            rgba: hex('#FFFFFF')
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    canvas.before:
+                        Color:
+                            rgba: hex('#FFFFFF')
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                Label:
+                    canvas.before:
+                        Color:
+                            rgba: hex('#FFFFFF')
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
                 Button:
                     id: button_senegal
                     background_normal: "ffffff"
@@ -464,6 +486,9 @@
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 on_text: root.update_form()
                 background_color: (0, 0.278, 0.172, 0.294)
+                text_size: self.width, None
+                height: self.texture_size[1]
+                padding_x: 10
             Label:
                 size_hint: (1.0,0.05)
 
@@ -483,9 +508,13 @@
                 size_hint: (1.0,0.05)
             Spinner:
                 id: menu_a_tendina_variabili
-                size_hint: (0.8,0.1)
+                size_hint: (0.8,0.15)
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 background_color: (0, 0.278, 0.172, 0.294)
+                text_size: self.width, None
+                height: self.texture_size[1]
+                padding_x: 10
+
             Label:
                 size_hint: (1.0,0.05)
             TextInput:
@@ -584,6 +613,9 @@
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 on_text: root.update_form()
                 background_color: (0, 0.278, 0.172, 0.294)
+                text_size: self.width, None
+                height: self.texture_size[1]
+                padding_x: 10
             Label:
                 size_hint: (1.0,0.05)
 
@@ -603,17 +635,12 @@
                 size_hint: (1.0,0.05)
             Spinner:
                 id: menu_a_tendina_variabili_output
-                size_hint: (0.8,0.1)
+                size_hint: (0.8,0.15)
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 background_color: (0, 0.278, 0.172, 0.294)
-            Label:
-                size_hint: (1.0,0.05)
-            TextInput:
-                id: input_value_variable_output
-                multiline: False
-                hint_text: 'Value of the selected variable'
-                size_hint: (1.0,0.1)
-                pos_hint: {'center_x': .5, 'center_y': .5}
+                text_size: self.width, None
+                height: self.texture_size[1]
+                padding_x: 10
 
             Label:
                 size_hint: (1.0,0.05)
@@ -685,7 +712,7 @@
         orientation: "horizontal"
         LabelLeftTop:
             id: "label_input"
-            #TODO text: root.manager.get_screen('output_variable').string_var_input + "aldo"
+            text: root.content_input
         Label:
             size_hint: 0.001,1
             canvas.before:
@@ -696,6 +723,7 @@
                     size: self.size
         LabelLeftTop:
             id: "label_output"
+            text: root.content_output
 
 <LabelLeftTop>
     padding_x: 20
