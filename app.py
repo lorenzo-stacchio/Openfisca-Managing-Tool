@@ -782,8 +782,9 @@ class OutputVariableScreen(Screen):
             self.manager.current = 'make_simulation'
 
 class ExecuteSimulationScreen(Screen):
-    content_input = StringProperty("")
-    content_output = StringProperty("")
+    #content_input = StringProperty("")
+    #content_output = StringProperty("")
+
 
     def __init__(self, **kwargs):
         super(ExecuteSimulationScreen, self).__init__(**kwargs)
@@ -818,11 +819,23 @@ class ExecuteSimulationScreen(Screen):
         for key_name, value_situation in situations.iteritems():
             simulation_generator.add_situation_to_simulator(value_situation)
         # compute
-        print simulation_generator.generate_simulation()
-        print simulation_generator.get_results()
-        print simulation_generator.generate_rst_strings_document_after_simulation()[0]
-        self.ids.document_results_simulation_viewer.text = simulation_generator.generate_rst_strings_document_after_simulation()[0]
+        simulation_generator.generate_simulation()
+        # visualize results
+        self.string_rst_documents = simulation_generator.generate_rst_strings_document_after_simulation()
+        self.current_index = 0
+        self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
 
+
+    def next_rst_result(self):
+        if self.current_index < (len(self.string_rst_documents)-1):
+            self.current_index = self.current_index + 1
+        self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
+
+
+    def previous_rst_result(self):
+        if self.current_index > 0:
+            self.current_index = self.current_index -1
+        self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
 
 #    def summary_output(self):
 #        #TODO Migliora visualizzazione anche qui (scopri però gli output variable)

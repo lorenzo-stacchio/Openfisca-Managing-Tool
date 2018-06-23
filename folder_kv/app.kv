@@ -711,16 +711,21 @@
         cols: 1
         Label:
             text: "Summary of results for each situation"
+            size_hint: (1.0,0.05)
         RstDocument:
             id: document_results_simulation_viewer
+            size_hint: (1.0,0.9)
         BoxLayout:
             orientation: "horizontal"
+            size_hint: (1.0,0.05)
+            Button:
+                id: left_switch
+                text: "previous_rst"
+                on_press: root.previous_rst_result()
             Button:
                 id: right_switch
                 text: "next_rst"
-            Button:
-                id: right_switch
-                text: "previous_rst"
+                on_press: root.next_rst_result()
 
 <LabelLeftTop>
     padding_x: 20
