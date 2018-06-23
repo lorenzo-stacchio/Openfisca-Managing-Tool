@@ -263,7 +263,7 @@ class VisualizeSystemScreen(Screen):
         Reform_File_Interpeter.import_depending_on_system(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config) #static method
         # entity of situation for simulator
         Entity.import_depending_on_system_entity_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
-
+        Simulation_generator.import_depending_on_system_situation_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
 
         os.chdir(os.getcwd())
         self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
@@ -774,6 +774,7 @@ class OutputVariableScreen(Screen):
 class ExecuteSimulationScreen(Screen):
     content_input = StringProperty("")
     content_output = StringProperty("")
+
     def __init__(self, **kwargs):
         super(ExecuteSimulationScreen, self).__init__(**kwargs)
 
@@ -783,8 +784,17 @@ class ExecuteSimulationScreen(Screen):
             entity,variable,value = el_input.text.split(" - ")
             entity_variable_value.append([entity,variable,value])
             entity_variable_value= sorted(entity_variable_value, key=lambda x: x[0])
+        previous_entity = ""
+        for entity,variable,value in entity_variable_value:
+            if(previous_entity != entity):
+                self.content_input += "[b]"+entity+"[/b]\n"
+            previous_entity = entity
+            self.content_input += "> [i]"+variable+"[/i]"+": "+"[color=ff0000]"+value+"[/color]\n"
+
+
     def run_simulation(self):
         situations =  self.manager.get_screen('make_simulation').situations
+
         period =  str(self.manager.get_screen('choose_entity').period).split("-")
         simulation_generator = Simulation_generator()
         if len(period) == 1:
@@ -793,16 +803,12 @@ class ExecuteSimulationScreen(Screen):
             simulation_generator.set_period(year = period[0],month = period[1])
         elif len(period) == 3:
             simulation_generator.set_period(year = period[0],month = period[1],day = period[2])
-        for situation in situations:
-            simulation_generator.add_situation_to_simulator(situation)
-        print simulation_generator
 
-        previous_entity = ""
-        for entity,variable,value in entity_variable_value:
-            if(previous_entity != entity):
-                self.content_input += "[b]"+entity+"[/b]\n"
-            previous_entity = entity
-            self.content_input += "> [i]"+variable+"[/i]"+": "+"[color=ff0000]"+value+"[/color]\n"
+        for key_name, value_situation in situations.iteritems():
+            simulation_generator.add_situation_to_simulator(value_situation)
+        # compute
+        simulation_generator.generate_simulation()
+        print simulation_generator.get_results()
 
     def summary_output(self):
         #TODO Migliora visualizzazione anche qui (scopri però gli output variable)
