@@ -704,26 +704,23 @@
 
 
 
-
-
 <ExecuteSimulationScreen>
     name: "execute_simulation"
-    BoxLayout:
-        orientation: "horizontal"
-        LabelLeftTop:
-            id: "label_input"
-            text: root.content_input
+    GridLayout:
+        rows: 3
+        cols: 1
         Label:
-            size_hint: 0.001,1
-            canvas.before:
-                Color:
-                    rgba: hex('#ffffff')
-                Rectangle:
-                    pos: self.pos
-                    size: self.size
-        LabelLeftTop:
-            id: "label_output"
-            text: root.content_output
+            text: "Summary of results for each situation"
+        RstDocument:
+            id: document_results_simulation_viewer
+        BoxLayout:
+            orientation: "horizontal"
+            Button:
+                id: right_switch
+                text: "next_rst"
+            Button:
+                id: right_switch
+                text: "previous_rst"
 
 <LabelLeftTop>
     padding_x: 20

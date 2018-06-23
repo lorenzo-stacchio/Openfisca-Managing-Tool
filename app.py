@@ -743,8 +743,8 @@ class OutputVariableScreen(Screen):
 
     def go_to_execute_simulation(self):
         if self.manager.current == 'output_variable':
-            self.manager.get_screen('execute_simulation').summary_input()
-            self.manager.get_screen('execute_simulation').summary_output()
+            #self.manager.get_screen('execute_simulation').summary_input()
+            #self.manager.get_screen('execute_simulation').summary_output()
             #Content of popup
             string_var_input = "The situation is following:\nInput\n"
             for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
@@ -778,21 +778,22 @@ class ExecuteSimulationScreen(Screen):
     def __init__(self, **kwargs):
         super(ExecuteSimulationScreen, self).__init__(**kwargs)
 
-    def summary_input(self):
-        entity_variable_value = []
-        for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
-            entity,variable,value = el_input.text.split(" - ")
-            entity_variable_value.append([entity,variable,value])
-            entity_variable_value= sorted(entity_variable_value, key=lambda x: x[0])
-        previous_entity = ""
-        for entity,variable,value in entity_variable_value:
-            if(previous_entity != entity):
-                self.content_input += "[b]"+entity+"[/b]\n"
-            previous_entity = entity
-            self.content_input += "> [i]"+variable+"[/i]"+": "+"[color=ff0000]"+value+"[/color]\n"
+    #def summary_input(self):
+    #    entity_variable_value = []
+    #    for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
+    #        entity,variable,value = el_input.text.split(" - ")
+    #        entity_variable_value.append([entity,variable,value])
+    #        entity_variable_value= sorted(entity_variable_value, key=lambda x: x[0])
+    #    previous_entity = ""
+    #    for entity,variable,value in entity_variable_value:
+    #        if(previous_entity != entity):
+    #            self.content_input += "[b]"+entity+"[/b]\n"
+    #        previous_entity = entity
+    #        self.content_input += "> [i]"+variable+"[/i]"+": "+"[color=ff0000]"+value+"[/color]\n"
 
 
     def run_simulation(self):
+        # situations
         situations =  self.manager.get_screen('make_simulation').situations
 
         period =  str(self.manager.get_screen('choose_entity').period).split("-")
@@ -803,17 +804,20 @@ class ExecuteSimulationScreen(Screen):
             simulation_generator.set_period(year = period[0],month = period[1])
         elif len(period) == 3:
             simulation_generator.set_period(year = period[0],month = period[1],day = period[2])
-
+        # get notes to visualize results
         for key_name, value_situation in situations.iteritems():
             simulation_generator.add_situation_to_simulator(value_situation)
         # compute
-        simulation_generator.generate_simulation()
+        print simulation_generator.generate_simulation()
         print simulation_generator.get_results()
+        print simulation_generator.generate_rst_strings_document_after_simulation()[0]
+        self.ids.document_results_simulation_viewer.text = simulation_generator.generate_rst_strings_document_after_simulation()[0]
 
-    def summary_output(self):
-        #TODO Migliora visualizzazione anche qui (scopri però gli output variable)
-        for el_output in self.manager.get_screen('output_variable').ids.variable_added_output.children:
-            self.content_output += "-" + str(el_output.text) + "\n"
+
+#    def summary_output(self):
+#        #TODO Migliora visualizzazione anche qui (scopri però gli output variable)
+#        for el_output in self.manager.get_screen('output_variable').ids.variable_added_output.children:
+#            self.content_output += "-" + str(el_output.text) + "\n"
 
 class LabelLeftTop(Label):
     pass

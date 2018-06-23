@@ -11,6 +11,9 @@ sys.setdefaultencoding('utf8')
 from enum import Enum
 from datetime import date
 
+
+GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
+
 # show the names in GUI
 class TYPEOFVARIABLE(Enum):
     float = "Float type"
@@ -272,8 +275,12 @@ class Simulation_generator(): #defined for Italy
     def __repr__(self):
         return "\nNumber of situations: " + str(len(self.situations)) + "\nPeriod: " + str(self.period)
 
+
     def get_results(self):
-        return self.results
+        if not(self.results is None):
+            return self.results
+        else:
+            raise TypeError("You must do a simulation to get the results")
 
 
     def add_situation_to_simulator(self, situation): # you can add situations with the same content
@@ -300,6 +307,37 @@ class Simulation_generator(): #defined for Italy
         else:
             raise ValueError("To trigger a simulation, at least a situation it's needed")
 
+
+    def generate_rst_strings_document_after_simulation(self):
+        strings_RST = []
+        for situation in self.situations:
+            string_RST= ""
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST= string_RST + '#'
+            string_RST = string_RST + str("\nSituation: " + situation.name_of_situation + "\n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST= string_RST + '#'
+            string_RST= string_RST + '\n\n'
+            #input variables
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST= string_RST + '#'
+            string_RST = string_RST + str("\nInput variables: \n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST= string_RST + '#'
+            for k,v in situation.get_choosen_input_variables().iteritems():
+                string_RST = string_RST + "\n- " + k + " with value: " + v + "\n"
+            string_RST= string_RST + '\n'
+            #output variables
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST + '#'
+            string_RST = string_RST + str("\nOutput calculated variables: \n")
+            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
+                string_RST = string_RST + '#'
+            for out_v in situation.get_choosen_output_variables():
+                results = self.results
+                string_RST = string_RST + "\n- " + out_v + " with value: " + str(results[situation.name_of_situation][out_v]) +"\n"
+            strings_RST.append(string_RST)
+        return strings_RST
 
     @staticmethod
     def import_depending_on_system_situation_for_simulation(system_selected, json_config_path_object):
