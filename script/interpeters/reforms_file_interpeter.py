@@ -12,11 +12,9 @@ import site
 reload(sys)
 sys.setdefaultencoding('utf8')
 from variables_file_interpeter import *
-#from openfisca_italy import italy_taxbenefitsystem
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
-#PATH_RST_DOCUMENT = os.path.abspath(os.path.join(os.path.abspath(os.path.join(os.getcwd(), os.pardir)), os.pardir)) + "\\messages\\rst_da_visualizzare.rst"
 PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
 
 class TypeReformAction(Enum):
@@ -126,31 +124,18 @@ class Reform_File_Interpeter():
                     self.__file_is_a_reform__ = True
 
     @staticmethod
-    def import_depending_on_system(system_selected, json_config_path_object):
-        # The import depenends on the system selected
-        print system_selected
-        system_selected = os.path.basename(system_selected)
-        for key, value in json_config_path_object[system_selected].items():
-                if key == 'tax_benefit_system':
-                    for key_tax, value_tax in value.items():
-                        tax_benefit_system_module,ext = os.path.splitext(key_tax)
-                        tax_benefit_system_class = value_tax
-        Reform_File_Interpeter.tax_benefit_system_class = tax_benefit_system_class
-        reload(site)
-        Reform_File_Interpeter.tax_benefit_system = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
-        print type(Reform_File_Interpeter.tax_benefit_system), Reform_File_Interpeter.tax_benefit_system
+    def import_depending_on_system(tax_benefit_system_module_class):
+        Reform_File_Interpeter.tax_benefit_system_module_class = tax_benefit_system_module_class()
 
 
     def __find_and_bind_variables__(self):
-        tax_benefit_system = getattr(Reform_File_Interpeter.tax_benefit_system, str(Reform_File_Interpeter.tax_benefit_system_class))
-        current_system  = tax_benefit_system()
         # Print actions
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():
                 for key,value in action.iteritems():
                     if not (value == 'modify_parameters'):
                         if value == 'neutralize_variable':
-                            for k_var, val_var in current_system.get_variables().iteritems():
+                            for k_var, val_var in Reform_File_Interpeter.tax_benefit_system_module_class.get_variables().iteritems():
                                 if key==k_var:
                                     variable = Variable_for_writing()
                                     variable.set_variable_name(key)
@@ -316,8 +301,6 @@ class Reform_File_Interpeter():
                     elif 'def apply(self):' in pieces[0]:
                         reform_found = False # set to false because the function is the last part
                         reform_apply_fun_found = True
-        #print "\nSTAMPO LE RIFORME",self.__reforms__
-        #print self.__reforms__
         self.__find_and_bind_variables__()
         self.__find_and_bind_modifier_func__()
 

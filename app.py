@@ -32,7 +32,7 @@ from multiprocessing.pool import ThreadPool
 
 TAX_BENEFIT_SYSTEM_MODULE_CLASS = None
 ENTITY_MODULE_CLASS = None
-
+ENTITY_MODULE_CLASS_ALL_ENTITIES = None
 
 # Screen
 class InitScreen(Screen):
@@ -55,14 +55,9 @@ class InitScreen(Screen):
                 with open('./messages/config_import.json') as f:
                     data_config = json.load(f)
                 self.init_import_tax_benefit_system(self.PATH_OPENFISCA,data_config)
-                global TAX_BENEFIT_SYSTEM_MODULE_CLASS
-                print TAX_BENEFIT_SYSTEM_MODULE_CLASS
-                global ENTITY_MODULE
-                print ENTITY_MODULE
-                time.sleep(10)
                 self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
                 self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
-                self.manager.get_screen('choose_entity').import_entities_system(self.PATH_OPENFISCA,data_config)
+                #self.manager.get_screen('choose_entity').import_entities_system(self.PATH_OPENFISCA,data_config)
         else:
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
 
@@ -77,12 +72,19 @@ class InitScreen(Screen):
                 if key == 'entities':
                     for key_ent, value_ent in value.items():
                         entity_module,ext = os.path.splitext(key_ent)
+                        for entity_elements_key,entity_elements_value in value_ent.items():
+                            if entity_elements_key == "all_entities":
+                                all_entities_classname = entity_elements_value
         reload(site)
         tax_benefit_system_module = importlib.import_module(system_name + "." + str(tbs_module))
         global TAX_BENEFIT_SYSTEM_MODULE_CLASS
         TAX_BENEFIT_SYSTEM_MODULE_CLASS = getattr(tax_benefit_system_module, tbs_module_class)
-        global ENTITY_MODULE
-        ENTITY_MODULE = importlib.import_module(system_name + "." + str(entity_module))
+        global ENTITY_MODULE_CLASS
+        ENTITY_MODULE_CLASS = importlib.import_module(system_name + "." + str(entity_module))
+        global ENTITY_MODULE_CLASS_ALL_ENTITIES
+        ENTITY_MODULE_CLASS_ALL_ENTITIES = all_entities_classname
+        reload(site)
+
 
     def generate_pop_up(self, title, content):
         popup = Popup(title = title,
@@ -156,7 +158,6 @@ class HomeScreen(Screen):
 
 
 class ChooseEntityScreen(Screen):
-    entity_module = None
     type_of_entity = None
     number_of_entity = {}
     period = None
@@ -169,6 +170,9 @@ class ChooseEntityScreen(Screen):
 
 
     def init_content_screen(self):
+        global ENTITY_MODULE_CLASS
+        global ENTITY_MODULE_CLASS_ALL_ENTITIES
+        self.type_of_entity = getattr(ENTITY_MODULE_CLASS, ENTITY_MODULE_CLASS_ALL_ENTITIES)
         for entity in self.type_of_entity:
             self.entity_box_layout.add_widget(LineOfChooser())
             self.entity_box_layout.children[0].children[-1].text = entity.key
@@ -182,23 +186,6 @@ class ChooseEntityScreen(Screen):
         self.entity_box_layout.add_widget(Label(text="You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD"))
         self.entity_box_layout.add_widget(Button(id="button_go_to_insert_input_variables", text="Click"))
         Clock.schedule_once(self._finish_init)
-
-
-    def import_entities_system(self, system_selected, json_config_path_object):
-        # The import depenends on the system selected
-        print system_selected
-        system_selected = os.path.basename(system_selected)
-        system_selected = system_selected.replace("-","_")
-        for key, value in json_config_path_object[system_selected].items():
-                if key == 'entities':
-                    for key_entity, value_entity in value.items():
-                        entity_module,ext = os.path.splitext(key_entity)
-                        for key_attribute_entity, value_attribute_entity in value_entity.items():
-                            if key_attribute_entity == 'all_entities':
-                                all_entities_name = value_attribute_entity
-        self.entity_module = importlib.import_module(str(system_selected) + "." + str(entity_module))
-        reload(site)
-        self.type_of_entity = getattr(self.entity_module, all_entities_name)
 
 
 
@@ -266,8 +253,6 @@ class LineOfChooser(BoxLayout):
 
 class VisualizeSystemScreen(Screen):
 
-    ENTITY_MODULE = ""
-
     def __init__(self, **kwargs):
         super(VisualizeSystemScreen, self).__init__(**kwargs)
 
@@ -277,8 +262,9 @@ class VisualizeSystemScreen(Screen):
         with open('./messages/config_import.json') as f:
             data_config = json.load(f)
         # init dynamic loading in classes
-        Variable_File_Interpeter.import_depending_on_system(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config) #static method
-        Reform_File_Interpeter.import_depending_on_system(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config) #static method
+        global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+        Variable_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
+        Reform_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
         # entity of situation for simulator
         Entity.import_depending_on_system_entity_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
         Simulation_generator.import_depending_on_system_situation_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
@@ -290,21 +276,6 @@ class VisualizeSystemScreen(Screen):
         self.ids.document_variables_viewer.colors["bullet"] = "000000ff"
         self.ids.document_variables_viewer.colors["title"] = "971640ff"
         self.ids.document_variables_viewer.underline_color = "971640ff"
-
-
-
-    def import_entity_module(self, system_selected, json_config_path_object):
-        system_selected = os.path.basename(system_selected)
-        for key, value in json_config_path_object[system_selected].items():
-                if key == 'entities':
-                    for key_tax, value_tax in value.items():
-                        entity_module,ext = os.path.splitext(key_tax)
-        reload(site)
-        #TAX_BENEFIT_SYSTEM_MODULE = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
-        self.ENTITY_MODULE = importlib.import_module(str(system_selected) + "." + str(entity_module))
-        #print type(TAX_BENEFIT_SYSTEM_MODULE), TAX_BENEFIT_SYSTEM_MODULE
-        print self.ENTITY_MODULE
-
 
     def show_variables(self):
         self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
@@ -429,14 +400,12 @@ class MakeSimulation(Screen):
                         #ostruisco l'entità
                         real_entity = Entity(entity = entity)
                         period =  str(self.manager.get_screen('choose_entity').period).split("-")
-
                         if len(period) == 1:
                             real_entity.generate_associated_variable_filter(year = period[0])
                         elif len(period) == 2:
                             real_entity.generate_associated_variable_filter(year = period[0],month = period[1])
                         elif len(period) == 3:
                             real_entity.generate_associated_variable_filter(year = period[0],month = period[1],day = period[2])
-
                         for name_ent, variables in real_entity.get_associated_variables().iteritems():
                             string_name_list = []
                             for variable in variables:
@@ -698,8 +667,6 @@ class OutputVariableScreen(Screen):
         return False
 
     def add_value_and_reset_form(self):
-
-
         # If there are blank value
         if self.ids.menu_a_tendina_variabili_output.text != '':
             # You can't add again a certain variable of a certain entity
@@ -721,7 +688,6 @@ class OutputVariableScreen(Screen):
                 # inizialize if key is not exists
                 if not self.ids.menu_a_tendina_entita_output.text in self.dict_of_entity_variable_value_output.keys():
                     self.dict_of_entity_variable_value_output[self.ids.menu_a_tendina_entita_output.text] = []
-
                 # Add value
                 # add name of variable and value
                 tuple = [self.ids.menu_a_tendina_variabili_output.text, ""]
@@ -766,8 +732,6 @@ class OutputVariableScreen(Screen):
 
     def go_to_execute_simulation(self):
         if self.manager.current == 'output_variable':
-            #self.manager.get_screen('execute_simulation').summary_input()
-            #self.manager.get_screen('execute_simulation').summary_output()
             #Content of popup
             string_var_input = "The situation is following:\nInput\n"
             for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
@@ -775,7 +739,6 @@ class OutputVariableScreen(Screen):
             string_var_output = "Output\n"
             for el_output in self.ids.variable_added_output.children:
                 string_var_output += "-" + str(el_output.text) + "\n"
-
             #Create a popup
             content = ConfirmPopup(text=str(string_var_input) + "\n" + str(string_var_output))
             content.bind(on_answer=self._on_answer)
@@ -797,14 +760,12 @@ class OutputVariableScreen(Screen):
 
 class ExecuteSimulationScreen(Screen):
 
-
     def __init__(self, **kwargs):
         super(ExecuteSimulationScreen, self).__init__(**kwargs)
 
     def run_simulation(self):
         # situations
         situations =  self.manager.get_screen('make_simulation').situations
-
         period =  str(self.manager.get_screen('choose_entity').period).split("-")
         simulation_generator = Simulation_generator()
         if len(period) == 1:

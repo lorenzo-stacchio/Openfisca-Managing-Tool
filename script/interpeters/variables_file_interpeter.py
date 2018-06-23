@@ -213,7 +213,7 @@ class Variable_File_Interpeter():
     __variables__ = [] # will be a list
     __file_is_a_variable__ = False
     tax_benefit_system = None
-    tax_benefit_system_class = None
+    tax_benefit_system_module_class = None
 
     def __init__(self,variable_path):
         self.__variable_path__ = variable_path
@@ -230,21 +230,8 @@ class Variable_File_Interpeter():
         return self.__file_is_a_variable__
 
     @staticmethod
-    def import_depending_on_system(system_selected, json_config_path_object):
-        # The import depenends on the system selected
-        print system_selected
-        system_selected = os.path.basename(system_selected)
-        for key, value in json_config_path_object[system_selected].items():
-                if key == 'tax_benefit_system':
-                    for key_tax, value_tax in value.items():
-                        tax_benefit_system_module,ext = os.path.splitext(key_tax)
-                        tax_benefit_system_class = value_tax
-        Variable_File_Interpeter.tax_benefit_system_class = tax_benefit_system_class
-        reload(site)
-        Variable_File_Interpeter.tax_benefit_system = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
-        print type(Variable_File_Interpeter.tax_benefit_system), Variable_File_Interpeter.tax_benefit_system
-
-
+    def import_depending_on_system(tax_benefit_system_module_class):
+        Variable_File_Interpeter.tax_benefit_system_module_class = tax_benefit_system_module_class()
 
     def start_interpetration(self):
         self.__variables__ = []
@@ -262,10 +249,8 @@ class Variable_File_Interpeter():
                         self.__variables__.append(current_Variable)
         # found all the variables
         # Openfisca modules importing, matching variables found
-        tax_benefit_system = getattr(Variable_File_Interpeter.tax_benefit_system, str(Variable_File_Interpeter.tax_benefit_system_class))
-        current_system  = tax_benefit_system()
         # scenario normale
-        variables = current_system.get_variables()
+        variables = self.tax_benefit_system_module_class.get_variables()
         for k,v in variables.iteritems():
             for element in self.__variables__:
                 #print "Nome variabile trovata:", element.get_variable_name()
