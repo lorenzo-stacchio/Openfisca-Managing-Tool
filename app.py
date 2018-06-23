@@ -467,7 +467,11 @@ class MakeSimulation(Screen):
                 # add all variable and value of this entity
                 self.ids.variable_added.add_widget(
                     Button(text=self.ids.menu_a_tendina_entita.text + " - " + tuple[0] + " - " + tuple[1],
-                           on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
+
+                           font_size='14sp',
+                           on_release=self.destroy_button,
+                           background_color=(255, 255, 255, 0.9),
+                           color=(0, 0, 0, 1)))
 
 
     def go_to_home(self):
@@ -527,7 +531,10 @@ class MakeSimulation(Screen):
                 # Add button
                 self.ids.variable_added.add_widget(Button(
                     text=self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text + " - " + self.ids.input_value_variable.text,
-                    on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
+                    on_release=self.destroy_button,
+                    font_size= '14sp',
+                    background_color=(255, 255, 255, 0.9),
+                    color=(0, 0, 0, 1)))
 
                 # CORRADOOOOOOO
                 # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
@@ -658,6 +665,8 @@ class OutputVariableScreen(Screen):
                 # add all variable and value of this entity
                 self.ids.variable_added_output.add_widget(
                     Button(text=self.ids.menu_a_tendina_entita_output.text + " - " + tuple[0] + " - " + tuple[1],
+
+                           font_size='14sp',
                            on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
     def exist_tuple(self, dictionary, input_entity, input_variable):
@@ -764,6 +773,7 @@ class OutputVariableScreen(Screen):
         # print "Risposta: " , repr(answer)
         if answer == 'Yes':
             self.manager.get_screen('execute_simulation').run_simulation()
+            self.popup.dismiss()
             self.manager.current = 'execute_simulation'
         self.popup.dismiss()
 
@@ -920,6 +930,17 @@ class FormVariableScreen(Screen):
             pass
 
     def run_operation(self):
+        #delete all whitespace
+        name_input = self.ids.name_input.text.replace(" ","")
+        value_type_input=self.ids.value_type_input.text.replace(" ","")
+        entity_input=self.ids.entity_input.text.replace(" ","")
+        label_input=self.ids.label_input.text.replace(" ","")
+        definition_period_input=self.ids.definition_period_input.text.replace(" ","")
+        reference_input=self.ids.reference_input.text.replace(" ","")
+        #If there are empty text
+        if name_input == "" or value_type_input == "" or entity_input == "" or label_input == "" or definition_period_input == "":
+            print "Error"
+            return
         if self.manager.get_screen('select_variable_screen').choice == "Update variable":
             #TODO Operazione di aggiornamento
             #Cerca la variabile selezionata (qui sotto troviamo il testo della variabile)
@@ -932,12 +953,12 @@ class FormVariableScreen(Screen):
             print "Hai aggiunto "+self.ids.name_input.text
             pass
         #Print di quello che hai aggiunto/aggiornato
-        print " ".join([self.ids.name_input.text,
-                        self.ids.value_type_input.text,
-                        self.ids.entity_input.text,
-                        self.ids.label_input.text,
-                        self.ids.definition_period_input.text,
-                        self.ids.reference_input.text])
+        print " ".join([name_input,
+                        value_type_input,
+                        entity_input,
+                        label_input,
+                        definition_period_input,
+                        reference_input])
 
     def go_to_home(self):
         if self.manager.current == 'form_variable_screen':
