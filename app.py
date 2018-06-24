@@ -282,9 +282,6 @@ class VisualizeSystemScreen(Screen):
         v.set_definition_period("month")
         v.set_set_input("set_input_divide_by_period")
         v.set_formula("def formula(person, period, parameters):\n\t\treturn person('reddito_lavoro_dipendente_annuale', period) * parameters(period).tasse.aliquota_IRPEF")
-        manager = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Lorenzo Stacchio\\Desktop', variable = v )
-        manager.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)
-
         os.chdir(os.getcwd())
         self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
         self.ids.document_variables_viewer.colors["link"] = "33AAFFff"
