@@ -9,6 +9,7 @@ import site
 import re
 from enum import Enum
 
+
 # show the names in GUI
 class TYPEOFVARIABLE(Enum):
     float = "Float type"
@@ -31,11 +32,8 @@ class TYPEOFDEFINITIONPERIOD(Enum):
 
 class Variable_To_Reform():
 
-    tax_benefit_system_class = None
-    tax_benefit_system = None
-    entity_module = None
     type_of_entity = None
-
+    tax_benefit_system_module_class = None
 
     def __init__(self, name = None, entity = None, type = None, reference = None,  formula = None, label = None, set_input = None, definition_period = None):
         self.__name__ = name
@@ -64,7 +62,6 @@ class Variable_To_Reform():
         self.entity = None
         for entity_name in Variable_To_Reform.type_of_entity:
             entity_names.append(entity)
-        print entity_names
         for entity_name in entity_names:
             if entity == entity_name:
                 self.entity = entity
@@ -104,29 +101,9 @@ class Variable_To_Reform():
 
 
     @staticmethod
-    def import_depending_on_system(system_selected, json_config_path_object):
-        # The import depenends on the system selected
-        print system_selected
-        system_selected = os.path.basename(system_selected)
-        for key, value in json_config_path_object[system_selected].items():
-                if key == 'tax_benefit_system':
-                    for key_tax, value_tax in value.items():
-                        tax_benefit_system_module,ext = os.path.splitext(key_tax)
-                        tax_benefit_system_class = value_tax
-                if key == 'entities':
-                    for key_entity, value_entity in value.items():
-                        entity_module,ext = os.path.splitext(key_entity)
-                        for key_attribute_entity, value_attribute_entity in value_entity.items():
-                            if key_attribute_entity == 'all_entities':
-                                all_entities_name = value_attribute_entity
-
-        reload(site)
-        Variable_To_Reform.entity_module = importlib.import_module(str(system_selected) + "." + str(entity_module))
-        Variable_To_Reform.tax_benefit_system = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
-        Variable_To_Reform.type_of_entity = getattr(Variable_To_Reform.entity_module, all_entities_name)
-        Variable_To_Reform.tax_benefit_system_class = getattr(Variable_To_Reform.tax_benefit_system, tax_benefit_system_class)
-
-        print type(Variable_To_Reform.tax_benefit_system), Variable_To_Reform.tax_benefit_system
+    def import_depending_on_system(tax_benefit_system_module_class, system_entity_module, system_all_entities_name):
+        Variable_To_Reform.tax_benefit_system_module_class = tax_benefit_system_module_class()
+        Variable_To_Reform.type_of_entity = getattr(system_entity_module,system_all_entities_name)
 
 
     def __repr__(self):
@@ -152,16 +129,18 @@ class Variable_reform_manager():
             raise TypeError("The passed value is not a correct Variable")
 
     def do_reform(self, command):
+        if self.__variable_to_add__ == None:
+            raise ValueError("You have to choose a variable to do a reform")
         accept_value = []
         for type_accepted in TYPEOFREFORMVARIABILE:
-            accept_value.append(type_accepted.name)
+            accept_value.append(type_accepted)
         if command in accept_value:
             # switch the command
-            if command == TYPEOFREFORMVARIABILE.add_variable.name:
+            if command == TYPEOFREFORMVARIABILE.add_variable:
                 self.__add_variable__()
-            elif command == TYPEOFREFORMVARIABILE.update_variable.name:
+            elif command == TYPEOFREFORMVARIABILE.update_variable:
                 self.__update_variable__()
-            elif command == TYPEOFREFORMVARIABILE.neutralize_variable.name:
+            elif command == TYPEOFREFORMVARIABILE.neutralize_variable:
                 self.__neutralize_variable__()
         else:
             raise ValueError("The reform command is not acceptable")
@@ -202,7 +181,6 @@ class Variable_reform_manager():
             new_reform.write("\n\tdef apply(self):\n\t\tself.add_variable(\'" + self.__variable_to_add__.__name__ + "\')")
 
 
-
     def __update_variable__(self):
         if self.__reform_name__ is None:
             self.__reform_name__ = "no_named_reform"
@@ -210,14 +188,10 @@ class Variable_reform_manager():
         if (self.__variable_to_add__.__name__ is None) or ((self.__variable_to_add__.__type__ is None) and (self.__variable_to_add__.entity is None) and (self.__variable_to_add__.__definition_period__ is None) and (self.__variable_to_add__.__set_input__ is None) and (self.__variable_to_add__.__label__ is None) and (self.__variable_to_add__.__reference__ is None) and (self.__variable_to_add__.__formula__ is None)):
             raise ValueError("You doesn't insert a necessary field")
         #check if variable exist
-        tax_benefit_system = Variable_To_Reform.tax_benefit_system_class()
-        print "TBS", tax_benefit_system
-        all_variables = tax_benefit_system.get_variables()
-
+        all_variables = Variable_To_Reform.tax_benefit_system_module_class.get_variables()
         variable_exist = False
 
         for key,var in all_variables.iteritems():
-            print key
             if self.__variable_to_add__.__name__ == key:
                 variable_exist = True
 
@@ -268,19 +242,17 @@ class Variable_reform_manager():
             raise ValueError("You doesn't insert a necessary field")
 
         #check if variable exist
-        tax_benefit_system = Variable_To_Reform.tax_benefit_system_class()
-        print "TBS", tax_benefit_system
-        all_variables = tax_benefit_system.get_variables()
+        all_variables = Variable_To_Reform.tax_benefit_system_module_class.get_variables()
+        variable_exist = False
 
         variable_exist = False
 
         for key,var in all_variables.iteritems():
-            print key
             if self.__variable_to_add__.__name__ == key:
                 variable_exist = True
 
         if variable_exist == False:
-            raise ValueError("The variable you want update doesn't exist")
+            raise ValueError("The variable you want neutralize doesn't exist")
 
         path_new_reform = self.__path_to_save_reform__ + "\\" + self.__reform_name__ + ".py"
 
@@ -295,15 +267,15 @@ class Variable_reform_manager():
             new_reform.write("\n\tdef apply(self):\n\t\tself.neutralize_variable(\'" + self.__variable_to_add__.__name__ + "\')")
 
 
-with open('config_import.json') as f:
-    data_config = json.load(f)
-Variable_To_Reform.import_depending_on_system("openfisca_italy", data_config)
-v = Variable_To_Reform()
-v.set_name("RP62_periodo_2013")
+#with open('config_import.json') as f:
+#    data_config = json.load(f)
+#Variable_To_Reform.import_depending_on_system("openfisca_italy", data_config)
+#v = Variable_To_Reform()
+#v.set_name("RP62_periodo_2013")
 #v.set_type("float")
 #v.set_entity("person")
 #v.set_definition_period("month")
 #v.set_set_input("set_input_divide_by_period")
-v.set_formula("def formula(person, period, parameters):\n\t\treturn person('reddito_lavoro_dipendente_annuale', period) * parameters(period).tasse.aliquota_IRPEF")
-manager = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Lorenzo Stacchio\\Desktop', variable_to_add = v )
-manager.do_reform("neutralize_variable")
+#v.set_formula("def formula(person, period, parameters):\n\t\treturn person('reddito_lavoro_dipendente_annuale', period) * parameters(period).tasse.aliquota_IRPEF")
+#manager = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Lorenzo Stacchio\\Desktop', variable_to_add = v )
+#manager.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)

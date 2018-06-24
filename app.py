@@ -27,6 +27,7 @@ from script.interpeters.parameters_interpeter import *
 from script.interpeters.reforms_file_interpeter import *
 from script.download_openfisca_system import download_and_install as download_and_install_openfisca
 from script.Simulation.Situation_for_simulation import *
+from script.reforms_maker.reform_variables import *
 from multiprocessing.pool import ThreadPool
 
 
@@ -263,12 +264,17 @@ class VisualizeSystemScreen(Screen):
             data_config = json.load(f)
         # init dynamic loading in classes
         global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+        global ENTITY_MODULE_CLASS
+        global ENTITY_MODULE_CLASS_ALL_ENTITIES
         Variable_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
         Reform_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
         # entity of situation for simulator
         Entity.import_depending_on_system_entity_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
         Simulation_generator.import_depending_on_system_situation_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
-
+        Variable_To_Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, system_entity_module = ENTITY_MODULE_CLASS, system_all_entities_name = ENTITY_MODULE_CLASS_ALL_ENTITIES)
+        for el in TAX_BENEFIT_SYSTEM_MODULE_CLASS().parameters.children.iteritems():
+            for al in el:
+                print "\nNuovo el\n",al
         os.chdir(os.getcwd())
         self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
         self.ids.document_variables_viewer.colors["link"] = "33AAFFff"

@@ -8,6 +8,9 @@ import yaml
 from script.interpeters.variables_file_interpeter import *
 from script.interpeters.reforms_file_interpeter import *
 
+# FONDAMENTALE, COSI PRENDI TUTTI I PARAMETRI ESISTENTI
+# print TAX_BENEFIT_SYSTEM_MODULE_CLASS().parameters
+
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
 
@@ -350,6 +353,9 @@ class FancyIndexingParamater():
     def set_code_dict(self,code_dict):
         self.__code_dict__ = code_dict
 
+    def __repr__(self):
+        return "\n\nParameter name: " + str(self.__parameter_name__) + "\nCode dict" + str(self.__code_dict__)
+
     def generate_RST(self):
         if os.path.exists(PATH_RST_DOCUMENT):
             os.remove(PATH_RST_DOCUMENT)
@@ -375,15 +381,12 @@ class FancyIndexingParamater():
 
 
 class ParameterInterpeter():
-    __parameter_path__ = None
-    __parameter_name__ = None
-    __parameter_type__ = ParameterType.non_parametro
     __actual_parameter__ = None
-    __yaml_file__ = None
 
     def __init__(self,parameter_path):
         self.__parameter_path__  = parameter_path
         self.__parameter_name__ = os.path.basename(parameter_path)
+        self.__parameter_type__ = ParameterType.non_parametro
         self.__yaml_file__ = yaml.load(file(parameter_path))
 
 
@@ -464,7 +467,6 @@ class ParameterInterpeter():
 
 
     def __interpeter_fancy_indexing_parameter__(self):
-        print "Fancy indexing!"
         if (self.__parameter_type__ == ParameterType.fancy_indexing):
             self.__actual_parameter__ = FancyIndexingParamater(parameter_name = self.__parameter_name__)
             formatted_dict = {}
