@@ -884,7 +884,7 @@ class SelectVariableScreen(Screen):
             variables_name = []
             for key_variable, variables_content in TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems():
                 if key_variable == self.ids.id_spinner_select_variable_screen.text:
-                    v_r_man = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Lorenzo Stacchio\\Desktop', variable = Variable_To_Reform(name = key_variable), reform_name = "neutralize_" + self.ids.id_spinner_select_variable_screen.text)
+                    v_r_man = Variable_reform_manager(path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], variable = Variable_To_Reform(name = key_variable), reform_name = "neutralize_" + self.ids.id_spinner_select_variable_screen.text)
                     v_r_man.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)
                     break
             # TODO HERE YOU MUSH NEUTRALIZE VARIABLE, CONTROLLA PRIMA CHE NON SIA GIA NEUTRALIZZATA
