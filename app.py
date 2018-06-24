@@ -272,9 +272,19 @@ class VisualizeSystemScreen(Screen):
         Entity.import_depending_on_system_entity_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
         Simulation_generator.import_depending_on_system_situation_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
         Variable_To_Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, system_entity_module = ENTITY_MODULE_CLASS, system_all_entities_name = ENTITY_MODULE_CLASS_ALL_ENTITIES)
-        for el in TAX_BENEFIT_SYSTEM_MODULE_CLASS().parameters.children.iteritems():
-            for al in el:
-                print "\nNuovo el\n",al
+
+        with open('./messages/config_import.json') as f:
+            data_config = json.load(f)
+        v = Variable_To_Reform()
+        v.set_name("RP62_periodo_2013")
+        v.set_type("float")
+        v.set_entity("person")
+        v.set_definition_period("month")
+        v.set_set_input("set_input_divide_by_period")
+        v.set_formula("def formula(person, period, parameters):\n\t\treturn person('reddito_lavoro_dipendente_annuale', period) * parameters(period).tasse.aliquota_IRPEF")
+        manager = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Lorenzo Stacchio\\Desktop', variable = v )
+        manager.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)
+
         os.chdir(os.getcwd())
         self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
         self.ids.document_variables_viewer.colors["link"] = "33AAFFff"
@@ -819,14 +829,17 @@ class ReformsScreen(Screen):
 
     def go_to_add_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Add variable"
+        self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'form_variable_screen'
 
     def go_to_update_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Update variable"
+        self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'select_variable_screen'
 
     def go_to_neutralize_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Neutralize variable"
+        self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'select_variable_screen'
 
 
@@ -835,10 +848,7 @@ class SelectVariableScreen(Screen):
 
     def __init__(self, **kwargs):
         super(SelectVariableScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._finish_init)
 
-    def _finish_init(self, dt):
-        self.inizialize_form()
 
     def go_to_home(self):
         if self.manager.current == 'select_variable_screen':
@@ -846,19 +856,13 @@ class SelectVariableScreen(Screen):
 
     def inizialize_form(self):
         self.ids.id_spinner_select_variable_screen.dropdown_cls.max_height = self.ids.id_spinner_select_variable_screen.height*3
-
-        variable = []
-        ###TODO CHANGE FROM HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-        import random
-        import string
-        #genera 10 stringhe lunghe 10 casualmente
-        for i in xrange(1,21):
-            variable.append(''.join(random.choice(string.ascii_uppercase) for _ in range(10)))
-        #####TODO HEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHERE
-
+        global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+        variables_name = []
+        for key_variable, variables_content in TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems():
+            variables_name.append(key_variable)
         #Ordina alfabeticamente
-        variable.sort()
-        self.ids.id_spinner_select_variable_screen.values = variable
+        variables_name.sort()
+        self.ids.id_spinner_select_variable_screen.values = variables_name
 
     def select_variable(self):
         if self.manager.get_screen('select_variable_screen').choice == "Neutralize variable":
@@ -876,9 +880,18 @@ class SelectVariableScreen(Screen):
 
     def _on_answer(self, instance, answer):
         if answer == 'Yes':
-            pass
+            global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+            variables_name = []
+            for key_variable, variables_content in TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems():
+                if key_variable == self.ids.id_spinner_select_variable_screen.text:
+                    v_r_man = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Lorenzo Stacchio\\Desktop', variable = Variable_To_Reform(name = key_variable), reform_name = "neutralize_" + self.ids.id_spinner_select_variable_screen.text)
+                    v_r_man.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)
+                    break
             # TODO HERE YOU MUSH NEUTRALIZE VARIABLE, CONTROLLA PRIMA CHE NON SIA GIA NEUTRALIZZATA
         self.popup.dismiss()
+        self.popup = Popup(title="Variable neutralized", content = Label(text = "The reform that neutralized\n" + self.ids.id_spinner_select_variable_screen.text + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                           auto_dismiss=True)
+        self.popup.open()
         self.manager.current = 'reforms'
 
 

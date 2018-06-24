@@ -116,20 +116,23 @@ class TYPEOFREFORMVARIABILE(Enum):
 
 class Variable_reform_manager():
 
-    def __init__(self, variable_to_add = None, reform_name = None, path_to_save_reform = None):
-        self.__variable_to_add__ = variable_to_add
+    def __init__(self, variable = None, reform_name = None, path_to_save_reform = None):
+        if isinstance(variable, Variable_To_Reform):
+            self.__variable__ = variable
+        else:
+            raise TypeError("The passed value is not a correct Variable")
         self.__reform_name__ = reform_name
         self.__path_to_save_reform__ = path_to_save_reform
 
 
-    def set_variable_to_add(self, variable_to_add):
-        if isinstance(variable_to_add, Variable_To_Reform):
-            self.__variable_to_add__ = variable_to_add
+    def set_variable(self, variable):
+        if isinstance(variable, Variable_To_Reform):
+            self.__variable__ = variable
         else:
             raise TypeError("The passed value is not a correct Variable")
 
     def do_reform(self, command):
-        if self.__variable_to_add__ == None:
+        if self.__variable__ == None:
             raise ValueError("You have to choose a variable to do a reform")
         accept_value = []
         for type_accepted in TYPEOFREFORMVARIABILE:
@@ -150,7 +153,7 @@ class Variable_reform_manager():
         if self.__reform_name__ is None:
             self.__reform_name__ = "no_named_reform"
         # check the necessary fields, which are name, type, definition_period and entity
-        if (self.__variable_to_add__.__name__ is None) or (self.__variable_to_add__.entity is None) or (self.__variable_to_add__.__definition_period__ is None) or (self.__variable_to_add__.entity is None):
+        if (self.__variable__.__name__ is None) or (self.__variable__.entity is None) or (self.__variable__.__definition_period__ is None) or (self.__variable__.entity is None):
             raise ValueError("You doesn't insert a necessary field")
         path_new_reform = self.__path_to_save_reform__ + "\\" + self.__reform_name__ + ".py"
         if os.path.exists(path_new_reform):
@@ -160,39 +163,39 @@ class Variable_reform_manager():
             new_reform.write("\nfrom openfisca_core.model_api import *")
             new_reform.write("\nfrom openfisca_core.model_api import *\n")
             # required fields
-            new_reform.write("\nclass " + self.__variable_to_add__.__name__ + "(Variable):")
-            new_reform.write("\n\tvalue_type = " + self.__variable_to_add__.__type__)
-            new_reform.write("\n\tentity = " + self.__variable_to_add__.entity)
-            new_reform.write("\n\tdefinition_period = " + self.__variable_to_add__.__definition_period__)
+            new_reform.write("\nclass " + self.__variable__.__name__ + "(Variable):")
+            new_reform.write("\n\tvalue_type = " + self.__variable__.__type__)
+            new_reform.write("\n\tentity = " + self.__variable__.entity)
+            new_reform.write("\n\tdefinition_period = " + self.__variable__.__definition_period__)
             # facultative fields
-            if self.__variable_to_add__.__reference__:
-                new_reform.write("\n\treference = " + self.__variable_to_add__.__reference__)
+            if self.__variable__.__reference__:
+                new_reform.write("\n\treference = " + self.__variable__.__reference__)
 
-            if self.__variable_to_add__.__label__:
-                new_reform.write("\n\tlabel = " + self.__variable_to_add__.__label__)
+            if self.__variable__.__label__:
+                new_reform.write("\n\tlabel = " + self.__variable__.__label__)
 
-            if self.__variable_to_add__.__set_input__:
-                new_reform.write("\n\tset_input = " + self.__variable_to_add__.__set_input__)
+            if self.__variable__.__set_input__:
+                new_reform.write("\n\tset_input = " + self.__variable__.__set_input__)
 
-            if self.__variable_to_add__.__formula__:
-                new_reform.write("\n\n\t" + self.__variable_to_add__.__formula__)
+            if self.__variable__.__formula__:
+                new_reform.write("\n\n\t" + self.__variable__.__formula__)
             # write reform
             new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
-            new_reform.write("\n\tdef apply(self):\n\t\tself.add_variable(\'" + self.__variable_to_add__.__name__ + "\')")
+            new_reform.write("\n\tdef apply(self):\n\t\tself.add_variable(\'" + self.__variable__.__name__ + "\')")
 
 
     def __update_variable__(self):
         if self.__reform_name__ is None:
             self.__reform_name__ = "no_named_reform"
 
-        if (self.__variable_to_add__.__name__ is None) or ((self.__variable_to_add__.__type__ is None) and (self.__variable_to_add__.entity is None) and (self.__variable_to_add__.__definition_period__ is None) and (self.__variable_to_add__.__set_input__ is None) and (self.__variable_to_add__.__label__ is None) and (self.__variable_to_add__.__reference__ is None) and (self.__variable_to_add__.__formula__ is None)):
+        if (self.__variable__.__name__ is None) or ((self.__variable__.__type__ is None) and (self.__variable__.entity is None) and (self.__variable__.__definition_period__ is None) and (self.__variable__.__set_input__ is None) and (self.__variable__.__label__ is None) and (self.__variable__.__reference__ is None) and (self.__variable__.__formula__ is None)):
             raise ValueError("You doesn't insert a necessary field")
         #check if variable exist
         all_variables = Variable_To_Reform.tax_benefit_system_module_class.get_variables()
         variable_exist = False
 
         for key,var in all_variables.iteritems():
-            if self.__variable_to_add__.__name__ == key:
+            if self.__variable__.__name__ == key:
                 variable_exist = True
 
         if variable_exist == False:
@@ -207,38 +210,38 @@ class Variable_reform_manager():
             new_reform.write("\nfrom openfisca_core.model_api import *")
             new_reform.write("\nfrom openfisca_core.model_api import *\n")
             # facultative fields
-            new_reform.write("\nclass " + self.__variable_to_add__.__name__ + "(Variable):")
+            new_reform.write("\nclass " + self.__variable__.__name__ + "(Variable):")
 
-            if self.__variable_to_add__.__type__:
-                new_reform.write("\n\tvalue_type = " + self.__variable_to_add__.__type__)
+            if self.__variable__.__type__:
+                new_reform.write("\n\tvalue_type = " + self.__variable__.__type__)
 
-            if self.__variable_to_add__.entity:
-                new_reform.write("\n\tentity = " + self.__variable_to_add__.entity)
+            if self.__variable__.entity:
+                new_reform.write("\n\tentity = " + self.__variable__.entity)
 
-            if self.__variable_to_add__.__definition_period__:
-                new_reform.write("\n\tdefinition_period = " + self.__variable_to_add__.__definition_period__)
+            if self.__variable__.__definition_period__:
+                new_reform.write("\n\tdefinition_period = " + self.__variable__.__definition_period__)
 
-            if self.__variable_to_add__.__reference__:
-                new_reform.write("\n\treference = " + self.__variable_to_add__.__reference__)
+            if self.__variable__.__reference__:
+                new_reform.write("\n\treference = " + self.__variable__.__reference__)
 
-            if self.__variable_to_add__.__label__:
-                new_reform.write("\n\tlabel = " + self.__variable_to_add__.__label__)
+            if self.__variable__.__label__:
+                new_reform.write("\n\tlabel = " + self.__variable__.__label__)
 
-            if self.__variable_to_add__.__set_input__:
-                new_reform.write("\n\tset_input = " + self.__variable_to_add__.__set_input__)
+            if self.__variable__.__set_input__:
+                new_reform.write("\n\tset_input = " + self.__variable__.__set_input__)
 
-            if self.__variable_to_add__.__formula__:
-                new_reform.write("\n\n\t" + self.__variable_to_add__.__formula__)
+            if self.__variable__.__formula__:
+                new_reform.write("\n\n\t" + self.__variable__.__formula__)
             # write reform
             new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
-            new_reform.write("\n\tdef apply(self):\n\t\tself.update_variable(\'" + self.__variable_to_add__.__name__ + "\')")
+            new_reform.write("\n\tdef apply(self):\n\t\tself.update_variable(\'" + self.__variable__.__name__ + "\')")
 
 
     def __neutralize_variable__(self):
         if self.__reform_name__ is None:
             self.__reform_name__ = "no_named_reform"
 
-        if (self.__variable_to_add__.__name__ is None):
+        if (self.__variable__.__name__ is None):
             raise ValueError("You doesn't insert a necessary field")
 
         #check if variable exist
@@ -248,7 +251,7 @@ class Variable_reform_manager():
         variable_exist = False
 
         for key,var in all_variables.iteritems():
-            if self.__variable_to_add__.__name__ == key:
+            if self.__variable__.__name__ == key:
                 variable_exist = True
 
         if variable_exist == False:
@@ -264,12 +267,11 @@ class Variable_reform_manager():
             new_reform.write("\nfrom openfisca_core.model_api import *\n")
             # write reform
             new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
-            new_reform.write("\n\tdef apply(self):\n\t\tself.neutralize_variable(\'" + self.__variable_to_add__.__name__ + "\')")
+            new_reform.write("\n\tdef apply(self):\n\t\tself.neutralize_variable(\'" + self.__variable__.__name__ + "\')")
 
 
 #with open('config_import.json') as f:
 #    data_config = json.load(f)
-#Variable_To_Reform.import_depending_on_system("openfisca_italy", data_config)
 #v = Variable_To_Reform()
 #v.set_name("RP62_periodo_2013")
 #v.set_type("float")
