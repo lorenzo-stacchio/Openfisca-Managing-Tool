@@ -897,19 +897,71 @@ class FormVariableScreen(Screen):
     def __init__(self, **kwargs):
         super(FormVariableScreen, self).__init__(**kwargs)
 
+
     def setting_up_form_variable(self):
+        # get type members
+        list_of_type = []
+        for el in TYPEOFVARIABLE.__members__:
+            list_of_type.append(el)
+        self.ids.value_type_input.values = list_of_type
+        # get the entities
+        global ENTITY_MODULE_CLASS
+        global ENTITY_MODULE_CLASS_ALL_ENTITIES
+        list_of_type_entity = getattr(ENTITY_MODULE_CLASS, ENTITY_MODULE_CLASS_ALL_ENTITIES)
+        list_key_name_entity = []
+        for ent in list_of_type_entity:
+            list_key_name_entity.append(ent.key)
+        self.ids.entity_input.values = list_key_name_entity
+        # get type members
+        list_of_type_definition_period = []
+        for el in TYPEOFDEFINITIONPERIOD.__members__:
+            list_of_type_definition_period.append(el)
+        self.ids.definition_period_input.values = list_of_type_definition_period
+        # get set_input_period
+        list_of_set_input_period = []
+        for el in TYPEOFSETINPUT.__members__:
+            list_of_set_input_period.append(el)
+        self.ids.set_input_period.values = list_of_set_input_period
+        # update vs add variable
         if self.manager.get_screen('select_variable_screen').choice == "Update variable":
-            self.ids.value_type_input.text = self.ids.value_type_input.values[0] #TODO cambia con quella della variabile
-            self.ids.entity_input.text = "x" #TODO Mettere dinamicamente l'entità
-            self.ids.label_input.text = "x"
-            self.ids.definition_period_input.text = self.ids.definition_period_input.values[0]
-            self.ids.reference_input.text = "x"
+            # get all the system variables and compare
+            global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+            vars = TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables()
+            for key_var, value_var in vars.iteritems():
+                if key_var == self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text:
+                    self.ids.name_input.text = self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text
+                    self.ids.value_type_input.text = value_var.value_type.__name__
+                    self.ids.entity_input.text = value_var.entity.__name__
+                    if value_var.label:
+                        self.ids.label_input.text = value_var.label.encode("utf-8")
+                    else:
+                        self.ids.label_input.text = "No label found"
+
+                    if value_var.set_input:
+                        self.ids.set_input_period.text = value_var.set_input.__name__
+                    else:
+                        self.ids.set_input_period.text = TYPEOFSETINPUT.no_set_input_period.name
+
+                    if value_var.definition_period:
+                        self.ids.definition_period_input.text = value_var.definition_period
+                    else:
+                        self.ids.definition_period_input.text = "No definition period found"
+
+                    if value_var.reference:
+                        print "\n\n", value_var.reference, "\n\n"
+                        self.ids.reference_input.text = value_var.reference[0]
+                    else:
+                        self.ids.reference_input.text ="No reference found"
+                    break
+
         elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+            print self.ids.value_type_input.values[0]
             self.ids.value_type_input.text = self.ids.value_type_input.values[0]
-            self.ids.entity_input.text = "" #TODO Mettere dinamicamente l'entità
-            self.ids.label_input.text = ""
+            self.ids.entity_input.text = self.ids.entity_input.values [0]
+            self.ids.label_input.text = "Insert here the description of the variable"
+            self.ids.set_input_period.text = TYPEOFSETINPUT.no_set_input_period.name
             self.ids.definition_period_input.text = self.ids.definition_period_input.values[0]
-            self.ids.reference_input.text = ""
+            self.ids.reference_input.text = "Insert here the legislative reference"
         else:
             pass
 

@@ -76,7 +76,6 @@ class Entity():
     @staticmethod
     def import_depending_on_system_entity_for_simulation(system_selected, json_config_path_object):
         # The import depenends on the system selected
-        print system_selected
         system_selected = os.path.basename(system_selected)
         for key, value in json_config_path_object[system_selected].items():
                 if key == 'tax_benefit_system':
@@ -96,13 +95,8 @@ class Entity():
         Entity.tax_benefit_system_module = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
         Entity.entity_module = importlib.import_module(str(system_selected) + "." + str(entity_module))
         Entity.all_entities_names = getattr(Entity.entity_module, all_entities)
-        print type(Entity.tax_benefit_system_module), Entity.tax_benefit_system_module
-        print "MODULE ENTITY", Entity.entity_module
 
     def generate_associated_variable_filter(self, year = None, month = None, day = None):
-        print str(year)
-        print str(month)
-        print str(day)
         if year and not month and not day:
             if re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4:
                 self.period_to_filter_variables = TYPEOFDEFINITIONPERIOD.year
@@ -352,66 +346,3 @@ class Simulation_generator(): #defined for Italy
         Simulation_generator.tax_benefit_system_module_class = tax_benefit_system_class
         reload(site)
         Simulation_generator.tax_benefit_system_module = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
-
-
-
-# main
-#path = 'C:\\Users\\Stach\\Desktop\\openfisca-italy\\openfisca_italy'
-#person = Entity(entity = Persona)
-#person.generate_associated_variable_filter(year = '2017')
-
-#situation_IRPEF_1 = Situation(name_of_situation = "IRPEF1_2017")
-#situation_IRPEF_1.set_entity_choose(person)
-#situation_IRPEF_1.set_period(year = '2017')
-# input variables
-#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN1_reddito_complessivo', value = 25000)
-#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN2_deduzione_abitazione_principale', value = 2000)
-#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN3_oneri_deducibili_totali', value = 1500)
-#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN22_totale_detrazioni_imposta', value = 2000)
-#situation_IRPEF_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN25_totale_altre_detrazioni_crediti_imposta', value = 1000)
-# output
-#situation_IRPEF_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN4_reddito_imponibile')
-#situation_IRPEF_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN5_irpef_lorda')
-#situation_IRPEF_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN26_irpef_netta')
-#print "IRPEF",  situation_IRPEF_1
-
-
-#situation_IRPEF_2 = Situation(name_of_situation = "IRPEF2_2017")
-#situation_IRPEF_2.set_entity_choose(person)
-#situation_IRPEF_2.set_period(year = '2017')
-# input variables
-#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN1_reddito_complessivo', value = 15000)
-#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN2_deduzione_abitazione_principale', value = 1000)
-#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN3_oneri_deducibili_totali', value = 1000)
-#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN22_totale_detrazioni_imposta', value = 500)
-#situation_IRPEF_2.add_variable_to_choosen_input_variables(choosen_input_variable = 'RN25_totale_altre_detrazioni_crediti_imposta', value = 400)
-# output
-#situation_IRPEF_2.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN4_reddito_imponibile')
-#situation_IRPEF_2.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN5_irpef_lorda')
-#situation_IRPEF_2.add_variable_to_choosen_output_variables(choosen_output_variable = 'RN26_irpef_netta')
-#print "IRPEF",  situation_IRPEF_2
-#print id(situation_IRPEF_1)
-#situation_IMU_1 = Situation(name_of_situation = "IMU_2017")
-#situation_IMU_1.set_period(year = '2017' , month ='01')
-#situation_IMU_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'valore_immobile_non_rivalutato', value = 10000)
-#situation_IMU_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'is_immobile_prima_casa', value = False)
-#situation_IMU_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'immobile_categoria_catastale', value = 'A5')
-#situation_IMU_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'percentuale_possesso', value = 100)
-#situation_IMU_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'mesi_di_possesso', value = 12)
-#situation_IMU_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'aliquota_imu', value = 7.6)
-#situation_IMU_1.add_variable_to_choosen_input_variables(choosen_input_variable = 'is_interesse_storico_artistico', value = True)
-# outpu
-#situation_IMU_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'imposta_imu')
-#situation_IMU_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'detrazioni_imu')
-#situation_IMU_1.add_variable_to_choosen_output_variables(choosen_output_variable = 'importo_imu')
-#print "IMU",  situation_IMU_1
-#print id(situation_IMU_1)
-#simulation_IRPEF = Simulation_generator()
-#simulation_IRPEF.set_period('2017')
-#simulation_IRPEF.add_situation_to_simulator(situation_IRPEF_1)
-#simulation_IRPEF.add_situation_to_simulator(situation_IRPEF_2)
-#simulation_IRPEF.generate_simulation()
-#print simulation_IRPEF.get_results()
-#simulation_IMU = Simulation_generator(situations = [situation_IMU_1], period='2017-01')
-#simulation_IMU.generate_simulation()
-#simulation_IMU.get_results()

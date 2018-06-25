@@ -9,7 +9,6 @@ from script.interpeters.variables_file_interpeter import *
 from script.interpeters.reforms_file_interpeter import *
 
 # FONDAMENTALE, COSI PRENDI TUTTI I PARAMETRI ESISTENTI
-# print TAX_BENEFIT_SYSTEM_MODULE_CLASS().parameters
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
@@ -293,7 +292,6 @@ class ScaleParameter():
             # Rates
             count_rate_for_view = 0
             formatted_dict = {}
-            #print "Dict non formattato ", self.__brackets__, "\n"
             for element in self.__brackets__:
                 count_rate_for_view = count_rate_for_view + 1
                 formatted_dict[count_rate_for_view] = {}
@@ -368,7 +366,6 @@ class FancyIndexingParamater():
                 rst.write('#')
             rst.write("\n")
             rst.write('\nIn this parameter it will be described the value of the various homogeneous parameters depending on the value of an external variable.\n\n')
-            print self.__code_dict__
             for key_lv1, value_lv1 in self.__code_dict__.iteritems():
                 for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                     rst.write('#')
@@ -440,7 +437,6 @@ class ParameterInterpeter():
     #SCALE PARAMETER
     def __interpeter_scale_parameter__(self):
         if (self.__parameter_type__ == ParameterType.scale):
-            #print "In scala", self.__yaml_file__
             self.__actual_parameter__ = ScaleParameter()
             self.__actual_parameter__.set_brackets(self.__yaml_file__['brackets'])
             self.__actual_parameter__.set_parameter_name(os.path.basename(self.__parameter_path__))
@@ -474,11 +470,9 @@ class ParameterInterpeter():
             for key_lv1, value_lv1 in self.__yaml_file__.iteritems():
                 actual_inner_dict = {}
                 for key_lv2, value_lv2 in value_lv1.iteritems():
-                    #print "\nChiave attuale", key_lv2
                     actual_normal_parameter = self.__interpeter_normal_parameter_for_fancy_indexing__(normal_yaml_parameter = value_lv2, parameter_name = key_lv2)
                     actual_inner_dict[key_lv2] = actual_normal_parameter
                 formatted_dict[key_lv1] = actual_inner_dict
-            #print "Total", formatted_dict
             self.__actual_parameter__.set_code_dict(formatted_dict)
 
 

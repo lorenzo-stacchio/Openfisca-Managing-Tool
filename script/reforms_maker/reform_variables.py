@@ -21,6 +21,7 @@ class TYPEOFVARIABLE(Enum):
 
 
 class TYPEOFSETINPUT(Enum):
+    no_set_input_period = "There's no set_input_period"
     set_input_divide_by_period = "The 12 months are set equal to the 12th of the input value"
     set_input_dispatch_by_period = "The 12 months are set equal to input value"
 
