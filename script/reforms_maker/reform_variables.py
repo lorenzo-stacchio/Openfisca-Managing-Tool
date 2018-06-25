@@ -40,8 +40,8 @@ class Variable_To_Reform():
         self.__name__ = name
         self.entity = entity
         self.__type__ = type
-        self.__reference__ = reference
-        self.__label__ = label
+        self.__reference__ = "\"" + str(reference) + "\""
+        self.__label__ = "\"" + str(label) + "\""
         self.__definition_period__ = definition_period
         self.__set_input__ = set_input
         self.__formula__ = formula
@@ -152,10 +152,21 @@ class Variable_reform_manager():
 
     def __add_variable__(self):
         if self.__reform_name__ is None:
-            self.__reform_name__ = "no_named_reform"
+            self.__reform_name__ = "add_" + self.__variable__.__name__
         # check the necessary fields, which are name, type, definition_period and entity
         if (self.__variable__.__name__ is None) or (self.__variable__.entity is None) or (self.__variable__.__definition_period__ is None) or (self.__variable__.entity is None):
             raise ValueError("You doesn't insert a necessary field")
+
+        all_variables = Variable_To_Reform.tax_benefit_system_module_class.get_variables()
+        variable_exist = False
+
+        for key,var in all_variables.iteritems():
+            if self.__variable__.__name__ == key:
+                variable_exist = True
+
+        if variable_exist == True:
+            raise ValueError("The variable you want update already exist please update it!")
+
         path_new_reform = self.__path_to_save_reform__ + "\\" + self.__reform_name__ + ".py"
         if os.path.exists(path_new_reform):
             os.remove(path_new_reform)
@@ -187,17 +198,19 @@ class Variable_reform_manager():
 
     def __update_variable__(self):
         if self.__reform_name__ is None:
-            self.__reform_name__ = "no_named_reform"
+            self.__reform_name__ = "update_" + self.__variable__.__name__
 
         if (self.__variable__.__name__ is None) or ((self.__variable__.__type__ is None) and (self.__variable__.entity is None) and (self.__variable__.__definition_period__ is None) and (self.__variable__.__set_input__ is None) and (self.__variable__.__label__ is None) and (self.__variable__.__reference__ is None) and (self.__variable__.__formula__ is None)):
             raise ValueError("You doesn't insert a necessary field")
+
         #check if variable exist
         all_variables = Variable_To_Reform.tax_benefit_system_module_class.get_variables()
         variable_exist = False
-
+        variable_to_update = None
         for key,var in all_variables.iteritems():
             if self.__variable__.__name__ == key:
                 variable_exist = True
+                variable_to_update = var
 
         if variable_exist == False:
             raise ValueError("The variable you want update doesn't exist")
@@ -213,25 +226,25 @@ class Variable_reform_manager():
             # facultative fields
             new_reform.write("\nclass " + self.__variable__.__name__ + "(Variable):")
 
-            if self.__variable__.__type__:
+            if self.__variable__.__type__ and not(self.__variable__.__type__ == variable_to_update.value_type.__name__):
                 new_reform.write("\n\tvalue_type = " + self.__variable__.__type__)
 
-            if self.__variable__.entity:
+            if self.__variable__.entity and not(self.__variable__.entity == variable_to_update.entity.__name__):
                 new_reform.write("\n\tentity = " + self.__variable__.entity)
 
-            if self.__variable__.__definition_period__:
+            if self.__variable__.__definition_period__ and not(self.__variable__.__definition_period__ == variable_to_update.definition_period):
                 new_reform.write("\n\tdefinition_period = " + self.__variable__.__definition_period__)
 
-            if self.__variable__.__reference__:
+            if self.__variable__.__reference__ and not(self.__variable__.__reference__ == variable_to_update.reference):
                 new_reform.write("\n\treference = " + self.__variable__.__reference__)
 
-            if self.__variable__.__label__:
+            if self.__variable__.__label__ and not(self.__variable__.__label__ == variable_to_update.label):
                 new_reform.write("\n\tlabel = " + self.__variable__.__label__)
 
-            if self.__variable__.__set_input__:
+            if self.__variable__.__set_input__ and not(self.__variable__.__set_input__ == variable_to_update.set_input):
                 new_reform.write("\n\tset_input = " + self.__variable__.__set_input__)
 
-            if self.__variable__.__formula__:
+            if self.__variable__.__formula__ and not(self.__variable__.__formula__ == variable_to_update.formula):
                 new_reform.write("\n\n\t" + self.__variable__.__formula__)
             # write reform
             new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
@@ -240,7 +253,7 @@ class Variable_reform_manager():
 
     def __neutralize_variable__(self):
         if self.__reform_name__ is None:
-            self.__reform_name__ = "no_named_reform"
+            self.__reform_name__ = "neutralize_" + self.__variable__.__name__
 
         if (self.__variable__.__name__ is None):
             raise ValueError("You doesn't insert a necessary field")

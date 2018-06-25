@@ -129,7 +129,6 @@ class Reform_File_Interpeter():
 
 
     def __find_and_bind_variables__(self):
-        # Print actions
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():
                 for key,value in action.iteritems():
@@ -157,7 +156,7 @@ class Reform_File_Interpeter():
                             var_interpeter.__interpretation_variable_for_reform__()
                             variables_in_reform = var_interpeter.get_variables()
                             for variable in variables_in_reform:
-                                if key == variable.get_variable_name():
+                                if key == str(variable.get_variable_name()):
                                     action[key] = action[key] + "\n\n" + variable.generate_RST_string_variable()
                         elif value == 'update_variable':
                             var_interpeter = Variable_File_Interpeter(self.__reforms_file_path__)
@@ -168,13 +167,10 @@ class Reform_File_Interpeter():
                             for variable_in_reform,variable_in_system in zip(variables_in_reform,variables_updated_if_exist):
                                 if key == variable_in_reform.get_variable_name():
                                     variable_X = Variable_for_writing(variable_name = key)
-                                    # print "VARIABILE RIFORMATA", variable_in_reform
-                                    # print "Variabile normale", variable_in_system
                                     if not (variable_in_reform.get_value_type() == None):
                                         variable_X.set_value_type(variable_in_reform.get_value_type())
                                     else:
                                         variable_X.set_value_type(variable_in_system.get_value_type())
-                                    # print "Tipo variabile finale", variable_X.get_value_type()
                                     if not (variable_in_reform.get_entity() == None):
                                         variable_X.set_entity(variable_in_reform.get_entity())
                                     else:
@@ -183,7 +179,7 @@ class Reform_File_Interpeter():
                                     if not (variable_in_reform.get_definition_period() == None):
                                         variable_X.set_definition_period(variable_in_reform.get_definition_period())
                                     else:
-                                        variable_X.set_definition_period(variable_in_system.get_entity())
+                                        variable_X.set_definition_period(variable_in_system.get_definition_period())
 
                                     if not (variable_in_reform.get_label() == None):
                                         variable_X.set_label(variable_in_reform.get_label())
@@ -223,23 +219,15 @@ class Reform_File_Interpeter():
                     if ('def' in line) and ('parameters' in line) and ('(' in line) and (')' in line) and (':' in line) and not('formula' in line): # is almost a modifier function
                         modifier_function_found = True
                         name = (line[:line.find('(')].replace("def","")).strip()
-                        #print "Name of modifier function:", name
                         modifier_function_dict[name] = "\n\n .. code:: python \n\n  " + line
-            #print "Dict", modifier_function_dict
 
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():
                 for key,value in action.iteritems():
                     if(value == 'modify_parameters'):
-                    #print "key", key
-                    #print "value", value
-                    # get the actions
                         for name,value_name in modifier_function_dict.iteritems():
-                            # print "name", name
                             if key==name:
                                 action[key] = action[key] + value_name
-        #for reform in self.__reforms__:
-            #print "Riforme", reform.get_reform_actions()
 
     def start_interpetration_reforms(self):
         self.__reforms__ = []
@@ -254,7 +242,6 @@ class Reform_File_Interpeter():
                 if '#' in line:
                     line = line[:line.find('#')]
                 if line:
-                    #print "Linea attuale", line
                     if reform_apply_fun_found:
                         if 'class' in line and '(Reform):' in line:
                             reform_apply_fun_found = False
@@ -269,16 +256,20 @@ class Reform_File_Interpeter():
                             elif 'update_variable' in line:
                                 # example of code line self.update_variable(income_tax)
                                 line = (line [(line.find('(') + 1):line.find(')')].strip()).replace("self.","") # start is inclusive, instead end is exclusive
+                                # erase '' from line
+                                line = line.replace("\'", "")
                                 dict_action[line] = "update_variable"
                                 current_reform.append_reform_action(dict_action)
                             elif 'add_variable' in line:
                                 # example of code line self.add_variable(income_tax)
                                 line = (line[(line.find('(') + 1):line.find(')')].strip()).replace("self.","")
+                                line = line.replace("\'", "")
                                 dict_action[line] = "add_variable"
                                 current_reform.append_reform_action(dict_action)
                             elif 'neutralize_variable' in line:
                                 # example of code line self.add_variable(income_tax)
                                 line = (line[(line.find('(\'') + 2):line.find('\')')].strip()).replace("self.","")
+                                line = line.replace("\'", "")
                                 dict_action[line] = "neutralize_variable"
                                 current_reform.append_reform_action(dict_action)
                     pieces = line.split('=')
@@ -291,7 +282,6 @@ class Reform_File_Interpeter():
                             reform_name = reform_name.replace(chs,'')
                         current_reform = Reform_for_writing(reform_name = reform_name)
                         current_reform.set_reform_actions(reform_actions=[])
-                        #print "Dopo creazione", current_reform
                         self.__reforms__.append(current_reform)
                     elif 'name ' in pieces[0] and reform_found == True:
                         full_name = pieces[1]

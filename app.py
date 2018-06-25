@@ -826,7 +826,7 @@ class ReformsScreen(Screen):
 
     def go_to_add_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Add variable"
-        self.manager.get_screen('select_variable_screen').inizialize_form()
+        self.manager.get_screen('form_variable_screen').setting_up_form_variable()
         self.manager.current = 'form_variable_screen'
 
     def go_to_update_variable(self):
@@ -894,6 +894,7 @@ class SelectVariableScreen(Screen):
 
 class FormVariableScreen(Screen):
 
+
     def __init__(self, **kwargs):
         super(FormVariableScreen, self).__init__(**kwargs)
 
@@ -927,15 +928,15 @@ class FormVariableScreen(Screen):
             # get all the system variables and compare
             global TAX_BENEFIT_SYSTEM_MODULE_CLASS
             vars = TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables()
+            # fill the fields with the existing variables
             for key_var, value_var in vars.iteritems():
                 if key_var == self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text:
                     self.ids.name_input.text = self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text
                     self.ids.value_type_input.text = value_var.value_type.__name__
                     self.ids.entity_input.text = value_var.entity.__name__
+
                     if value_var.label:
                         self.ids.label_input.text = value_var.label.encode("utf-8")
-                    else:
-                        self.ids.label_input.text = "No label found"
 
                     if value_var.set_input:
                         self.ids.set_input_period.text = value_var.set_input.__name__
@@ -944,50 +945,63 @@ class FormVariableScreen(Screen):
 
                     if value_var.definition_period:
                         self.ids.definition_period_input.text = value_var.definition_period
-                    else:
-                        self.ids.definition_period_input.text = "No definition period found"
 
                     if value_var.reference:
                         print "\n\n", value_var.reference, "\n\n"
                         self.ids.reference_input.text = value_var.reference[0]
-                    else:
-                        self.ids.reference_input.text ="No reference found"
                     break
 
         elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
-            print self.ids.value_type_input.values[0]
             self.ids.value_type_input.text = self.ids.value_type_input.values[0]
             self.ids.entity_input.text = self.ids.entity_input.values [0]
-            self.ids.label_input.text = "Insert here the description of the variable"
             self.ids.set_input_period.text = TYPEOFSETINPUT.no_set_input_period.name
             self.ids.definition_period_input.text = self.ids.definition_period_input.values[0]
-            self.ids.reference_input.text = "Insert here the legislative reference"
         else:
             pass
 
     def run_operation(self):
-        #delete all whitespace
-        name_input = self.ids.name_input.text.replace(" ","")
+        #delete all whitespace and che that variable doesn't exist
+        if self.ids.name_input.text == "":
+            name_input = None
+        else:
+            name_input = self.ids.name_input.text
+
         value_type_input=self.ids.value_type_input.text.replace(" ","")
         entity_input=self.ids.entity_input.text.replace(" ","")
-        label_input=self.ids.label_input.text.replace(" ","")
         definition_period_input=self.ids.definition_period_input.text.replace(" ","")
-        reference_input=self.ids.reference_input.text.replace(" ","")
-        #If there are empty text
-        if name_input == "" or value_type_input == "" or entity_input == "" or label_input == "" or definition_period_input == "":
-            print "Error"
-            return
+
+        if self.ids.label_input.text == "":
+            label_input = None
+        else:
+            label_input = self.ids.label_input.text
+        if self.ids.reference_input.text == "":
+            reference_input = None
+        else:
+            reference_input = self.ids.reference_input.text.encode("utf-8")
+
+
         if self.manager.get_screen('select_variable_screen').choice == "Update variable":
-            #TODO Operazione di aggiornamento
-            #Cerca la variabile selezionata (qui sotto troviamo il testo della variabile)
-            print "Hai aggiornato "+self.ids.name_input.text
-            #Aggiornala
-            pass
+            try:
+                v_to_add = Variable_To_Reform(name = name_input, entity = entity_input, type = value_type_input, reference = reference_input,  formula = None, label = label_input, set_input = None, definition_period = definition_period_input)
+                ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'])
+                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
+                self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                                   auto_dismiss=True)
+                self.popup.open()
+                self.manager.current = 'reforms'
+            except Exception as e:
+                print e
         elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
-            #TODO Operazione di aggiunta
-            #Aggiungi la variabile
-            print "Hai aggiunto "+self.ids.name_input.text
-            pass
+            try:
+                v_to_add = Variable_To_Reform(name = name_input, entity = entity_input, type = value_type_input, reference = reference_input,  formula = None, label = label_input, set_input = None, definition_period = definition_period_input)
+                ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'])
+                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
+                self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                                   auto_dismiss=True)
+                self.popup.open()
+                self.manager.current = 'reforms'
+            except Exception as e:
+                print e
         #Print di quello che hai aggiunto/aggiornato
         print " ".join([name_input,
                         value_type_input,
