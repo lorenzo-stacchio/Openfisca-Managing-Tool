@@ -848,6 +848,17 @@ class ReformsScreen(Screen):
         self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'select_variable_screen'
 
+    def to_do(self):
+        self.box_popup = BoxLayout(orientation='horizontal')
+
+        self.box_popup.add_widget(Label(text="In the future"))
+
+        self.popup_exit = Popup(title="To Do!",
+                                content=self.box_popup,
+                                size_hint=(0.4, 0.4),
+                                auto_dismiss=True)
+        self.popup_exit.open()
+
 
 class SelectVariableScreen(Screen):
     choice = StringProperty()

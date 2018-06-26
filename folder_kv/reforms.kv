@@ -23,12 +23,15 @@
             Button:
                 id: button_add_parameter
                 text: "Add parameter"
+                on_press: root.to_do()
             Button:
                 id: button_modify_parameter
                 text: "Modify variable"
+                on_press: root.to_do()
             Button:
                 id: button_make_reform
                 text: "Make reform"
+                on_press: root.to_do()
         Button:
             size_hint: (1.0,0.2)
             text: 'Come back to home'
@@ -39,10 +42,27 @@
     name: "select_variable_screen"
     BoxLayout:
         orientation: "vertical"
-        Spinner
+        Label:
+        Spinner:
             id: id_spinner_select_variable_screen
             size_hint: (0.8,None)
             pos_hint: {'center_x': .5, 'center_y': .5}
+        Label:
+        GridLayout:
+            cols: 2
+            Label:
+                id: id_label_reform_name
+                text: "Reform name:"
+            TextInput:
+                id: id_input_reform_name
+                text: ""
+            Label:
+                id: id_label_reform_reference
+                text: "Reference name:"
+            TextInput:
+                id: id_input_reform_reference
+                text: ""
+
         BoxLayout:
             orientation: "horizontal"
             Button:
