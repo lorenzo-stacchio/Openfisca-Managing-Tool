@@ -501,8 +501,22 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
+
             Label:
                 size_hint: (1.0,0.05)
+            Label:
+                text: "Search Box (enter to search)"
+                size_hint: (1.0,0.08)
+            TextInput:
+                id: id_search_box_input_variable
+                size_hint: (0.8,0.1)
+                hint_text: 'Insert a value to filter'
+                multiline: False
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_text_validate: root.change_spinner()
+            Label:
+                size_hint: (1.0,0.05)
+
             Spinner:
                 id: menu_a_tendina_variabili
                 size_hint: (0.8,0.15)
@@ -625,8 +639,22 @@
                     Rectangle:
                         pos: self.pos
                         size: self.size
+
             Label:
                 size_hint: (1.0,0.05)
+            Label:
+                text: "Search Box (enter to search)"
+                size_hint: (1.0,0.08)
+            TextInput:
+                id: id_search_box_input_variable
+                size_hint: (0.8,0.1)
+                hint_text: 'Insert a value to filter'
+                multiline: False
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_text_validate: root.change_spinner()
+            Label:
+                size_hint: (1.0,0.05)
+
             Spinner:
                 id: menu_a_tendina_variabili_output
                 size_hint: (0.8,0.15)

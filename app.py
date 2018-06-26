@@ -404,6 +404,7 @@ class MakeSimulation(Screen):
     variable_added = ObjectProperty()
     dict_entita = DictProperty()
     dict_of_entity_variable_value = {}
+    previous_text_typed = ""
 
     def __init__(self, **kwargs):
         super(MakeSimulation, self).__init__(**kwargs)
@@ -453,7 +454,6 @@ class MakeSimulation(Screen):
 
         self.ids.menu_a_tendina_entita.values = self.dict_entita.keys()
         self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
-
         self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
         self.ids.information.text = """
@@ -465,6 +465,36 @@ class MakeSimulation(Screen):
 [b]Rules[/b]:
     - You can't insert a blank variable
     - You can't insert a blank variable value"""
+
+
+    def change_spinner(self):
+        variables_name = []
+        if self.ids.id_search_box_input_variable != "":
+            valori = self.dict_entita[self.ids.menu_a_tendina_entita.text]
+            for key_variable in valori:
+                if (self.ids.id_search_box_input_variable.text in key_variable):
+                    variables_name.append(key_variable)
+        # Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
+        # Quindi devo eliminare ciò che contiene non contiene la nuova stringa
+        elif self.previous_text_typed in self.ids.id_search_box_input_variable.text:
+            for key_variable in self.ids.menu_a_tendina_variabili.values:
+                if (self.previous_text_typed not in key_variable):
+                    variables_name.remove(key_variable)
+        # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
+        # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
+        else:
+            valori = self.dict_entita[self.ids.menu_a_tendina_entita.text]
+            for key_variable in valori:
+                if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
+                    variables_name.append(key_variable)
+
+        # Ordina alfabeticamente
+        variables_name.sort()
+        self.ids.menu_a_tendina_variabili.values = variables_name
+        if self.ids.menu_a_tendina_variabili.values:
+            self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
+        else:
+            self.ids.menu_a_tendina_variabili.text = ""
 
     def update_form(self):
         # print "Hai selezionato "+self.ids.menu_a_tendina_entita.text
@@ -624,7 +654,7 @@ class OutputVariableScreen(Screen):
     string_var_output = ""
     variable_added_output = ObjectProperty()
     dict_of_entity_variable_value_output = {}
-
+    previous_text_typed = ""
     def __init__(self, **kwargs):
         super(OutputVariableScreen, self).__init__(**kwargs)
 
@@ -653,6 +683,35 @@ class OutputVariableScreen(Screen):
             - You can't insert a blank variable
             - You can't insert a blank variable value"""
 
+    def change_spinner(self):
+        variables_name = []
+        if self.ids.id_search_box_input_variable != "":
+            #TOFIX
+            valori = self.manager.get_screen('make_simulation').dict_entita[self.ids.menu_a_tendina_entita.text]
+            for key_variable in valori:
+                if (self.ids.id_search_box_input_variable.text in key_variable):
+                    variables_name.append(key_variable)
+        # Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
+        # Quindi devo eliminare ciò che contiene non contiene la nuova stringa
+        elif self.previous_text_typed in self.ids.id_search_box_input_variable.text:
+            for key_variable in self.ids.menu_a_tendina_variabili_output.values:
+                if (self.previous_text_typed not in key_variable):
+                    variables_name.remove(key_variable)
+        # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
+        # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
+        else:
+            valori = self.manager.get_screen('make_simulation').dict_entita[self.ids.menu_a_tendina_entita.text]
+            for key_variable in valori:
+                if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
+                    variables_name.append(key_variable)
+
+        # Ordina alfabeticamente
+        variables_name.sort()
+        self.ids.menu_a_tendina_variabili_output.values = variables_name
+        if self.ids.menu_a_tendina_variabili_output.values:
+            self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
+        else:
+            self.ids.menu_a_tendina_variabili_output.text = ""
 
     def go_to_home(self):
         if self.manager.current == 'output_variable':
