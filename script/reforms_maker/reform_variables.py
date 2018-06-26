@@ -37,7 +37,7 @@ class Variable_To_Reform():
     tax_benefit_system_module_class = None
 
     def __init__(self, name = None, entity = None, type = None, reference = None,  formula = None, label = None, set_input = None, definition_period = None):
-        self.name = name
+        self.__name__ = name
         self.entity = entity
         self.__type__ = type
         self.__reference__ = "\"" + str(reference) + "\""
@@ -73,11 +73,14 @@ class Variable_To_Reform():
         self.__reference__ = reference
 
     def set_formula(self, formula):
-        f = re.compile("def formula\(([a-zA-Z\, ]*)\)\:")
-        if f.match(formula):
-            self.__formula__ = formula
+        if not(formula is None or formula==""):
+            f = re.compile("def formula\(([a-zA-Z\, ]*)\)\:")
+            if f.match(formula):
+                self.__formula__ = formula
+            else:
+                raise ValueError("The text you insert is not a valid formula")
         else:
-            raise ValueError("The text you insert is not a valid formula")
+            self.__formula__ = formula
 
     def set_label(self, label):
         self.__label__ = label
@@ -110,21 +113,26 @@ class Variable_To_Reform():
     def __repr__(self):
         return "\n\nName: " + self.__name__ + "\nType: " + self.__type__ + "\nEntity: " + self.entity + "\nDefinition period: " + self.__definition_period__ + "\nLabel: " + self.__label__ +  "\nSet_input: " + self.__set_input__ +  "\nReference: " + self.__reference__
 
+
 class TYPEOFREFORMVARIABILE(Enum):
     update_variable = "Update an existing variable"
     add_variable = "Add a new variable"
     neutralize_variable = " Neutralize an existent variable"
 
+
 class Variable_reform_manager():
 
-    def __init__(self, variable = None, reform_name = None, path_to_save_reform = None):
+    def __init__(self, variable = None, reform_name = None, path_to_save_reform = None, reform_full_description = None):
         if isinstance(variable, Variable_To_Reform):
             self.__variable__ = variable
         else:
             raise TypeError("The passed value is not a correct Variable")
-        self.__reform_name__ = reform_name
+        self.__reform_name__ = reform_name.replace(" ", "_")
         self.__path_to_save_reform__ = path_to_save_reform
+        self.__reform_full_description__ = "\"" + str(reform_full_description) + "\""
 
+    def set_description(self,reform_full_description):
+        self.__reform_full_description__ = "\"" + reform_full_description + "\""
 
     def set_variable(self, variable):
         if isinstance(variable, Variable_To_Reform):
@@ -193,6 +201,8 @@ class Variable_reform_manager():
                 new_reform.write("\n\n\t" + self.__variable__.__formula__)
             # write reform
             new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
+            if not(self.__reform_full_description__ is None):
+                new_reform.write("\n\tname = " + self.__reform_full_description__)
             new_reform.write("\n\tdef apply(self):\n\t\tself.add_variable(\'" + self.__variable__.__name__ + "\')")
 
 
@@ -215,7 +225,7 @@ class Variable_reform_manager():
         if variable_exist == False:
             raise ValueError("The variable you want update doesn't exist")
 
-        path_new_reform = self.__path_to_save_reform__ + "\\" + self.__reform_name__ + ".py"
+        path_new_reform = self.__path_to_save_reform__ + "\\" + str(self.__reform_name__) + ".py"
 
         if os.path.exists(path_new_reform):
             os.remove(path_new_reform)
@@ -244,10 +254,16 @@ class Variable_reform_manager():
             if self.__variable__.__set_input__ and not(self.__variable__.__set_input__ == variable_to_update.set_input):
                 new_reform.write("\n\tset_input = " + self.__variable__.__set_input__)
 
-            if self.__variable__.__formula__ and not(self.__variable__.__formula__ == variable_to_update.formula):
+
+            if self.__variable__.__formula__ and variable_to_update.is_input_variable():
                 new_reform.write("\n\n\t" + self.__variable__.__formula__)
+            elif self.__variable__.__formula__ and not(self.__variable__.__formula__ == variable_to_update.formula):
+                new_reform.write("\n\n\t" + self.__variable__.__formula__)
+
             # write reform
             new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
+            if not(self.__reform_full_description__ is None):
+                new_reform.write("\n\tname = " + self.__reform_full_description__)
             new_reform.write("\n\tdef apply(self):\n\t\tself.update_variable(\'" + self.__variable__.__name__ + "\')")
 
 
@@ -281,17 +297,6 @@ class Variable_reform_manager():
             new_reform.write("\nfrom openfisca_core.model_api import *\n")
             # write reform
             new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
+            if not(self.__reform_full_description__ is None):
+                new_reform.write("\n\tname = " + self.__reform_full_description__)
             new_reform.write("\n\tdef apply(self):\n\t\tself.neutralize_variable(\'" + self.__variable__.__name__ + "\')")
-
-
-#with open('config_import.json') as f:
-#    data_config = json.load(f)
-#v = Variable_To_Reform()
-#v.set_name("RP62_periodo_2013")
-#v.set_type("float")
-#v.set_entity("person")
-#v.set_definition_period("month")
-#v.set_set_input("set_input_divide_by_period")
-#v.set_formula("def formula(person, period, parameters):\n\t\treturn person('reddito_lavoro_dipendente_annuale', period) * parameters(period).tasse.aliquota_IRPEF")
-#manager = Variable_reform_manager(path_to_save_reform = 'C:\\Users\\Lorenzo Stacchio\\Desktop', variable_to_add = v )
-#manager.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)

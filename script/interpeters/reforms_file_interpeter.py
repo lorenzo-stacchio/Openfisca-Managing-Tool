@@ -25,13 +25,6 @@ class TypeReformAction(Enum):
 
 
 class Reform_for_writing():
-    #each reform coul contain variables and modifier functions
-    __reform_name__ = None
-    __reform_full_name__ = None
-    __reference__ = None
-    __reform_actions__ = []
-    __variables_used__ = {}  # dict key = name, value = RST string
-    #__modifier_functions__ = []
 
     def __init__(self, reform_name = None, reform_full_name = None, reference = None, reform_actions = []):
         if os.path.exists(PATH_RST_DOCUMENT):
@@ -81,20 +74,7 @@ class Reform_for_writing():
                 rst.write("\n\n" + self.__reform_full_name__.strip() + "\n\n")
             else:
                 rst.write("\n\nUndefined full name\n\n")
-            # Properties
-            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                rst.write('#')
-            rst.write("\nProperties: \n")
-            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                rst.write('#')
-            rst.write("\nReference \n")
-            for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
-                rst.write('#')
-            # reference
-            if self.__reference__:
-                rst.write("\n" + self.__reference__ + "\n")
-            else:
-                rst.write("\nReference non specificata\n")
+            # reform actions
             rst.write("\nReform Actions \n")
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
                 rst.write('*')
@@ -109,14 +89,13 @@ class Reform_for_writing():
 
 
 class Reform_File_Interpeter():
-    __reforms_file_path__ = ""
     __reforms__ = [] # will be a list
-    __file_is_a_reform__ = False
     tax_benefit_system_class = None
     tax_benefit_system = None
 
     def __init__(self,reform_path):
         self.__reforms_file_path__ = reform_path
+        self.__file_is_a_reform__ = False
         # check if the file passed contains a variable
         with open(self.__reforms_file_path__,'r') as content_reform:
             for line in content_reform.readlines():
