@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import kivy
 import json
+import os, sys
 kivy.require("1.10.0")
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -20,28 +21,28 @@ from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import DictProperty
 from kivy.uix.textinput import TextInput
-import os, sys
 from script.get_parameters_reforms_tests_variables_folder_paths import *
 from script.interpeters.variables_file_interpeter import *
 from script.interpeters.parameters_interpeter import *
 from script.interpeters.reforms_file_interpeter import *
 from script.download_openfisca_system import download_and_install as download_and_install_openfisca
 from script.Simulation.Situation_for_simulation import *
-
+from script.reforms_maker.reform_variables import *
 from multiprocessing.pool import ThreadPool
 
+
+TAX_BENEFIT_SYSTEM_MODULE_CLASS = None
+ENTITY_MODULE_CLASS = None
+ENTITY_MODULE_CLASS_ALL_ENTITIES = None
 
 # Screen
 class InitScreen(Screen):
     download_information = StringProperty("[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]")
-
     PATH_OPENFISCA = None
-
 
     def __init__(self, **kwargs):
         super(InitScreen, self).__init__(**kwargs)
         Clock.schedule_once(self._finish_init)
-
 
     def _finish_init(self, dt):
         self.ids.home_file_chooser.path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
@@ -52,14 +53,38 @@ class InitScreen(Screen):
         if dict:
             if self.manager.current == 'init':
                 self.manager.current = 'home'
-                self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
-                self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
                 with open('./messages/config_import.json') as f:
                     data_config = json.load(f)
-                self.manager.get_screen('choose_entity').import_entities_system(self.PATH_OPENFISCA,data_config)
-
+                self.init_import_tax_benefit_system(self.PATH_OPENFISCA,data_config)
+                self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
+                self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
+                #self.manager.get_screen('choose_entity').import_entities_system(self.PATH_OPENFISCA,data_config)
         else:
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
+
+
+    def init_import_tax_benefit_system(self, system_selected, json_config_path_object):
+        system_name = str(os.path.basename(system_selected)).replace("-","_")
+        for key, value in json_config_path_object[system_name].items():
+                if key == 'tax_benefit_system':
+                    for key_tax, value_tax in value.items():
+                        tbs_module,ext = os.path.splitext(key_tax)
+                        tbs_module_class = value_tax
+                if key == 'entities':
+                    for key_ent, value_ent in value.items():
+                        entity_module,ext = os.path.splitext(key_ent)
+                        for entity_elements_key,entity_elements_value in value_ent.items():
+                            if entity_elements_key == "all_entities":
+                                all_entities_classname = entity_elements_value
+        reload(site)
+        tax_benefit_system_module = importlib.import_module(system_name + "." + str(tbs_module))
+        global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+        TAX_BENEFIT_SYSTEM_MODULE_CLASS = getattr(tax_benefit_system_module, tbs_module_class)
+        global ENTITY_MODULE_CLASS
+        ENTITY_MODULE_CLASS = importlib.import_module(system_name + "." + str(entity_module))
+        global ENTITY_MODULE_CLASS_ALL_ENTITIES
+        ENTITY_MODULE_CLASS_ALL_ENTITIES = all_entities_classname
+        reload(site)
 
 
     def generate_pop_up(self, title, content):
@@ -72,10 +97,7 @@ class InitScreen(Screen):
 
 
     def download_system(self,btn_instance):
-        #print str(btn_instance.text)
         id_button = self.get_id(btn_instance)
-        #previous_color = btn_instance.background_color
-        #btn_instance.background_color = 1.0, 0.0, 0.0, 1.0
         # read documents
         with open('messages\\config_import.json') as f:
             data_config = json.load(f)
@@ -84,8 +106,6 @@ class InitScreen(Screen):
         user_desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
         github_link = data_config[system_selected]["link"]
         project_name = data_config[system_selected]["project_name"]
-
-
         # waiting popup
         # TODO: AGGIUSTA IL CAMBIAMENTO DELLA LABEL
         self.download_information= "[color=FF033D] [b] [size=20] [u] Downloading and installing the system[/size] [u] [b] [/color]"
@@ -97,7 +117,8 @@ class InitScreen(Screen):
         else:
             self.generate_pop_up( title = 'System already exist!',
                             content = Label(text='The system [b]' + system_selected + '[b] already exist in:' + user_desktop + "\n If you want to download a newest version, please erase it!", size = self.parent.size, halign="left", valign="middle"))
-        #self.download_information = "[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]"
+
+
     def get_id(self, instance):
             for id, widget in self.ids.items():
                 print id, widget
@@ -111,7 +132,6 @@ class HomeScreen(Screen):
         super(HomeScreen, self).__init__(**kwargs)
 
     def ricevi_inizializza_path(self, path):
-        print path
         self.dict_path = get_all_paths(path)
         self.ids.label_0_0.text = """[color=000000]
         [b][size=24sp]Hello ![/size][/b]\n
@@ -139,7 +159,6 @@ class HomeScreen(Screen):
 
 
 class ChooseEntityScreen(Screen):
-    entity_module = None
     type_of_entity = None
     number_of_entity = {}
     period = None
@@ -152,6 +171,9 @@ class ChooseEntityScreen(Screen):
 
 
     def init_content_screen(self):
+        global ENTITY_MODULE_CLASS
+        global ENTITY_MODULE_CLASS_ALL_ENTITIES
+        self.type_of_entity = getattr(ENTITY_MODULE_CLASS, ENTITY_MODULE_CLASS_ALL_ENTITIES)
         for entity in self.type_of_entity:
             self.entity_box_layout.add_widget(LineOfChooser())
             self.entity_box_layout.children[0].children[-1].text = entity.key
@@ -165,23 +187,6 @@ class ChooseEntityScreen(Screen):
         self.entity_box_layout.add_widget(Label(text="You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD"))
         self.entity_box_layout.add_widget(Button(id="button_go_to_insert_input_variables", text="Click"))
         Clock.schedule_once(self._finish_init)
-
-
-    def import_entities_system(self, system_selected, json_config_path_object):
-        # The import depenends on the system selected
-        print system_selected
-        system_selected = os.path.basename(system_selected)
-        system_selected = system_selected.replace("-","_")
-        for key, value in json_config_path_object[system_selected].items():
-                if key == 'entities':
-                    for key_entity, value_entity in value.items():
-                        entity_module,ext = os.path.splitext(key_entity)
-                        for key_attribute_entity, value_attribute_entity in value_entity.items():
-                            if key_attribute_entity == 'all_entities':
-                                all_entities_name = value_attribute_entity
-        self.entity_module = importlib.import_module(str(system_selected) + "." + str(entity_module))
-        reload(site)
-        self.type_of_entity = getattr(self.entity_module, all_entities_name)
 
 
 
@@ -242,6 +247,7 @@ class ChooseEntityScreen(Screen):
             return False
         return True
 
+
 class LineOfChooser(BoxLayout):
     name_label = StringProperty()
 
@@ -255,8 +261,6 @@ class LineOfChooser(BoxLayout):
 
 class VisualizeSystemScreen(Screen):
 
-    ENTITY_MODULE = ""
-
     def __init__(self, **kwargs):
         super(VisualizeSystemScreen, self).__init__(**kwargs)
 
@@ -266,12 +270,25 @@ class VisualizeSystemScreen(Screen):
         with open('./messages/config_import.json') as f:
             data_config = json.load(f)
         # init dynamic loading in classes
-        Variable_File_Interpeter.import_depending_on_system(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config) #static method
-        Reform_File_Interpeter.import_depending_on_system(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config) #static method
+        global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+        global ENTITY_MODULE_CLASS
+        global ENTITY_MODULE_CLASS_ALL_ENTITIES
+        Variable_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
+        Reform_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
         # entity of situation for simulator
         Entity.import_depending_on_system_entity_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
         Simulation_generator.import_depending_on_system_situation_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
+        Variable_To_Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, system_entity_module = ENTITY_MODULE_CLASS, system_all_entities_name = ENTITY_MODULE_CLASS_ALL_ENTITIES)
 
+        with open('./messages/config_import.json') as f:
+            data_config = json.load(f)
+        v = Variable_To_Reform()
+        v.set_name("RP62_periodo_2013")
+        v.set_type("float")
+        v.set_entity("person")
+        v.set_definition_period("month")
+        v.set_set_input("set_input_divide_by_period")
+        v.set_formula("def formula(person, period, parameters):\n\t\treturn person('reddito_lavoro_dipendente_annuale', period) * parameters(period).tasse.aliquota_IRPEF")
         os.chdir(os.getcwd())
         self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
         self.ids.document_variables_viewer.colors["link"] = "33AAFFff"
@@ -279,21 +296,6 @@ class VisualizeSystemScreen(Screen):
         self.ids.document_variables_viewer.colors["bullet"] = "000000ff"
         self.ids.document_variables_viewer.colors["title"] = "971640ff"
         self.ids.document_variables_viewer.underline_color = "971640ff"
-
-
-
-    def import_entity_module(self, system_selected, json_config_path_object):
-        system_selected = os.path.basename(system_selected)
-        for key, value in json_config_path_object[system_selected].items():
-                if key == 'entities':
-                    for key_tax, value_tax in value.items():
-                        entity_module,ext = os.path.splitext(key_tax)
-        reload(site)
-        #TAX_BENEFIT_SYSTEM_MODULE = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
-        self.ENTITY_MODULE = importlib.import_module(str(system_selected) + "." + str(entity_module))
-        #print type(TAX_BENEFIT_SYSTEM_MODULE), TAX_BENEFIT_SYSTEM_MODULE
-        print self.ENTITY_MODULE
-
 
     def show_variables(self):
         self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
@@ -404,10 +406,6 @@ class MakeSimulation(Screen):
         self.ids.menu_a_tendina_entita.dropdown_cls.max_height = self.ids.menu_a_tendina_entita.height*30
         self.ids.menu_a_tendina_variabili.dropdown_cls.max_height = self.ids.menu_a_tendina_variabili.height*30
 
-        # i take the dict with association of enitites
-        print self.manager.get_screen('choose_entity').number_of_entity
-        print self.manager.get_screen('choose_entity').period
-
         self.dict_entita = {}
         self.situations = {}
         # Cicla il dizionario contenente l'input fornito in precedenza
@@ -422,14 +420,12 @@ class MakeSimulation(Screen):
                         #ostruisco l'entità
                         real_entity = Entity(entity = entity)
                         period =  str(self.manager.get_screen('choose_entity').period).split("-")
-
                         if len(period) == 1:
                             real_entity.generate_associated_variable_filter(year = period[0])
                         elif len(period) == 2:
                             real_entity.generate_associated_variable_filter(year = period[0],month = period[1])
                         elif len(period) == 3:
                             real_entity.generate_associated_variable_filter(year = period[0],month = period[1],day = period[2])
-
                         for name_ent, variables in real_entity.get_associated_variables().iteritems():
                             string_name_list = []
                             for variable in variables:
@@ -691,8 +687,6 @@ class OutputVariableScreen(Screen):
         return False
 
     def add_value_and_reset_form(self):
-
-
         # If there are blank value
         if self.ids.menu_a_tendina_variabili_output.text != '':
             # You can't add again a certain variable of a certain entity
@@ -714,7 +708,6 @@ class OutputVariableScreen(Screen):
                 # inizialize if key is not exists
                 if not self.ids.menu_a_tendina_entita_output.text in self.dict_of_entity_variable_value_output.keys():
                     self.dict_of_entity_variable_value_output[self.ids.menu_a_tendina_entita_output.text] = []
-
                 # Add value
                 # add name of variable and value
                 tuple = [self.ids.menu_a_tendina_variabili_output.text, ""]
@@ -759,8 +752,6 @@ class OutputVariableScreen(Screen):
 
     def go_to_execute_simulation(self):
         if self.manager.current == 'output_variable':
-            #self.manager.get_screen('execute_simulation').summary_input()
-            #self.manager.get_screen('execute_simulation').summary_output()
             #Content of popup
             string_var_input = "The situation is following:\nInput\n"
             for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
@@ -768,7 +759,6 @@ class OutputVariableScreen(Screen):
             string_var_output = "Output\n"
             for el_output in self.ids.variable_added_output.children:
                 string_var_output += "-" + str(el_output.text) + "\n"
-
             #Create a popup
             content = ConfirmPopup(text=str(string_var_input) + "\n" + str(string_var_output))
             content.bind(on_answer=self._on_answer)
@@ -789,30 +779,13 @@ class OutputVariableScreen(Screen):
             self.manager.current = 'make_simulation'
 
 class ExecuteSimulationScreen(Screen):
-    content_input = StringProperty("")
-    content_output = StringProperty("")
 
     def __init__(self, **kwargs):
         super(ExecuteSimulationScreen, self).__init__(**kwargs)
 
-    #def summary_input(self):
-    #    entity_variable_value = []
-    #    for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
-    #        entity,variable,value = el_input.text.split(" - ")
-    #        entity_variable_value.append([entity,variable,value])
-    #        entity_variable_value= sorted(entity_variable_value, key=lambda x: x[0])
-    #    previous_entity = ""
-    #    for entity,variable,value in entity_variable_value:
-    #        if(previous_entity != entity):
-    #            self.content_input += "[b]"+entity+"[/b]\n"
-    #        previous_entity = entity
-    #        self.content_input += "> [i]"+variable+"[/i]"+": "+"[color=ff0000]"+value+"[/color]\n"
-
-
     def run_simulation(self):
         # situations
         situations =  self.manager.get_screen('make_simulation').situations
-
         period =  str(self.manager.get_screen('choose_entity').period).split("-")
         simulation_generator = Simulation_generator()
         if len(period) == 1:
@@ -825,16 +798,24 @@ class ExecuteSimulationScreen(Screen):
         for key_name, value_situation in situations.iteritems():
             simulation_generator.add_situation_to_simulator(value_situation)
         # compute
-        print simulation_generator.generate_simulation()
-        print simulation_generator.get_results()
-        print simulation_generator.generate_rst_strings_document_after_simulation()[0]
-        self.ids.document_results_simulation_viewer.text = simulation_generator.generate_rst_strings_document_after_simulation()[0]
+        simulation_generator.generate_simulation()
+        # visualize results
+        self.string_rst_documents = simulation_generator.generate_rst_strings_document_after_simulation()
+        self.current_index = 0
+        self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
 
 
-#    def summary_output(self):
-#        #TODO Migliora visualizzazione anche qui (scopri però gli output variable)
-#        for el_output in self.manager.get_screen('output_variable').ids.variable_added_output.children:
-#            self.content_output += "-" + str(el_output.text) + "\n"
+    def next_rst_result(self):
+        if self.current_index < (len(self.string_rst_documents)-1):
+            self.current_index = self.current_index + 1
+        self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
+
+
+    def previous_rst_result(self):
+        if self.current_index > 0:
+            self.current_index = self.current_index -1
+        self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
+
 
 class LabelLeftTop(Label):
     pass
@@ -852,14 +833,17 @@ class ReformsScreen(Screen):
 
     def go_to_add_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Add variable"
+        self.manager.get_screen('form_variable_screen').setting_up_form_variable()
         self.manager.current = 'form_variable_screen'
 
     def go_to_update_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Update variable"
+        self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'select_variable_screen'
 
     def go_to_neutralize_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Neutralize variable"
+        self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'select_variable_screen'
 
 
@@ -868,10 +852,7 @@ class SelectVariableScreen(Screen):
 
     def __init__(self, **kwargs):
         super(SelectVariableScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._finish_init)
 
-    def _finish_init(self, dt):
-        self.inizialize_form()
 
     def go_to_home(self):
         if self.manager.current == 'select_variable_screen':
@@ -879,19 +860,13 @@ class SelectVariableScreen(Screen):
 
     def inizialize_form(self):
         self.ids.id_spinner_select_variable_screen.dropdown_cls.max_height = self.ids.id_spinner_select_variable_screen.height*3
-
-        variable = []
-        ###TODO CHANGE FROM HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
-        import random
-        import string
-        #genera 10 stringhe lunghe 10 casualmente
-        for i in xrange(1,21):
-            variable.append(''.join(random.choice(string.ascii_uppercase) for _ in range(10)))
-        #####TODO HEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHEREHERE
-
+        global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+        variables_name = []
+        for key_variable, variables_content in TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems():
+            variables_name.append(key_variable)
         #Ordina alfabeticamente
-        variable.sort()
-        self.ids.id_spinner_select_variable_screen.values = variable
+        variables_name.sort()
+        self.ids.id_spinner_select_variable_screen.values = variables_name
 
     def select_variable(self):
         if self.manager.get_screen('select_variable_screen').choice == "Neutralize variable":
@@ -909,56 +884,131 @@ class SelectVariableScreen(Screen):
 
     def _on_answer(self, instance, answer):
         if answer == 'Yes':
-            pass
+            global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+            variables_name = []
+            for key_variable, variables_content in TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems():
+                if key_variable == self.ids.id_spinner_select_variable_screen.text:
+                    v_r_man = Variable_reform_manager(path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], variable = Variable_To_Reform(name = key_variable), reform_name = "neutralize_" + self.ids.id_spinner_select_variable_screen.text)
+                    v_r_man.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)
+                    break
             # TODO HERE YOU MUSH NEUTRALIZE VARIABLE, CONTROLLA PRIMA CHE NON SIA GIA NEUTRALIZZATA
         self.popup.dismiss()
+        self.popup = Popup(title="Variable neutralized", content = Label(text = "The reform that neutralized\n" + self.ids.id_spinner_select_variable_screen.text + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                           auto_dismiss=True)
+        self.popup.open()
         self.manager.current = 'reforms'
 
 
 class FormVariableScreen(Screen):
 
+
     def __init__(self, **kwargs):
         super(FormVariableScreen, self).__init__(**kwargs)
 
+
     def setting_up_form_variable(self):
+        # get type members
+        list_of_type = []
+        for el in TYPEOFVARIABLE.__members__:
+            list_of_type.append(el)
+        self.ids.value_type_input.values = list_of_type
+        # get the entities
+        global ENTITY_MODULE_CLASS
+        global ENTITY_MODULE_CLASS_ALL_ENTITIES
+        list_of_type_entity = getattr(ENTITY_MODULE_CLASS, ENTITY_MODULE_CLASS_ALL_ENTITIES)
+        list_key_name_entity = []
+        for ent in list_of_type_entity:
+            list_key_name_entity.append(ent.key)
+        self.ids.entity_input.values = list_key_name_entity
+        # get type members
+        list_of_type_definition_period = []
+        for el in TYPEOFDEFINITIONPERIOD.__members__:
+            list_of_type_definition_period.append(el)
+        self.ids.definition_period_input.values = list_of_type_definition_period
+        # get set_input_period
+        list_of_set_input_period = []
+        for el in TYPEOFSETINPUT.__members__:
+            list_of_set_input_period.append(el)
+        self.ids.set_input_period.values = list_of_set_input_period
+        # update vs add variable
         if self.manager.get_screen('select_variable_screen').choice == "Update variable":
-            self.ids.value_type_input.text = self.ids.value_type_input.values[0] #TODO cambia con quella della variabile
-            self.ids.entity_input.text = "x" #TODO Mettere dinamicamente l'entità
-            self.ids.label_input.text = "x"
-            self.ids.definition_period_input.text = self.ids.definition_period_input.values[0]
-            self.ids.reference_input.text = "x"
+            # get all the system variables and compare
+            global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+            vars = TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables()
+            # fill the fields with the existing variables
+            for key_var, value_var in vars.iteritems():
+                if key_var == self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text:
+                    self.ids.name_input.text = self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text
+                    self.ids.value_type_input.text = value_var.value_type.__name__
+                    self.ids.entity_input.text = value_var.entity.__name__
+
+                    if value_var.label:
+                        self.ids.label_input.text = value_var.label.encode("utf-8")
+
+                    if value_var.set_input:
+                        self.ids.set_input_period.text = value_var.set_input.__name__
+                    else:
+                        self.ids.set_input_period.text = TYPEOFSETINPUT.no_set_input_period.name
+
+                    if value_var.definition_period:
+                        self.ids.definition_period_input.text = value_var.definition_period
+
+                    if value_var.reference:
+                        print "\n\n", value_var.reference, "\n\n"
+                        self.ids.reference_input.text = value_var.reference[0]
+                    break
+
         elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
             self.ids.value_type_input.text = self.ids.value_type_input.values[0]
-            self.ids.entity_input.text = "" #TODO Mettere dinamicamente l'entità
-            self.ids.label_input.text = ""
+            self.ids.entity_input.text = self.ids.entity_input.values [0]
+            self.ids.set_input_period.text = TYPEOFSETINPUT.no_set_input_period.name
             self.ids.definition_period_input.text = self.ids.definition_period_input.values[0]
-            self.ids.reference_input.text = ""
         else:
             pass
 
     def run_operation(self):
-        #delete all whitespace
-        name_input = self.ids.name_input.text.replace(" ","")
+        #delete all whitespace and che that variable doesn't exist
+        if self.ids.name_input.text == "":
+            name_input = None
+        else:
+            name_input = self.ids.name_input.text
+
         value_type_input=self.ids.value_type_input.text.replace(" ","")
         entity_input=self.ids.entity_input.text.replace(" ","")
-        label_input=self.ids.label_input.text.replace(" ","")
         definition_period_input=self.ids.definition_period_input.text.replace(" ","")
-        reference_input=self.ids.reference_input.text.replace(" ","")
-        #If there are empty text
-        if name_input == "" or value_type_input == "" or entity_input == "" or label_input == "" or definition_period_input == "":
-            print "Error"
-            return
+
+        if self.ids.label_input.text == "":
+            label_input = None
+        else:
+            label_input = self.ids.label_input.text
+        if self.ids.reference_input.text == "":
+            reference_input = None
+        else:
+            reference_input = self.ids.reference_input.text.encode("utf-8")
+
+
         if self.manager.get_screen('select_variable_screen').choice == "Update variable":
-            #TODO Operazione di aggiornamento
-            #Cerca la variabile selezionata (qui sotto troviamo il testo della variabile)
-            print "Hai aggiornato "+self.ids.name_input.text
-            #Aggiornala
-            pass
+            try:
+                v_to_add = Variable_To_Reform(name = name_input, entity = entity_input, type = value_type_input, reference = reference_input,  formula = None, label = label_input, set_input = None, definition_period = definition_period_input)
+                ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'])
+                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
+                self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                                   auto_dismiss=True)
+                self.popup.open()
+                self.manager.current = 'reforms'
+            except Exception as e:
+                print e
         elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
-            #TODO Operazione di aggiunta
-            #Aggiungi la variabile
-            print "Hai aggiunto "+self.ids.name_input.text
-            pass
+            try:
+                v_to_add = Variable_To_Reform(name = name_input, entity = entity_input, type = value_type_input, reference = reference_input,  formula = None, label = label_input, set_input = None, definition_period = definition_period_input)
+                ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'])
+                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
+                self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                                   auto_dismiss=True)
+                self.popup.open()
+                self.manager.current = 'reforms'
+            except Exception as e:
+                print e
         #Print di quello che hai aggiunto/aggiornato
         print " ".join([name_input,
                         value_type_input,

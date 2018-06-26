@@ -62,7 +62,6 @@
     BoxLayout:
         orientation: "vertical"
         BoxLayout:
-
             padding: (30,30,30,0)
             orientation: "horizontal"
             Label:
@@ -81,7 +80,7 @@
                 size_hint:(0.3,1)
             Spinner:
                 id: value_type_input
-                values: ["int","float","bool","str","date","Enum"]
+                #values: ["int","float","bool","str","date","Enum"]
                 size_hint:(0.7,1)
 
         BoxLayout:
@@ -90,9 +89,19 @@
             Label:
                 text: "Entity"
                 size_hint:(0.3,1)
-            TextInput:
+            Spinner:
                 id: entity_input
-                multiline: False
+                #multiline: False
+                size_hint:(0.7,1)
+
+        BoxLayout:
+            padding: (30,30,30,0)
+            orientation: "horizontal"
+            Label:
+                text: "Set input period"
+                size_hint:(0.3,1)
+            Spinner:
+                id: set_input_period
                 size_hint:(0.7,1)
 
         BoxLayout:
@@ -114,7 +123,7 @@
                 size_hint:(0.3,1)
             Spinner:
                 id: definition_period_input
-                values: ["MONTH","YEAR","ETERNITY"]
+                #values: ["MONTH","YEAR","ETERNITY"]
                 size_hint:(0.7,1)
 
         BoxLayout:
@@ -139,6 +148,3 @@
                 text: "Come back to home"
                 on_press: root.go_to_home()
                 background_color: hex('971640')
-
-
-
