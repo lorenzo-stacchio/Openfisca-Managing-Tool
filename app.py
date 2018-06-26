@@ -891,6 +891,7 @@ class SelectVariableScreen(Screen):
         #Ordina alfabeticamente
         variables_name.sort()
         self.ids.id_spinner_select_variable_screen.values = variables_name
+        self.ids.id_spinner_select_variable_screen.text = self.ids.id_spinner_select_variable_screen.values[0]
 
     def select_variable(self):
         if self.manager.get_screen('select_variable_screen').choice == "Neutralize variable":
@@ -925,7 +926,6 @@ class SelectVariableScreen(Screen):
                     v_r_man = Variable_reform_manager(path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], variable = Variable_To_Reform(name = key_variable), reform_name = "neutralize_" + self.ids.id_spinner_select_variable_screen.text)
                     v_r_man.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)
                     break
-            # TODO HERE YOU MUSH NEUTRALIZE VARIABLE, CONTROLLA PRIMA CHE NON SIA GIA NEUTRALIZZATA
         self.popup.dismiss()
         self.popup = Popup(title="Variable neutralized", content = Label(text = "The reform that neutralized\n" + self.ids.id_spinner_select_variable_screen.text + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
                            auto_dismiss=True)
@@ -973,6 +973,7 @@ class FormVariableScreen(Screen):
             for key_var, value_var in vars.iteritems():
                 if key_var == self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text:
                     self.ids.name_input.text = self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text
+                    self.ids.name_input.disabled = True
                     self.ids.value_type_input.text = value_var.value_type.__name__
                     self.ids.entity_input.text = value_var.entity.__name__
 
@@ -992,10 +993,24 @@ class FormVariableScreen(Screen):
 
                     if not (value_var.is_input_variable()):
                         self.formula_to_write_in_popup = inspect.getsource(value_var.get_formula())  # get formula if the variable if exist
+                        if "\n" in self.formula_to_write_in_popup: # if there is more than one line
+                            lines = self.formula_to_write_in_popup.split("\n")
+                            formatted_lines = []
+                            final_formatted_lines = []
+                            for line in lines:
+                                formatted_lines.append(line.strip())
+                            final_formatted_lines.append(formatted_lines[0])
+                            for line in formatted_lines[1:]: #except the first line
+                                final_formatted_lines.append("\t" + line)
+                            self.formula_to_write_in_popup = ""
+                            for line in final_formatted_lines:
+                                self.formula_to_write_in_popup = self.formula_to_write_in_popup + line + "\n"
+                            print self.formula_to_write_in_popup
                     else:
                         self.formula_to_write_in_popup = None
                     break
         elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+            self.ids.name_input.disabled = False
             self.ids.value_type_input.text = self.ids.value_type_input.values[0]
             self.ids.entity_input.text = self.ids.entity_input.values [0]
             self.ids.set_input_period.text = TYPEOFSETINPUT.no_set_input_period.name
@@ -1029,6 +1044,7 @@ class FormVariableScreen(Screen):
         value_type_input=self.ids.value_type_input.text.replace(" ","")
         entity_input=self.ids.entity_input.text.replace(" ","")
         definition_period_input=self.ids.definition_period_input.text.replace(" ","")
+        set_input_period = self.ids.set_input_period.text
 
         if self.ids.label_input.text == "":
             label_input = None
@@ -1063,18 +1079,19 @@ class FormVariableScreen(Screen):
             v_to_add.set_formula(formula)
             v_to_add.set_label(label_input)
             v_to_add.set_definition_period(definition_period_input)
+            v_to_add.set_set_input(set_input_period)
             ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], reform_full_description = reform_description , reform_name = reform_name)
 
             if self.manager.get_screen('select_variable_screen').choice == "Update variable":
                 ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
-                self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + reform_name + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
                                    auto_dismiss=True)
                 self.popup.open()
                 self.manager.current = 'reforms'
 
             elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
                 ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
-                self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + reform_name + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
                                    auto_dismiss=True)
                 self.popup.open()
                 self.manager.current = 'reforms'
