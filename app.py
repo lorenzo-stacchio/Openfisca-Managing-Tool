@@ -844,7 +844,7 @@ class ReformsScreen(Screen):
     def go_to_add_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Add variable"
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = True
-        self.manager.get_screen('select_variable_screen').ids.id_input_reform_reference.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text = ""
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
         self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text = ""
         self.manager.current = 'select_variable_screen'
@@ -852,7 +852,7 @@ class ReformsScreen(Screen):
     def go_to_update_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Update variable"
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = False
-        self.manager.get_screen('select_variable_screen').ids.id_input_reform_reference.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text = ""
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
         self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text = ""
         self.manager.get_screen('select_variable_screen').inizialize_form()
@@ -861,7 +861,7 @@ class ReformsScreen(Screen):
     def go_to_neutralize_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Neutralize variable"
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = False
-        self.manager.get_screen('select_variable_screen').ids.id_input_reform_reference.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text = ""
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
         self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text = ""
         self.manager.get_screen('select_variable_screen').inizialize_form()
@@ -1034,7 +1034,6 @@ class FormVariableScreen(Screen):
                     else:
                         self.formula_to_write_in_popup = None
                     break
-
         elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
             self.ids.value_type_input.text = self.ids.value_type_input.values[0]
             self.ids.entity_input.text = self.ids.entity_input.values [0]
@@ -1083,43 +1082,45 @@ class FormVariableScreen(Screen):
             formula = None
         else:
             formula = self.formula_to_write_in_popup
+        # get the reform name and reform reference if defined
+        if self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text == "":
+            reform_name = None
+        else:
+            reform_name = self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text
 
-        if self.manager.get_screen('select_variable_screen').choice == "Update variable":
-            try:
-                v_to_add = Variable_To_Reform()
-                v_to_add.set_name(name_input)
-                v_to_add.set_entity(entity_input)
-                v_to_add.set_type(value_type_input)
-                v_to_add.set_reference(reference_input)
-                v_to_add.set_formula(formula)
-                v_to_add.set_label(label_input)
-                v_to_add.set_definition_period(definition_period_input)
-                ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'])
+        if self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text == "":
+            reform_description = None
+        else:
+            reform_description = self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text
+
+        try:
+            v_to_add = Variable_To_Reform()
+            v_to_add.set_name(name_input)
+            v_to_add.set_entity(entity_input)
+            v_to_add.set_type(value_type_input)
+            v_to_add.set_reference(reference_input)
+            v_to_add.set_formula(formula)
+            v_to_add.set_label(label_input)
+            v_to_add.set_definition_period(definition_period_input)
+            ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], reform_full_description = reform_description , reform_name = reform_name)
+
+            if self.manager.get_screen('select_variable_screen').choice == "Update variable":
                 ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
-                self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + reform_name + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
                                    auto_dismiss=True)
                 self.popup.open()
                 self.manager.current = 'reforms'
-            except Exception as e:
-                print e
-        elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
-            try:
-                v_to_add = Variable_To_Reform()
-                v_to_add.set_name(name_input)
-                v_to_add.set_entity(entity_input)
-                v_to_add.set_type(value_type_input)
-                v_to_add.set_reference(reference_input)
-                v_to_add.set_formula(formula)
-                v_to_add.set_label(label_input)
-                v_to_add.set_definition_period(definition_period_input)
-                ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'])
+
+            elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
                 ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
-                self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + reform_name + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
                                    auto_dismiss=True)
                 self.popup.open()
                 self.manager.current = 'reforms'
-            except Exception as e:
-                print e
+        except Exception as e:
+            self.popup = Popup(title="Error compiling update variable reform", content = Label(text = "The error:\n" + str(e)), size_hint=(None, None), size=(480, 400),
+                               auto_dismiss=True)
+            self.popup.open()
 
 
     def go_to_home(self):
