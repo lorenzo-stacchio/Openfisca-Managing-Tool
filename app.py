@@ -185,15 +185,23 @@ class ChooseEntityScreen(Screen):
 
         self.entity_box_layout.add_widget(layout_period)
         self.entity_box_layout.add_widget(Label(text="You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD"))
-        self.entity_box_layout.add_widget(Button(id="button_go_to_insert_input_variables", text="Click"))
+        boxButtons = BoxLayout(orientation="horizontal")
+        boxButtons.add_widget(Button(id="button_go_to_insert_input_variables", text="Click"))
+        boxButtons.add_widget(Button(id="button_go_to_home", text="Come back to home"))
+        self.entity_box_layout.add_widget(boxButtons)
         Clock.schedule_once(self._finish_init)
+
 
 
 
     def _finish_init(self, dt):
         # go to make_simulation bind button
-        self.children[0].children[0].bind(on_release=self.go_to_insert_input_variables)
+        self.children[0].children[0].children[1].bind(on_release=self.go_to_insert_input_variables)
+        self.children[0].children[0].children[0].bind(on_release=self.go_to_home)
 
+    def go_to_home(self, a):
+        self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
+        self.manager.current = 'home'
 
     def go_to_insert_input_variables(self, instance):
         # verify that there aren't all zeros
@@ -873,10 +881,41 @@ class ReformsScreen(Screen):
 
 class SelectVariableScreen(Screen):
     choice = StringProperty()
-
+    previous_text_typed = ""
     def __init__(self, **kwargs):
         super(SelectVariableScreen, self).__init__(**kwargs)
 
+    def change_spinner(self):
+        global TAX_BENEFIT_SYSTEM_MODULE_CLASS
+        if(TAX_BENEFIT_SYSTEM_MODULE_CLASS):
+            variables_name = []
+            if self.ids.id_text_search_box != "":
+                dict = TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems()
+                for key_variable, variables_content in dict:
+                    if (self.ids.id_text_search_box.text in key_variable):
+                        variables_name.append(key_variable)
+            #Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
+            #Quindi devo eliminare ciò che contiene non contiene la nuova stringa
+            elif self.previous_text_typed in self.ids.id_text_search_box:
+                for key_variable in self.ids.id_spinner_select_variable_screen.values:
+                    if(self.previous_text_typed not in key_variable):
+                        variables_name.remove(key_variable)
+            # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
+            # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
+            else:
+                dict = TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems()
+                for key_variable, variables_content in dict:
+                    if((key_variable not in variables_name) and self.previous_text_typed in key_variable):
+                        variables_name.append(key_variable)
+
+
+            # Ordina alfabeticamente
+            variables_name.sort()
+            self.ids.id_spinner_select_variable_screen.values = variables_name
+            if self.ids.id_spinner_select_variable_screen.values:
+                self.ids.id_spinner_select_variable_screen.text = self.ids.id_spinner_select_variable_screen.values[0]
+            else:
+                self.ids.id_spinner_select_variable_screen.text = ""
 
     def go_to_home(self):
         if self.manager.current == 'select_variable_screen':
