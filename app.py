@@ -835,16 +835,27 @@ class ReformsScreen(Screen):
 
     def go_to_add_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Add variable"
-        self.manager.get_screen('form_variable_screen').setting_up_form_variable()
-        self.manager.current = 'form_variable_screen'
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = True
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_reference.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text = ""
+        self.manager.current = 'select_variable_screen'
 
     def go_to_update_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Update variable"
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = False
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_reference.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text = ""
         self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'select_variable_screen'
 
     def go_to_neutralize_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Neutralize variable"
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = False
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_reference.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text = ""
         self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'select_variable_screen'
 
@@ -890,6 +901,16 @@ class SelectVariableScreen(Screen):
                                auto_dismiss=False)
             self.popup.open()
         elif self.manager.get_screen('select_variable_screen').choice == "Update variable":
+            self.manager.get_screen('form_variable_screen').setting_up_form_variable()
+            self.manager.current = 'form_variable_screen'
+        elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+            self.manager.get_screen('form_variable_screen').ids.name_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.value_type_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.entity_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.set_input_period.text = ""
+            self.manager.get_screen('form_variable_screen').ids.label_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.definition_period_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.reference_input.text = ""
             self.manager.get_screen('form_variable_screen').setting_up_form_variable()
             self.manager.current = 'form_variable_screen'
         else:
