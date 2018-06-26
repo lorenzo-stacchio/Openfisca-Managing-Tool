@@ -1125,6 +1125,10 @@ class RigaSelezione(BoxLayout):
     text = StringProperty()
 
 
+class ButtonReforms(Button):
+    pass
+
+
 class ConfirmPopup(GridLayout):
     text = StringProperty()
 

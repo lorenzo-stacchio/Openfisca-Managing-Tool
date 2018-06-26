@@ -1,39 +1,66 @@
 #:kivy 1.10.0
 #: import utils kivy.utils
 
+<ButtonReforms>
+    background_color: hex('971640')
+    font_size: "18sp"
+
 <ReformsScreen>:
     name: "reforms"
-    BoxLayout:
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    GridLayout:
+        rows: 2
         orientation: "vertical"
-        GridLayout:
-            cols: 2
-            rows: 3
-            orientation: "horizontal"
-            Button:
-                id: button_add_variable
-                text: "Add variable"
-                on_press: root.go_to_add_variable()
-            Button:
-                id: button_update_variable
-                text: "Update variable"
-                on_press: root.go_to_update_variable()
-            Button:
-                id: button_neutralize_variable
-                text: "Neutralize variable"
-                on_press: root.go_to_neutralize_variable()
-            Button:
-                id: button_add_parameter
-                text: "Add parameter"
-                on_press: root.to_do()
-            Button:
-                id: button_modify_parameter
-                text: "Modify variable"
-                on_press: root.to_do()
-            Button:
-                id: button_make_reform
-                text: "Make reform"
-                on_press: root.to_do()
-        Button:
+        BoxLayout:
+            orientation: "vertical"
+            BoxLayout:
+                padding: (50,50,50,50)
+                orientation: "horizontal"
+                ButtonReforms:
+                    id: button_add_variable
+                    text: "Add variable"
+                    on_release: root.go_to_add_variable()
+                Label:
+                    size_hint_x: None
+                    width: self.parent.width*0.2
+                ButtonReforms:
+                    id: button_update_variable
+                    text: "Update variable"
+                    on_release: root.go_to_update_variable()
+            BoxLayout:
+                orientation: "horizontal"
+                padding: (50,50,50,50)
+                ButtonReforms:
+                    id: button_neutralize_variable
+                    text: "Neutralize variable"
+                    on_release: root.go_to_neutralize_variable()
+                Label:
+                    size_hint_x: None
+                    width: self.parent.width*0.2
+                ButtonReforms:
+                    id: button_add_parameter
+                    text: "Add parameter"
+                    on_release: root.to_do()
+            BoxLayout:
+                orientation: "horizontal"
+                padding: (50,50,50,50)
+                ButtonReforms:
+                    id: button_modify_parameter
+                    text: "Modify variable"
+                    on_release: root.to_do()
+                Label:
+                    size_hint_x: None
+                    width: self.parent.width*0.2
+                ButtonReforms:
+                    id: button_make_reform
+                    text: "Make reform"
+                    on_release: root.to_do()
+        ButtonReforms:
             size_hint: (1.0,0.2)
             text: 'Come back to home'
             background_color: hex('971640')
