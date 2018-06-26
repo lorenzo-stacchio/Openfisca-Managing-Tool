@@ -1,4 +1,5 @@
 #:kivy 1.10.0
+#: import utils kivy.utils
 
 <ReformsScreen>:
     name: "reforms"
@@ -80,7 +81,6 @@
                 size_hint:(0.3,1)
             Spinner:
                 id: value_type_input
-                #values: ["int","float","bool","str","date","Enum"]
                 size_hint:(0.7,1)
 
         BoxLayout:
@@ -138,6 +138,23 @@
                 size_hint:(0.7,1)
 
         BoxLayout:
+            padding: (30,30,30,0)
+            orientation: "horizontal"
+            Label:
+                text: "Formula"
+                size_hint:(0.3,1)
+            Button:
+                text: "Click to visualize the code of the formula"
+                id: watch_formula
+                on_press: root.create_pop_up_watch_formula()
+                size_hint:(0.35,1)
+            Button:
+                text: "Click to modify the actual code of the formula"
+                id: modify_formula
+                on_press: root.create_pop_up_modify_formula()
+                size_hint:(0.35,1)
+
+        BoxLayout:
             padding: (0,30,0,0)
             orientation: "horizontal"
             Button:
@@ -148,3 +165,31 @@
                 text: "Come back to home"
                 on_press: root.go_to_home()
                 background_color: hex('971640')
+
+
+<WatchingFormulaPopUp>:
+    size_hint: 0.8,0.8
+    title: "Formula code"
+    BoxLayout:
+        orientation:'vertical'
+        RstDocument:
+            id: formula_view_from_update
+        Button:
+            text:"Close this popup"
+            size_hint: 1,0.1
+            on_press:root.dismiss()
+
+
+<ModifyFormulaPopup>:
+    size_hint: 0.8,0.8
+    title: "Formula code"
+    BoxLayout:
+        orientation:'vertical'
+        TextInput:
+            id: txt_modify_formula
+            multiline: True
+            size_hint:(1,1)
+        Button:
+            text:"Click if you finish to modify the formula"
+            size_hint: 1,0.1
+            on_press:root.dismiss(), root.update_lines_basing_on(root.ids.txt_modify_formula.text)

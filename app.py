@@ -947,8 +947,12 @@ class FormVariableScreen(Screen):
                         self.ids.definition_period_input.text = value_var.definition_period
 
                     if value_var.reference:
-                        print "\n\n", value_var.reference, "\n\n"
                         self.ids.reference_input.text = value_var.reference[0]
+
+                    if not (value_var.is_input_variable()):
+                        self.formula_to_write_in_popup = inspect.getsource(value_var.get_formula())  # get formula if the variable if exist
+                    else:
+                        self.formula_to_write_in_popup = None
                     break
 
         elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
@@ -956,8 +960,24 @@ class FormVariableScreen(Screen):
             self.ids.entity_input.text = self.ids.entity_input.values [0]
             self.ids.set_input_period.text = TYPEOFSETINPUT.no_set_input_period.name
             self.ids.definition_period_input.text = self.ids.definition_period_input.values[0]
+            self.formula_to_write_in_popup = None
         else:
             pass
+
+
+    def create_pop_up_watch_formula(self):
+        w_f_p = WatchingFormulaPopUp()
+        if not(self.formula_to_write_in_popup is None):
+            w_f_p.ids.formula_view_from_update.text = ".. code:: python\n\n\n " + self.formula_to_write_in_popup
+        else:
+            w_f_p.ids.formula_view_from_update.text = ""
+        w_f_p.open()
+
+
+    def create_pop_up_modify_formula(self):
+        m_f_p = ModifyFormulaPopup(screen_manager = self.manager)
+        # there is a method inside the modify formula because we need to attempt the finish of the init to get the id
+
 
     def run_operation(self):
         #delete all whitespace and che that variable doesn't exist
@@ -979,10 +999,21 @@ class FormVariableScreen(Screen):
         else:
             reference_input = self.ids.reference_input.text.encode("utf-8")
 
+        if self.formula_to_write_in_popup == "":
+            formula = None
+        else:
+            formula = self.formula_to_write_in_popup
 
         if self.manager.get_screen('select_variable_screen').choice == "Update variable":
             try:
-                v_to_add = Variable_To_Reform(name = name_input, entity = entity_input, type = value_type_input, reference = reference_input,  formula = None, label = label_input, set_input = None, definition_period = definition_period_input)
+                v_to_add = Variable_To_Reform()
+                v_to_add.set_name(name_input)
+                v_to_add.set_entity(entity_input)
+                v_to_add.set_type(value_type_input)
+                v_to_add.set_reference(reference_input)
+                v_to_add.set_formula(formula)
+                v_to_add.set_label(label_input)
+                v_to_add.set_definition_period(definition_period_input)
                 ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'])
                 ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
                 self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
@@ -993,7 +1024,14 @@ class FormVariableScreen(Screen):
                 print e
         elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
             try:
-                v_to_add = Variable_To_Reform(name = name_input, entity = entity_input, type = value_type_input, reference = reference_input,  formula = None, label = label_input, set_input = None, definition_period = definition_period_input)
+                v_to_add = Variable_To_Reform()
+                v_to_add.set_name(name_input)
+                v_to_add.set_entity(entity_input)
+                v_to_add.set_type(value_type_input)
+                v_to_add.set_reference(reference_input)
+                v_to_add.set_formula(formula)
+                v_to_add.set_label(label_input)
+                v_to_add.set_definition_period(definition_period_input)
                 ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'])
                 ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
                 self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
@@ -1002,19 +1040,39 @@ class FormVariableScreen(Screen):
                 self.manager.current = 'reforms'
             except Exception as e:
                 print e
-        #Print di quello che hai aggiunto/aggiornato
-        print " ".join([name_input,
-                        value_type_input,
-                        entity_input,
-                        label_input,
-                        definition_period_input,
-                        reference_input])
+
 
     def go_to_home(self):
         if self.manager.current == 'form_variable_screen':
             #TODO Resetta variabili
             self.manager.current = 'home'
 
+
+class ModifyFormulaPopup(Popup):
+
+    def __init__(self, screen_manager = None , **kwargs):
+        super(ModifyFormulaPopup, self).__init__(**kwargs)
+        if (screen_manager is None) or not (isinstance(screen_manager, ScreenManager)) :
+            raise TypeError("You have to insert a screen manager to instantiate a Modify Formula Popup")
+        else:
+            self.screen_manager = screen_manager
+        Clock.schedule_once(self._finish_init)
+
+
+    def _finish_init(self,dt):
+        if not(self.screen_manager.get_screen("form_variable_screen").formula_to_write_in_popup is None):
+            self.ids.txt_modify_formula.text = "" + self.screen_manager.get_screen("form_variable_screen").formula_to_write_in_popup
+        else:
+            self.ids.txt_modify_formula.text = ""
+        self.open()
+
+
+    def update_lines_basing_on(self, *args):
+        self.screen_manager.get_screen('form_variable_screen').formula_to_write_in_popup = args[0]
+
+
+class WatchingFormulaPopUp(Popup):
+    pass
 
 
 class MyScreenManager(ScreenManager):

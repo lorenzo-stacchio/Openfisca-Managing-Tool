@@ -37,7 +37,7 @@ class Variable_To_Reform():
     tax_benefit_system_module_class = None
 
     def __init__(self, name = None, entity = None, type = None, reference = None,  formula = None, label = None, set_input = None, definition_period = None):
-        self.__name__ = name
+        self.name = name
         self.entity = entity
         self.__type__ = type
         self.__reference__ = "\"" + str(reference) + "\""
