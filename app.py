@@ -221,18 +221,25 @@ class ChooseEntityScreen(Screen):
     def check_data(self, data):
         if(len(data)==4):
             try:
-                datetime.date(int(data),01,01)
+                year = int(data)
+                if year <= 1900 :
+                    return False
+                datetime.date(year,01,01)
             except:
                 return False
         elif (len(data)==7):
             try:
                 year,month = data.split("-")
+                if year <= 1900 :
+                    return False
                 datetime.date(int(year),int(month),01)
             except:
                 return False
         elif (len(data)==10):
             try:
                 year,month,day = data.split("-")
+                if year <= 1900 :
+                    return False
                 datetime.date(int(year), int(month), int(day))
             except:
                 return False
@@ -474,6 +481,8 @@ class MakeSimulation(Screen):
         if self.manager.current == 'make_simulation':
             # Reset when you go to home
             self.ids.variable_added.clear_widgets()
+
+            self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
             self.ids.menu_a_tendina_variabili.text = ''
             self.ids.input_value_variable.text = ''
             #TODO: Resetta bene le variabili
@@ -826,18 +835,40 @@ class ReformsScreen(Screen):
 
     def go_to_add_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Add variable"
-        self.manager.get_screen('form_variable_screen').setting_up_form_variable()
-        self.manager.current = 'form_variable_screen'
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = True
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_reference.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text = ""
+        self.manager.current = 'select_variable_screen'
 
     def go_to_update_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Update variable"
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = False
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_reference.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text = ""
         self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'select_variable_screen'
 
     def go_to_neutralize_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Neutralize variable"
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = False
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_reference.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
+        self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text = ""
         self.manager.get_screen('select_variable_screen').inizialize_form()
         self.manager.current = 'select_variable_screen'
+
+    def to_do(self):
+        self.box_popup = BoxLayout(orientation='horizontal')
+
+        self.box_popup.add_widget(Label(text="In the future"))
+
+        self.popup_exit = Popup(title="To Do!",
+                                content=self.box_popup,
+                                size_hint=(0.4, 0.4),
+                                auto_dismiss=True)
+        self.popup_exit.open()
 
 
 class SelectVariableScreen(Screen):
@@ -870,6 +901,16 @@ class SelectVariableScreen(Screen):
                                auto_dismiss=False)
             self.popup.open()
         elif self.manager.get_screen('select_variable_screen').choice == "Update variable":
+            self.manager.get_screen('form_variable_screen').setting_up_form_variable()
+            self.manager.current = 'form_variable_screen'
+        elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+            self.manager.get_screen('form_variable_screen').ids.name_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.value_type_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.entity_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.set_input_period.text = ""
+            self.manager.get_screen('form_variable_screen').ids.label_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.definition_period_input.text = ""
+            self.manager.get_screen('form_variable_screen').ids.reference_input.text = ""
             self.manager.get_screen('form_variable_screen').setting_up_form_variable()
             self.manager.current = 'form_variable_screen'
         else:
