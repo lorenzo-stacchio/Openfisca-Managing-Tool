@@ -216,18 +216,25 @@ class ChooseEntityScreen(Screen):
     def check_data(self, data):
         if(len(data)==4):
             try:
-                datetime.date(int(data),01,01)
+                year = int(data)
+                if year <= 1900 :
+                    return False
+                datetime.date(year,01,01)
             except:
                 return False
         elif (len(data)==7):
             try:
                 year,month = data.split("-")
+                if year <= 1900 :
+                    return False
                 datetime.date(int(year),int(month),01)
             except:
                 return False
         elif (len(data)==10):
             try:
                 year,month,day = data.split("-")
+                if year <= 1900 :
+                    return False
                 datetime.date(int(year), int(month), int(day))
             except:
                 return False
