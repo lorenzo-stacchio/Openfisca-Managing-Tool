@@ -71,6 +71,16 @@
     BoxLayout:
         orientation: "vertical"
         Label:
+        Label:
+            text: "Type to filter"
+        Label:
+        TextInput:
+            id: id_text_search_box
+            size_hint: (0.8,None)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            multiline: False
+            on_text_validate: root.change_spinner()
+        Label:
         Spinner:
             id: id_spinner_select_variable_screen
             size_hint: (0.8,None)
