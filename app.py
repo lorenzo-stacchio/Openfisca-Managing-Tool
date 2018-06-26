@@ -481,6 +481,8 @@ class MakeSimulation(Screen):
         if self.manager.current == 'make_simulation':
             # Reset when you go to home
             self.ids.variable_added.clear_widgets()
+
+            self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
             self.ids.menu_a_tendina_variabili.text = ''
             self.ids.input_value_variable.text = ''
             #TODO: Resetta bene le variabili
