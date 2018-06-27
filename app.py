@@ -164,7 +164,7 @@ class ChooseEntityScreen(Screen):
     def __init__(self, **kwargs):
         super(ChooseEntityScreen, self).__init__(**kwargs)
         self.number_of_entity = {}
-        self.entity_box_layout = BoxLayout(orientation='vertical')
+        self.entity_box_layout = BoxLayout(orientation='vertical', padding=(50,50,50,50))
         self.add_widget(self.entity_box_layout)
 
 
@@ -177,15 +177,17 @@ class ChooseEntityScreen(Screen):
             self.entity_box_layout.children[0].children[-1].text = entity.key
 
         layout_period = BoxLayout(orientation = "horizontal")
-        layout_period.add_widget(Label(text="Period", markup=True))
+        layout_period.add_widget(Label(text="[color=000000]Period[/color]", markup=True, font_size="20sp"))
         txt_input = TextInput(id="txt_period")
         layout_period.add_widget(txt_input)
 
         self.entity_box_layout.add_widget(layout_period)
-        self.entity_box_layout.add_widget(Label(text="You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD"))
+        self.entity_box_layout.add_widget(Label(
+            text="[color=000000]You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD[/color]",markup=True,
+            font_size="20sp"))
         boxButtons = BoxLayout(orientation="horizontal")
-        boxButtons.add_widget(Button(id="button_go_to_insert_input_variables", text="Click"))
-        boxButtons.add_widget(Button(id="button_go_to_home", text="Come back to home"))
+        boxButtons.add_widget(Button(id="button_go_to_insert_input_variables", text="Click", size_hint=(1.0,0.4), background_color=(0.151, 0.022, 0.064, 1)))
+        boxButtons.add_widget(Button(id="button_go_to_home", text="Come back to home",size_hint=(1.0,0.4),  background_color=(0.151, 0.022, 0.064, 1)))
         self.entity_box_layout.add_widget(boxButtons)
         Clock.schedule_once(self._finish_init)
 
@@ -438,7 +440,7 @@ class MakeSimulation(Screen):
                         elif len(period) == 3:
                             app_situation.set_period(year = period[0],month = period[1],day = period[2])
                         self.situations[str(k + str(index))] = app_situation
-
+        print dict_entita.keys()
         self.ids.menu_a_tendina_entita.values = dict_entita.keys()
         self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
         self.ids.menu_a_tendina_variabili.values = dict_entita[self.ids.menu_a_tendina_entita.text]

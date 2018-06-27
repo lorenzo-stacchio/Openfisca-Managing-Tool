@@ -276,22 +276,41 @@
 
 <ChooseEntityScreen>:
     name: "choose_entity"
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
 
 <LineOfChooser>:
     name: "line_chooser"
     Label:
         id: name
+        size_hint: (0.3,1.0)
+        color: 0,0,0,1
+        font_size: "20sp"
+        markup: True
     Label:
         id: value
         text: "0"
+        size_hint: (0.3,1.0)
+        color: 0,0,0,1
+        font_size: "20sp"
     Button:
         id: dec
         text: "<"
+        font_size: 20
         on_release: root.decrementa()
+        background_color: hex('971640')
+        size_hint: (0.3,1.0)
     Button:
         id: inc
         text: ">"
+        font_size: 20
         on_release: root.incrementa()
+        background_color: hex('971640')
+        size_hint: (0.3,1.0)
 
 <VisualizeSystemScreen>:
     name: "visualize_system"
