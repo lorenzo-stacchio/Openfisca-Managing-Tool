@@ -8,6 +8,7 @@
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
                   },
+                  "reforms": "reforms",
                   "entities" :{
                     "entita.py": {
                       "household": "Famiglia",

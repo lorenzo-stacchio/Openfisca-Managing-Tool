@@ -10,7 +10,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 from enum import Enum
 from datetime import date
-
+from glob import glob
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
@@ -60,6 +60,8 @@ class Entity():
     entity_module_all_entities = None
 
     def __init__(self, entity = None):
+        if Entity.tax_benefit_system_module_class is None or Entity.entity_module_all_entities is None:
+            raise ValueError("You must import the system before you can create entity")
         print self.entity_module_all_entities
         if entity in self.entity_module_all_entities: # assign variables to entity
             self.entity = entity
@@ -116,6 +118,47 @@ class Entity():
         except AttributeError:
             print "You have to generate the variables before getting their"
 
+
+class Reform():
+    tax_benefit_system_module_class = None
+    reform_module = None
+
+
+    def __init__(self):
+        if self.tax_benefit_system_module_class is None or self.reform_module is None:
+            raise ValueError("You must import the system and add the reform path, before you can create a reform")
+        self.reforms_file_dict = {}
+        files_in_reform_path = [y for x in os.walk(self.reform_module.__path__[0]) for y in glob(os.path.join(x[0], '*.py')) if not os.path.basename(y) == "__init__.py" ]
+
+        for file in files_in_reform_path:
+            self.reforms_file_dict[file] = []
+            with open(file, 'r') as f_r:
+                for line in f_r.readlines():
+                    line =  line.strip()
+                    if '#' in line:
+                        line = line[:line.find('#')]
+                    if line:
+                        if 'class' in line and '(Reform):' in line:
+                            reform_name = line
+                            for chs in ['class','(Reform):', ' ']:
+                                reform_name = reform_name.replace(chs,'')
+                            self.reforms_file_dict[file].append(reform_name)
+
+
+    def get_reform_list(self):
+        list = []
+        if self.reforms_file_dict == None:
+            raise ValueError("You must init the reform!")
+        for k,v in self.reforms_file_dict.iteritems():
+            for reform in v:
+                list.append(reform)
+        return list
+
+
+    @staticmethod
+    def import_depending_on_system(tax_benefit_system_module_class, reform_module):
+        Reform.tax_benefit_system_module_class = tax_benefit_system_module_class()
+        Reform.reform_module = reform_module
 
 class Situation(): # defined for one entity
 
@@ -204,6 +247,8 @@ class Simulation_generator(): #defined for Italy
     tax_benefit_system_module_class = None
 
     def __init__(self):
+        if Simulation_generator.tax_benefit_system_module_class is None:
+            raise ValueError("You must import the system before you can create simulator")
         self.situations = None #take n situations
         self.period = datetime.datetime.now().year
         self.results = None

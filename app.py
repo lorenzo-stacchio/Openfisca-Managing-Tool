@@ -35,6 +35,7 @@ from folder_screen_widgets.personalized_widget import *
 TAX_BENEFIT_SYSTEM_MODULE_CLASS = None
 ENTITY_MODULE_CLASS = None
 ENTITY_MODULE_CLASS_ALL_ENTITIES = None
+REFORM_MODULE = None
 dict_entita ={}
 
 # Screen
@@ -60,7 +61,6 @@ class InitScreen(Screen):
                 self.init_import_tax_benefit_system(self.PATH_OPENFISCA,data_config)
                 self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
                 self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
-                #self.manager.get_screen('choose_entity').import_entities_system(self.PATH_OPENFISCA,data_config)
         else:
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
 
@@ -78,6 +78,8 @@ class InitScreen(Screen):
                         for entity_elements_key,entity_elements_value in value_ent.items():
                             if entity_elements_key == "all_entities":
                                 all_entities_classname = entity_elements_value
+                if key == 'reforms':
+                    reform_father_folder = value
         reload(site)
         tax_benefit_system_module = importlib.import_module(system_name + "." + str(tbs_module))
         global TAX_BENEFIT_SYSTEM_MODULE_CLASS
@@ -86,6 +88,8 @@ class InitScreen(Screen):
         ENTITY_MODULE_CLASS = importlib.import_module(system_name + "." + str(entity_module))
         global ENTITY_MODULE_CLASS_ALL_ENTITIES
         ENTITY_MODULE_CLASS_ALL_ENTITIES = all_entities_classname
+        global REFORM_MODULE
+        REFORM_MODULE = importlib.import_module(system_name + "." + reform_father_folder)
         reload(site)
 
 
@@ -154,7 +158,6 @@ class HomeScreen(Screen):
 
     def go_to_simulation(self):
         if self.manager.current == 'home':
-            # initialize the simulator entity manager
             self.manager.get_screen('choose_entity').init_content_screen()
             self.manager.current = 'choose_entity'
 
@@ -268,16 +271,15 @@ class VisualizeSystemScreen(Screen):
         global TAX_BENEFIT_SYSTEM_MODULE_CLASS
         global ENTITY_MODULE_CLASS
         global ENTITY_MODULE_CLASS_ALL_ENTITIES
-        start = datetime.datetime.now()
         Variable_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
         Reform_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
-        print " Interpeter IN: ", datetime.datetime.now() - start
-        start = datetime.datetime.now()
         # entity of situation for simulator
         Entity.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, entity_module_class = ENTITY_MODULE_CLASS,entity_module_all_entities = ENTITY_MODULE_CLASS_ALL_ENTITIES)
+        Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, reform_module = REFORM_MODULE)
+        print Reform().get_reform_list()
         Simulation_generator.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS)
         Variable_To_Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, system_entity_module = ENTITY_MODULE_CLASS, system_all_entities_name = ENTITY_MODULE_CLASS_ALL_ENTITIES)
-        print "Reform and simulator in: ", datetime.datetime.now() - start
+
         os.chdir(os.getcwd())
         # personalize rst rendere colors
         property_dict_viewer = {"paragraph":"202020ff", "link": "33AAFFff", "background": "ffffffff", "bullet" : "000000ff", "title": "971640ff"}
@@ -417,7 +419,6 @@ class MakeSimulation(Screen):
                         elif len(period) == 3:
                             app_situation.set_period(year = period[0],month = period[1],day = period[2])
                         self.situations[str(k + str(index))] = app_situation
-        print dict_entita.keys()
         self.ids.menu_a_tendina_entita.values = dict_entita.keys()
         self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
         self.ids.menu_a_tendina_variabili.values = dict_entita[self.ids.menu_a_tendina_entita.text]
@@ -655,7 +656,6 @@ class OutputVariableScreen(Screen):
                     on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
                 self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
-                print self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text ].get_choosen_output_variables()
 
                 if not self.ids.menu_a_tendina_entita_output.text in self.dict_of_entity_variable_value_output.keys():
                     self.dict_of_entity_variable_value_output[self.ids.menu_a_tendina_entita_output.text] = []
@@ -711,6 +711,7 @@ class OutputVariableScreen(Screen):
     def go_to_make_simulation(self):
         if self.manager.current == 'output_variable':
             self.manager.current = 'make_simulation'
+
 
 class ExecuteSimulationScreen(Screen):
 
