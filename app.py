@@ -276,7 +276,6 @@ class VisualizeSystemScreen(Screen):
         # entity of situation for simulator
         Entity.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, entity_module_class = ENTITY_MODULE_CLASS,entity_module_all_entities = ENTITY_MODULE_CLASS_ALL_ENTITIES)
         Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, reform_module = REFORM_MODULE)
-        print Reform().get_reform_list()
         Simulation_generator.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS)
         Variable_To_Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, system_entity_module = ENTITY_MODULE_CLASS, system_all_entities_name = ENTITY_MODULE_CLASS_ALL_ENTITIES)
 
@@ -732,6 +731,10 @@ class ExecuteSimulationScreen(Screen):
         # get notes to visualize results
         for key_name, value_situation in situations.iteritems():
             simulation_generator.add_situation_to_simulator(value_situation)
+        reform = Reform()
+        reform.set_choose_reform('diminuzione_aliquota_IRPEF_redditi_inferiori_15000')
+        print reform.get_choose_reform()
+        simulation_generator.set_reform(reform)
         # compute
         simulation_generator.generate_simulation()
         # visualize results

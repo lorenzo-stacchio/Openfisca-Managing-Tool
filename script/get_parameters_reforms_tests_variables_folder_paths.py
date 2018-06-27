@@ -10,16 +10,13 @@ def are_all_folders(dict_of_paths):
 
 def get_all_paths(path_di_partenza):
     if os.path.isdir(path_di_partenza) and os.path.exists(path_di_partenza):
-        print "You are in " + path_di_partenza
         #folder of the project
         project_folder = ""
         #I'm looking for the name
         for sub in os.listdir(path_di_partenza):
-            # print sub
             if(sub.startswith("openfisca") and os.path.isdir(path_di_partenza + "\\" +sub)):
                 project_folder = path_di_partenza + "\\" +sub
         if project_folder:
-            # print "sono in project folder",project_folder
             dict_path = {}
             dict_path['initial_path'] = str(path_di_partenza)
             dict_path['inner_system_folder'] = str(project_folder)
@@ -30,7 +27,6 @@ def get_all_paths(path_di_partenza):
                 dict_path['variables'] = str(project_folder + "/" + "variables")
             elif os.path.exists(str(project_folder + "/" + "model")):
                 dict_path['variables'] = str(project_folder + "/" + "model")
-            print dict_path
             if are_all_folders(dict_path):
                 return dict_path
             else:

@@ -127,11 +127,18 @@ class Reform():
     def __init__(self):
         if self.tax_benefit_system_module_class is None or self.reform_module is None:
             raise ValueError("You must import the system and add the reform path, before you can create a reform")
-        self.reforms_file_dict = {}
+        self.choose_reform = None # reform used for simulation
+        self.reforms_file_dict = {} # dict that contains module name of the reform and reforms within it
+        self.reform_module_name = self.reform_module.__name__ #reform name module
+        self.reform_folder_name = os.path.basename(self.reform_module.__path__[0]) #basepath of reform module path
         files_in_reform_path = [y for x in os.walk(self.reform_module.__path__[0]) for y in glob(os.path.join(x[0], '*.py')) if not os.path.basename(y) == "__init__.py" ]
-
         for file in files_in_reform_path:
-            self.reforms_file_dict[file] = []
+            # create a key that will be used to import the reform
+            start_index = re.search(self.reform_folder_name, str(file)).start()
+            key = str(file)[(start_index + len(self.reform_folder_name) + 1):]
+            key = key.replace("\\", ".") # used to create a correct module path
+            key = key.replace(".py", "") # erase the extension
+            self.reforms_file_dict[key] = []
             with open(file, 'r') as f_r:
                 for line in f_r.readlines():
                     line =  line.strip()
@@ -142,7 +149,7 @@ class Reform():
                             reform_name = line
                             for chs in ['class','(Reform):', ' ']:
                                 reform_name = reform_name.replace(chs,'')
-                            self.reforms_file_dict[file].append(reform_name)
+                            self.reforms_file_dict[key].append(reform_name)
 
 
     def get_reform_list(self):
@@ -155,10 +162,26 @@ class Reform():
         return list
 
 
+    def set_choose_reform(self, reform_name):
+        for k,v in self.reforms_file_dict.iteritems():
+            if reform_name in v:
+                self.choose_reform = {k : reform_name}
+        if self.choose_reform is None:
+            raise ValueError("You insert an invalid reform")
+
+
+    def get_choose_reform(self):
+        if self.choose_reform is None:
+            raise TypeError("You have to set the reform to get it")
+        else:
+            return self.choose_reform
+
+
     @staticmethod
     def import_depending_on_system(tax_benefit_system_module_class, reform_module):
         Reform.tax_benefit_system_module_class = tax_benefit_system_module_class()
         Reform.reform_module = reform_module
+
 
 class Situation(): # defined for one entity
 
@@ -243,7 +266,6 @@ class Situation(): # defined for one entity
 
 
 class Simulation_generator(): #defined for Italy
-
     tax_benefit_system_module_class = None
 
     def __init__(self):
@@ -252,6 +274,7 @@ class Simulation_generator(): #defined for Italy
         self.situations = None #take n situations
         self.period = datetime.datetime.now().year
         self.results = None
+        self.reform = None
 
 
     def init_profile(self, scenario, situation_period, entity_situation):
@@ -260,6 +283,7 @@ class Simulation_generator(): #defined for Italy
             parent1 = entity_situation
         )
         return scenario
+
 
     def set_period(self,year = None, month = None, day = None):
         if year and not month and not day:
@@ -276,12 +300,22 @@ class Simulation_generator(): #defined for Italy
             raise ValueError("No valid date selected")
 
 
+    def set_reform(self, reform):
+        if not isinstance(reform, Reform):
+            raise TypeError("The object you passed is not a valid reform")
+        elif reform is None:
+            raise ValueError("A non empty reform is required")
+        else:
+            self.reform = reform
+
+
     def add_to_result(self, situation, name_of_variable_calculated, result):
         if self.results is None: # initialize if it is empty
             self.results = {}
         if not situation in self.results:
             self.results[situation] = {} #initialize inner dict
         self.results[situation][name_of_variable_calculated] = result
+
 
     def __repr__(self):
         return "\nNumber of situations: " + str(len(self.situations)) + "\nPeriod: " + str(self.period)
@@ -305,13 +339,36 @@ class Simulation_generator(): #defined for Italy
 
     def generate_simulation(self):
         if not (self.situations == []) and not (self.situations is None):
+            # import reform if it used
+            if not (self.reform is None):
+                module_reform_name = ""
+                self.reform_class_name = "" #self because it's used in other method
+                for module_adding_name, reform_class in self.reform.get_choose_reform().iteritems():
+                    module_reform_name = module_adding_name
+                    self.reform_class_name = reform_class
+                current_reform_module = importlib.import_module(self.reform.reform_module_name + "." + module_reform_name)
+                current_reform_module_class = getattr(current_reform_module,self.reform_class_name)
+                print current_reform_module
+                print current_reform_module_class
+            # start simulation
             for situation in self.situations:
                 # RICORDA CHE DEVI FARE PRATICAMETE UNA SIMULAZIONE PER OGNI PERSONA, NEL SENSO CHE INIZIALIZZI TRE VOLTE LO SCENARIO E POI RUNNI per il problema dello scenario
                 scenario = self.tax_benefit_system_module_class.new_scenario()
+                print id(self.tax_benefit_system_module_class)
                 scenario = self.init_profile(scenario = scenario, situation_period = situation.get_period(), entity_situation = situation.get_choosen_input_variables())
                 simulation = scenario.new_simulation() # nuova simulazione per lo scenario normale
                 for element in situation.get_choosen_output_variables():
                     self.add_to_result(situation = situation.name_of_situation, name_of_variable_calculated = element , result = simulation.calculate(element,self.period))
+                if not (self.reform is None):
+                    reformed_system = current_reform_module_class(self.tax_benefit_system_module_class)
+                    print id(current_reform_module_class)
+                    reformed_scenario = reformed_system.new_scenario()
+                    reformed_scenario = self.init_profile(scenario = reformed_scenario, situation_period = situation.get_period(), entity_situation = situation.get_choosen_input_variables())
+                    reformed_simulation = reformed_scenario.new_simulation() # nuova simulazione per lo scenario normale
+                    for element in situation.get_choosen_output_variables():
+                        print reformed_simulation.calculate(element,self.period)
+                        self.add_to_result(situation = (situation.name_of_situation + " applying " + self.reform_class_name), name_of_variable_calculated = element , result = reformed_simulation.calculate(element,self.period))
+            print self.get_results()
         else:
             raise ValueError("To trigger a simulation, at least a situation it's needed")
 
@@ -344,6 +401,10 @@ class Simulation_generator(): #defined for Italy
             for out_v in situation.get_choosen_output_variables():
                 results = self.results
                 string_RST = string_RST + "\n- " + out_v + " with value: " + str(results[situation.name_of_situation][out_v]) +"\n"
+            if not (self.reform is None):
+                for out_v in situation.get_choosen_output_variables():
+                    results = self.results
+                    string_RST = string_RST + "\n- " + out_v + " calculated with the reform "+ self.reform_class_name + " assume: " + str(results[situation.name_of_situation + " applying " + self.reform_class_name][out_v]) +"\n"
             strings_RST.append(string_RST)
         return strings_RST
 
