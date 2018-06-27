@@ -2,6 +2,7 @@
 import kivy
 import json
 import os, sys
+import datetime
 kivy.require("1.10.0")
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -160,13 +161,10 @@ class HomeScreen(Screen):
 
 
 class ChooseEntityScreen(Screen):
-    type_of_entity = None
-    number_of_entity = {}
-    period = None
-    global_box_layout = None
 
     def __init__(self, **kwargs):
         super(ChooseEntityScreen, self).__init__(**kwargs)
+        self.number_of_entity = {}
         self.entity_box_layout = BoxLayout(orientation='vertical')
         self.add_widget(self.entity_box_layout)
 
@@ -193,16 +191,16 @@ class ChooseEntityScreen(Screen):
         Clock.schedule_once(self._finish_init)
 
 
-
-
     def _finish_init(self, dt):
         # go to make_simulation bind button
         self.children[0].children[0].children[1].bind(on_release=self.go_to_insert_input_variables)
         self.children[0].children[0].children[0].bind(on_release=self.go_to_home)
 
+
     def go_to_home(self, a):
         self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
         self.manager.current = 'home'
+
 
     def go_to_insert_input_variables(self, instance):
         # verify that there aren't all zeros
@@ -217,11 +215,9 @@ class ChooseEntityScreen(Screen):
 
         #save period
         self.period = box_layout[2].children[0].text
-
         if not self.check_data(self.period):
             self.period = ""
             condition = False
-
         if condition:
             self.manager.get_screen('make_simulation').inizializza_make_simulation()
             self.manager.current = 'make_simulation'
@@ -259,7 +255,6 @@ class ChooseEntityScreen(Screen):
 
 class LineOfChooser(BoxLayout):
     name_label = StringProperty()
-
     def decrementa(self):
         if int(self.ids.value.text) > 0:
             self.ids.value.text = str(int(self.ids.value.text) - 1)
@@ -282,29 +277,24 @@ class VisualizeSystemScreen(Screen):
         global TAX_BENEFIT_SYSTEM_MODULE_CLASS
         global ENTITY_MODULE_CLASS
         global ENTITY_MODULE_CLASS_ALL_ENTITIES
+        start = datetime.datetime.now()
         Variable_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
         Reform_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
+        print " Interpeter IN: ", datetime.datetime.now() - start
+        start = datetime.datetime.now()
         # entity of situation for simulator
-        Entity.import_depending_on_system_entity_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
-        Simulation_generator.import_depending_on_system_situation_for_simulation(system_selected = self.PATH_OPENFISCA, json_config_path_object = data_config)
+        Entity.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, entity_module_class = ENTITY_MODULE_CLASS,entity_module_all_entities = ENTITY_MODULE_CLASS_ALL_ENTITIES)
+        Simulation_generator.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS)
         Variable_To_Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, system_entity_module = ENTITY_MODULE_CLASS, system_all_entities_name = ENTITY_MODULE_CLASS_ALL_ENTITIES)
-
-        with open('./messages/config_import.json') as f:
-            data_config = json.load(f)
-        v = Variable_To_Reform()
-        v.set_name("RP62_periodo_2013")
-        v.set_type("float")
-        v.set_entity("person")
-        v.set_definition_period("month")
-        v.set_set_input("set_input_divide_by_period")
-        v.set_formula("def formula(person, period, parameters):\n\t\treturn person('reddito_lavoro_dipendente_annuale', period) * parameters(period).tasse.aliquota_IRPEF")
+        print "Reform and simulator in: ", datetime.datetime.now() - start
         os.chdir(os.getcwd())
-        self.ids.document_variables_viewer.colors["paragraph"] = "202020ff"
-        self.ids.document_variables_viewer.colors["link"] = "33AAFFff"
-        self.ids.document_variables_viewer.colors["background"] = "ffffffff"
-        self.ids.document_variables_viewer.colors["bullet"] = "000000ff"
-        self.ids.document_variables_viewer.colors["title"] = "971640ff"
-        self.ids.document_variables_viewer.underline_color = "971640ff"
+        # personalize rst rendere colors
+        property_dict_viewer = {"paragraph":"202020ff", "link": "33AAFFff", "background": "ffffffff", "bullet" : "000000ff", "title": "971640ff"}
+        dict_viewer_set = [self.ids.document_variables_viewer, self.ids.document_parameters_viewer, self.ids.document_reforms_viewer]
+        for viewer in dict_viewer_set:
+            for key_property,value_property in property_dict_viewer.iteritems():
+                viewer.colors[key_property] = value_property
+        viewer.underline_color = "971640ff"
 
     def show_variables(self):
         self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']

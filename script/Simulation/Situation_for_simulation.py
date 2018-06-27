@@ -56,13 +56,12 @@ class Variable():
 
 class Entity():
 
-    tax_benefit_system_module = None
     tax_benefit_system_module_class = None
-    entity_module = None
-    all_entities_names = None
+    entity_module_all_entities = None
 
     def __init__(self, entity = None):
-        if entity in getattr(Entity.entity_module, "entities"): # assign variables to entity
+        print self.entity_module_all_entities
+        if entity in self.entity_module_all_entities: # assign variables to entity
             self.entity = entity
             self.entity_name = entity.label
         else:
@@ -72,29 +71,10 @@ class Entity():
         return str("\nEntity name: " + self.entity + "\nNumber of variables: " + str(len(self.associated_variables)))
 
 
-
     @staticmethod
-    def import_depending_on_system_entity_for_simulation(system_selected, json_config_path_object):
-        # The import depenends on the system selected
-        system_selected = os.path.basename(system_selected)
-        for key, value in json_config_path_object[system_selected].items():
-                if key == 'tax_benefit_system':
-                    for key_tax, value_tax in value.items():
-                        tax_benefit_system_module,ext = os.path.splitext(key_tax)
-                        tax_benefit_system_class = value_tax
-                if key == 'entities':
-                    for key_tax, value_tax in value.items():
-                        entity_module,ext = os.path.splitext(key_tax)
-                        for key_entity, value_entity in value_tax.items():
-                            if key_entity == 'all_entities':
-                                all_entities = value_entity
-        #assign to global variable
-        Entity.all_entities_names = all_entities
-        Entity.tax_benefit_system_module_class = tax_benefit_system_class
-        reload(site)
-        Entity.tax_benefit_system_module = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
-        Entity.entity_module = importlib.import_module(str(system_selected) + "." + str(entity_module))
-        Entity.all_entities_names = getattr(Entity.entity_module, all_entities)
+    def import_depending_on_system(tax_benefit_system_module_class,entity_module_class,  entity_module_all_entities):
+        Entity.tax_benefit_system_module_class = tax_benefit_system_module_class()
+        Entity.entity_module_all_entities = getattr(entity_module_class,entity_module_all_entities)
 
     def generate_associated_variable_filter(self, year = None, month = None, day = None):
         if year and not month and not day:
@@ -118,10 +98,7 @@ class Entity():
             raise ValueError("No valid date selected")
         # validates
         self.associated_variables = []
-        tax_benefit_system = getattr(Entity.tax_benefit_system_module, str(Entity.tax_benefit_system_module_class))
-        current_system  = tax_benefit_system()
-
-        for key_variable, variables_content in current_system.get_variables(entity = self.entity).iteritems():
+        for key_variable, variables_content in self.tax_benefit_system_module_class.get_variables(entity = self.entity).iteritems():
             if (self.period_to_filter_variables.name == variables_content.definition_period) or (variables_content.definition_period == TYPEOFDEFINITIONPERIOD.eternity.name) or (variables_content.set_input):
                 self.associated_variables.append(Variable(name = key_variable,type = variables_content.value_type.__name__, entity = variables_content.entity.__name__, definition_period = variables_content.definition_period))
 
@@ -129,9 +106,7 @@ class Entity():
     def generate_all_associated_variable(self):
         # validates
         self.associated_variables = []
-        tax_benefit_system = getattr(Entity.tax_benefit_system_module, str(Entity.tax_benefit_system_module_class))
-        current_system  = tax_benefit_system()
-        for key_variable, variables_content in current_system.get_variables(entity = self.entity).iteritems():
+        for key_variable, variables_content in self.tax_benefit_system_module_class.get_variables(entity = self.entity).iteritems():
             self.associated_variables.append(Variable(name = key_variable,type = variables_content.value_type.__name__, entity = variables_content.entity.__name__, definition_period = variables_content.definition_period))
 
 
@@ -214,8 +189,6 @@ class Situation(): # defined for one entity
         variable_match = False
         for entity, associated_variables in self.entity_choose.get_associated_variables().iteritems():
             for variable in associated_variables:
-                #print "Variable exist", variable.name
-                #print "Variable choose", choosen_input_variable
                 if str(variable.name) == choosen_output_variable:
                     self.choosen_output_variables.append(choosen_output_variable)
                     variable_match = True
@@ -228,7 +201,6 @@ class Situation(): # defined for one entity
 
 class Simulation_generator(): #defined for Italy
 
-    tax_benefit_system_module = None
     tax_benefit_system_module_class = None
 
     def __init__(self):
@@ -287,13 +259,10 @@ class Simulation_generator(): #defined for Italy
 
 
     def generate_simulation(self):
-        # import dinamically
-        tax_benefit_system = getattr(Simulation_generator.tax_benefit_system_module, str(Simulation_generator.tax_benefit_system_module_class))
-        current_system  = tax_benefit_system()
         if not (self.situations == []) and not (self.situations is None):
             for situation in self.situations:
                 # RICORDA CHE DEVI FARE PRATICAMETE UNA SIMULAZIONE PER OGNI PERSONA, NEL SENSO CHE INIZIALIZZI TRE VOLTE LO SCENARIO E POI RUNNI per il problema dello scenario
-                scenario = current_system.new_scenario()
+                scenario = self.tax_benefit_system_module_class.new_scenario()
                 scenario = self.init_profile(scenario = scenario, situation_period = situation.get_period(), entity_situation = situation.get_choosen_input_variables())
                 simulation = scenario.new_simulation() # nuova simulazione per lo scenario normale
                 for element in situation.get_choosen_output_variables():
@@ -333,16 +302,8 @@ class Simulation_generator(): #defined for Italy
             strings_RST.append(string_RST)
         return strings_RST
 
+
+
     @staticmethod
-    def import_depending_on_system_situation_for_simulation(system_selected, json_config_path_object):
-        # The import depenends on the system selected
-        print system_selected
-        system_selected = os.path.basename(system_selected)
-        for key, value in json_config_path_object[system_selected].items():
-                if key == 'tax_benefit_system':
-                    for key_tax, value_tax in value.items():
-                        tax_benefit_system_module,ext = os.path.splitext(key_tax)
-                        tax_benefit_system_class = value_tax
-        Simulation_generator.tax_benefit_system_module_class = tax_benefit_system_class
-        reload(site)
-        Simulation_generator.tax_benefit_system_module = importlib.import_module(str(system_selected) + "." + str(tax_benefit_system_module))
+    def import_depending_on_system(tax_benefit_system_module_class):
+        Simulation_generator.tax_benefit_system_module_class = tax_benefit_system_module_class()
