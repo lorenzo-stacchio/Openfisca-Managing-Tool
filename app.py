@@ -684,34 +684,36 @@ class OutputVariableScreen(Screen):
             - You can't insert a blank variable value"""
 
     def change_spinner(self):
-        variables_name = []
-        if self.ids.id_search_box_input_variable != "":
-            #TOFIX
-            valori = self.manager.get_screen('make_simulation').dict_entita[self.ids.menu_a_tendina_entita.text]
-            for key_variable in valori:
-                if (self.ids.id_search_box_input_variable.text in key_variable):
-                    variables_name.append(key_variable)
-        # Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
-        # Quindi devo eliminare ciò che contiene non contiene la nuova stringa
-        elif self.previous_text_typed in self.ids.id_search_box_input_variable.text:
-            for key_variable in self.ids.menu_a_tendina_variabili_output.values:
-                if (self.previous_text_typed not in key_variable):
-                    variables_name.remove(key_variable)
-        # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
-        # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
-        else:
-            valori = self.manager.get_screen('make_simulation').dict_entita[self.ids.menu_a_tendina_entita.text]
-            for key_variable in valori:
-                if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
-                    variables_name.append(key_variable)
+        pass
 
-        # Ordina alfabeticamente
-        variables_name.sort()
-        self.ids.menu_a_tendina_variabili_output.values = variables_name
-        if self.ids.menu_a_tendina_variabili_output.values:
-            self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
-        else:
-            self.ids.menu_a_tendina_variabili_output.text = ""
+        # variables_name = []
+        # if self.ids.id_search_box_input_variable != "":
+        #     #TOFIX
+        #     valori = self.manager.get_screen('make_simulation').dict_entita[self.ids.menu_a_tendina_entita.text]
+        #     for key_variable in valori:
+        #         if (self.ids.id_search_box_input_variable.text in key_variable):
+        #             variables_name.append(key_variable)
+        # # Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
+        # # Quindi devo eliminare ciò che contiene non contiene la nuova stringa
+        # elif self.previous_text_typed in self.ids.id_search_box_input_variable.text:
+        #     for key_variable in self.ids.menu_a_tendina_variabili_output.values:
+        #         if (self.previous_text_typed not in key_variable):
+        #             variables_name.remove(key_variable)
+        # # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
+        # # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
+        # else:
+        #     valori = self.manager.get_screen('make_simulation').dict_entita[self.ids.menu_a_tendina_entita.text]
+        #     for key_variable in valori:
+        #         if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
+        #             variables_name.append(key_variable)
+        #
+        # # Ordina alfabeticamente
+        # variables_name.sort()
+        # self.ids.menu_a_tendina_variabili_output.values = variables_name
+        # if self.ids.menu_a_tendina_variabili_output.values:
+        #     self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
+        # else:
+        #     self.ids.menu_a_tendina_variabili_output.text = ""
 
     def go_to_home(self):
         if self.manager.current == 'output_variable':
