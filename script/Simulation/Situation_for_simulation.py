@@ -354,14 +354,14 @@ class Simulation_generator(): #defined for Italy
             for situation in self.situations:
                 # RICORDA CHE DEVI FARE PRATICAMETE UNA SIMULAZIONE PER OGNI PERSONA, NEL SENSO CHE INIZIALIZZI TRE VOLTE LO SCENARIO E POI RUNNI per il problema dello scenario
                 scenario = self.tax_benefit_system_module_class.new_scenario()
-                print id(self.tax_benefit_system_module_class)
+                print type(self.tax_benefit_system_module_class)
                 scenario = self.init_profile(scenario = scenario, situation_period = situation.get_period(), entity_situation = situation.get_choosen_input_variables())
                 simulation = scenario.new_simulation() # nuova simulazione per lo scenario normale
                 for element in situation.get_choosen_output_variables():
                     self.add_to_result(situation = situation.name_of_situation, name_of_variable_calculated = element , result = simulation.calculate(element,self.period))
                 if not (self.reform is None):
                     reformed_system = current_reform_module_class(self.tax_benefit_system_module_class)
-                    print id(current_reform_module_class)
+                    print type(current_reform_module_class)
                     reformed_scenario = reformed_system.new_scenario()
                     reformed_scenario = self.init_profile(scenario = reformed_scenario, situation_period = situation.get_period(), entity_situation = situation.get_choosen_input_variables())
                     reformed_simulation = reformed_scenario.new_simulation() # nuova simulazione per lo scenario normale

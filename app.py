@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import kivy
 import json
-import os, sys
+import os
+import sys
 import datetime
 kivy.require("1.10.0")
 from kivy.app import App
