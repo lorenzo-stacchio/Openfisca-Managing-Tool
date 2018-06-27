@@ -35,6 +35,7 @@ from folder_screen_widgets.personalized_widget import *
 TAX_BENEFIT_SYSTEM_MODULE_CLASS = None
 ENTITY_MODULE_CLASS = None
 ENTITY_MODULE_CLASS_ALL_ENTITIES = None
+dict_entita ={}
 
 # Screen
 class InitScreen(Screen):
@@ -122,7 +123,6 @@ class InitScreen(Screen):
 
     def get_id(self, instance):
             for id, widget in self.ids.items():
-                print id, widget
                 if widget.__self__ == instance:
                     return id
 
@@ -384,7 +384,6 @@ class VisualizeSystemScreen(Screen):
 
 class MakeSimulation(Screen):
     variable_added = ObjectProperty()
-    dict_entita = DictProperty()
     dict_of_entity_variable_value = {}
     previous_text_typed = ""
 
@@ -396,7 +395,7 @@ class MakeSimulation(Screen):
         #Resize max height of dropdown
         self.ids.menu_a_tendina_entita.dropdown_cls.max_height = self.ids.menu_a_tendina_entita.height*30
         self.ids.menu_a_tendina_variabili.dropdown_cls.max_height = self.ids.menu_a_tendina_variabili.height*30
-        self.dict_entita = {}
+
         self.situations = {}
         for k, v in self.manager.get_screen('choose_entity').number_of_entity.items():
             for entity in self.manager.get_screen('choose_entity').type_of_entity:
@@ -415,7 +414,7 @@ class MakeSimulation(Screen):
                             for variable in variables:
                                 string_name_list.append(variable.name)
                             string_name_list.sort()
-                        self.dict_entita[k + str(index)] = string_name_list
+                        dict_entita[k + str(index)] = string_name_list
                         # CREATE SITUATIONS
                         app_situation = Situation(name_of_situation = str(k + str(index)))
                         app_situation.set_entity_choose(real_entity)
@@ -427,9 +426,9 @@ class MakeSimulation(Screen):
                             app_situation.set_period(year = period[0],month = period[1],day = period[2])
                         self.situations[str(k + str(index))] = app_situation
 
-        self.ids.menu_a_tendina_entita.values = self.dict_entita.keys()
+        self.ids.menu_a_tendina_entita.values = dict_entita.keys()
         self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
-        self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
+        self.ids.menu_a_tendina_variabili.values = dict_entita[self.ids.menu_a_tendina_entita.text]
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
         self.ids.information.text = ""
         with open("messages\\instruction_make_simulation.txt", 'r') as f:
@@ -440,7 +439,7 @@ class MakeSimulation(Screen):
     def change_spinner(self):
         variables_name = []
         if self.ids.id_search_box_input_variable != "":
-            valori = self.dict_entita[self.ids.menu_a_tendina_entita.text]
+            valori = dict_entita[self.ids.menu_a_tendina_entita.text]
             for key_variable in valori:
                 if (self.ids.id_search_box_input_variable.text in key_variable):
                     variables_name.append(key_variable)
@@ -449,7 +448,7 @@ class MakeSimulation(Screen):
                 if (self.previous_text_typed not in key_variable):
                     variables_name.remove(key_variable)
         else:
-            valori = self.dict_entita[self.ids.menu_a_tendina_entita.text]
+            valori = dict_entita[self.ids.menu_a_tendina_entita.text]
             for key_variable in valori:
                 if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
                     variables_name.append(key_variable)
@@ -462,7 +461,7 @@ class MakeSimulation(Screen):
             self.ids.menu_a_tendina_variabili.text = ""
 
     def update_form(self):
-        self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
+        self.ids.menu_a_tendina_variabili.values = dict_entita[self.ids.menu_a_tendina_entita.text]
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
         self.ids.variable_added.clear_widgets()
         if self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
@@ -524,7 +523,6 @@ class MakeSimulation(Screen):
                     color=(0, 0, 0, 1)))
 
                 self.situations[self.ids.menu_a_tendina_entita.text ].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
-                print self.situations[self.ids.menu_a_tendina_entita.text ].get_choosen_input_variables()
 
                 if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
                     self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
@@ -550,7 +548,8 @@ class MakeSimulation(Screen):
                         break
 
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
-            self.ids.input_value_variable.text = ''
+            self.ids.input_value_variable.text = ""
+            self.ids.id_search_box_input_variable.text = ""
 
 
     def change_view_added_variables(self):
@@ -580,14 +579,10 @@ class OutputVariableScreen(Screen):
         self.ids.menu_a_tendina_entita_output.dropdown_cls.max_height = self.ids.menu_a_tendina_entita_output.height * 30
         self.ids.menu_a_tendina_variabili_output.dropdown_cls.max_height = self.ids.menu_a_tendina_variabili_output.height * 30
 
-        # i take the dict with association of enitites
-        print self.manager.get_screen('choose_entity').number_of_entity
-        print self.manager.get_screen('choose_entity').period
-
-        self.ids.menu_a_tendina_entita_output.values = self.manager.get_screen('make_simulation').dict_entita.keys()
+        self.ids.menu_a_tendina_entita_output.values = dict_entita.keys()
         self.ids.menu_a_tendina_entita_output.text = self.ids.menu_a_tendina_entita_output.values[0]
 
-        self.ids.menu_a_tendina_variabili_output.values = self.manager.get_screen('make_simulation').dict_entita[
+        self.ids.menu_a_tendina_variabili_output.values = dict_entita[
             self.ids.menu_a_tendina_entita_output.text]
         self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
         self.ids.information.text = ""
@@ -596,7 +591,34 @@ class OutputVariableScreen(Screen):
                 self.ids.information.text = self.ids.information.text + line
 
     def change_spinner(self):
-        pass
+        variables_name = []
+        if self.ids.id_search_box_input_variable != "":
+            #TOFIX
+            valori = dict_entita[self.ids.menu_a_tendina_entita_output.text]
+            for key_variable in valori:
+                if (self.ids.id_search_box_input_variable.text in key_variable):
+                    variables_name.append(key_variable)
+        # Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
+        # Quindi devo eliminare ciò che contiene non contiene la nuova stringa
+        elif self.previous_text_typed in self.ids.id_search_box_input_variable.text:
+            for key_variable in self.ids.menu_a_tendina_variabili_output.values:
+                if (self.previous_text_typed not in key_variable):
+                    variables_name.remove(key_variable)
+        # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
+        # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
+        else:
+            valori = dict_entita[self.ids.menu_a_tendina_entita_output.text]
+            for key_variable in valori:
+                if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
+                    variables_name.append(key_variable)
+
+        # Ordina alfabeticamente
+        variables_name.sort()
+        self.ids.menu_a_tendina_variabili_output.values = variables_name
+        if self.ids.menu_a_tendina_variabili_output.values:
+            self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
+        else:
+            self.ids.menu_a_tendina_variabili_output.text = ""
 
     def go_to_home(self):
         if self.manager.current == 'output_variable':
@@ -608,7 +630,7 @@ class OutputVariableScreen(Screen):
             self.manager.current = 'home'
 
     def update_form(self):
-        self.ids.menu_a_tendina_variabili_output.values = self.manager.get_screen('make_simulation').dict_entita[
+        self.ids.menu_a_tendina_variabili_output.values = dict_entita[
             self.ids.menu_a_tendina_entita_output.text]
         self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
         self.ids.variable_added_output.clear_widgets()
@@ -653,8 +675,6 @@ class OutputVariableScreen(Screen):
                 i = 0
 
                 self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
-                print self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text ].get_choosen_output_variables()
-
                 for el in self.ids.variable_added_output.children:
                     entity, variable = el.text.split(' - ')
                     if (self.ids.menu_a_tendina_entita_output.text + " - " + self.ids.menu_a_tendina_variabili_output.text) == (
@@ -664,6 +684,7 @@ class OutputVariableScreen(Screen):
                     i += 1
 
             self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
+            self.ids.id_search_box_input_variable.text = ""
 
     def destroy_button(self, button):
         entity, variable = button.text.split(" - ")
@@ -955,7 +976,6 @@ class FormVariableScreen(Screen):
                             self.formula_to_write_in_popup = ""
                             for line in final_formatted_lines:
                                 self.formula_to_write_in_popup = self.formula_to_write_in_popup + line + "\n"
-                            print self.formula_to_write_in_popup
                     else:
                         self.formula_to_write_in_popup = None
                     break
