@@ -30,7 +30,7 @@ from script.download_openfisca_system import download_and_install as download_an
 from script.Simulation.Situation_for_simulation import *
 from script.reforms_maker.reform_variables import *
 from multiprocessing.pool import ThreadPool
-
+from folder_screen_widgets.personalized_widget import *
 
 TAX_BENEFIT_SYSTEM_MODULE_CLASS = None
 ENTITY_MODULE_CLASS = None
@@ -252,14 +252,14 @@ class ChooseEntityScreen(Screen):
         return True
 
 
-class LineOfChooser(BoxLayout):
-    name_label = StringProperty()
-    def decrementa(self):
-        if int(self.ids.value.text) > 0:
-            self.ids.value.text = str(int(self.ids.value.text) - 1)
-
-    def incrementa(self):
-        self.ids.value.text = str(int(self.ids.value.text) + 1)
+#class LineOfChooser(BoxLayout):
+#    name_label = StringProperty()
+#    def decrementa(self):
+#        if int(self.ids.value.text) > 0:
+#            self.ids.value.text = str(int(self.ids.value.text) - 1)
+#
+#    def incrementa(self):
+#        self.ids.value.text = str(int(self.ids.value.text) + 1)
 
 
 class VisualizeSystemScreen(Screen):
@@ -319,7 +319,6 @@ class VisualizeSystemScreen(Screen):
         path_parameter = str(os.path.normpath(self.dict_path['parameters']))
         if (path_variable in path_file_scelto) or (path_parameter in path_file_scelto) or (
                 path_reforms in path_file_scelto):
-            # print "Path ok"
             return True
         else:
             self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
@@ -339,46 +338,39 @@ class VisualizeSystemScreen(Screen):
             path_file_scelto = args[1][0]
             if self.__check_path__(path_file_scelto):
                 filename, file_extension = os.path.splitext(path_file_scelto)
+                path_rst = path_file_scelto # default
                 # the file could be a parameter or a variable
                 if file_extension == '.yaml':
                     parameter_interpeter = ParameterInterpeter(path_file_scelto)
                     if (parameter_interpeter.understand_type() == ParameterType.normal):
                         parameter_interpeter.__interpeter_normal_parameter__()
-                        path_prm = parameter_interpeter.generate_RST_parameter()
-                        self.ids.document_variables_viewer.source = path_prm
-                        self.ids.document_parameters_viewer.source = path_prm
-                        self.ids.document_reforms_viewer.source = path_prm
+                        path_rst = parameter_interpeter.generate_RST_parameter()
                     elif (parameter_interpeter.understand_type() == ParameterType.scale):
                         parameter_interpeter.__interpeter_scale_parameter__()
-                        path_prm = parameter_interpeter.generate_RST_parameter()
-                        self.ids.document_variables_viewer.source = path_prm
-                        self.ids.document_parameters_viewer.source = path_prm
-                        self.ids.document_reforms_viewer.source = path_prm
+                        path_rst = parameter_interpeter.generate_RST_parameter()
                     elif (parameter_interpeter.understand_type() == ParameterType.fancy_indexing):
                         parameter_interpeter.__interpeter_fancy_indexing_parameter__()
-                        path_prm = parameter_interpeter.generate_RST_parameter()
-                        self.ids.document_variables_viewer.source = path_prm
-                        self.ids.document_parameters_viewer.source = path_prm
-                        self.ids.document_reforms_viewer.source = path_prm
+                        path_rst = parameter_interpeter.generate_RST_parameter()
+                    self.ids.document_variables_viewer.source = path_rst
+                    self.ids.document_parameters_viewer.source = path_rst
+                    self.ids.document_reforms_viewer.source = path_rst
                 elif file_extension == '.py':
                     variable_interpeter = Variable_File_Interpeter(path_file_scelto)
                     reform_interpeter = Reform_File_Interpeter(path_file_scelto)
                     if (variable_interpeter.file_is_a_variable() and not (reform_interpeter.file_is_a_reform())):
                         variable_interpeter.start_interpetration()
                         path_rst = variable_interpeter.generate_RSTs_variables()
-                        self.ids.document_variables_viewer.source = path_rst
-                        self.ids.document_parameters_viewer.source = path_rst
-                        self.ids.document_reforms_viewer.source = path_rst
                     elif (reform_interpeter.file_is_a_reform()):
                         reform_interpeter.start_interpetration_reforms()
                         path_rst = reform_interpeter.generate_RST_reforms()
-                        self.ids.document_variables_viewer.source = path_rst
-                        self.ids.document_parameters_viewer.source = path_rst
-                        self.ids.document_reforms_viewer.source = path_rst
-                else:  # file for which the interpretation is not defined yet
+                    self.ids.document_variables_viewer.source = path_rst
+                    self.ids.document_parameters_viewer.source = path_rst
+                    self.ids.document_reforms_viewer.source = path_rst
+                else: # file for which the interpretation is not defined yet
                     self.ids.document_variables_viewer.source = path_file_scelto
                     self.ids.document_parameters_viewer.source = path_file_scelto
                     self.ids.document_reforms_viewer.source = path_file_scelto
+                # update current path
                 self.ids.current_path_variables.text = self.ids.visualize_file_chooser_variables.path
                 self.ids.current_path_parameters.text = self.ids.visualize_file_chooser_parameters.path
                 self.ids.current_path_reforms.text = self.ids.visualize_file_chooser_reforms.path
@@ -404,19 +396,12 @@ class MakeSimulation(Screen):
         #Resize max height of dropdown
         self.ids.menu_a_tendina_entita.dropdown_cls.max_height = self.ids.menu_a_tendina_entita.height*30
         self.ids.menu_a_tendina_variabili.dropdown_cls.max_height = self.ids.menu_a_tendina_variabili.height*30
-
         self.dict_entita = {}
         self.situations = {}
-        # Cicla il dizionario contenente l'input fornito in precedenza
-        #Esempio "person":1,"household":2
         for k, v in self.manager.get_screen('choose_entity').number_of_entity.items():
-            #Per ogni oggetto entità esistente in type_of_entity
             for entity in self.manager.get_screen('choose_entity').type_of_entity:
-                #Se la chiave dell'oggetto è uguale a k
                 if entity.key == k:
-                    #Per ogni indice da 1 a numero di elementi di quell'entità
                     for index in xrange(1, int(v) + 1):
-                        #ostruisco l'entità
                         real_entity = Entity(entity = entity)
                         period =  str(self.manager.get_screen('choose_entity').period).split("-")
                         if len(period) == 1:
@@ -446,15 +431,10 @@ class MakeSimulation(Screen):
         self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
         self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
-        self.ids.information.text = """
-[b]Instructions[/b]:
-    - Select a variable
-    - Insert into the text input form its value
-    - Click on "Add Variable"
-
-[b]Rules[/b]:
-    - You can't insert a blank variable
-    - You can't insert a blank variable value"""
+        self.ids.information.text = ""
+        with open("messages\\instruction_make_simulation.txt", 'r') as f:
+            for line in f.readlines():
+                self.ids.information.text = self.ids.information.text + line
 
 
     def change_spinner(self):
@@ -464,21 +444,16 @@ class MakeSimulation(Screen):
             for key_variable in valori:
                 if (self.ids.id_search_box_input_variable.text in key_variable):
                     variables_name.append(key_variable)
-        # Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
-        # Quindi devo eliminare ciò che contiene non contiene la nuova stringa
         elif self.previous_text_typed in self.ids.id_search_box_input_variable.text:
             for key_variable in self.ids.menu_a_tendina_variabili.values:
                 if (self.previous_text_typed not in key_variable):
                     variables_name.remove(key_variable)
-        # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
-        # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
         else:
             valori = self.dict_entita[self.ids.menu_a_tendina_entita.text]
             for key_variable in valori:
                 if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
                     variables_name.append(key_variable)
 
-        # Ordina alfabeticamente
         variables_name.sort()
         self.ids.menu_a_tendina_variabili.values = variables_name
         if self.ids.menu_a_tendina_variabili.values:
@@ -487,18 +462,13 @@ class MakeSimulation(Screen):
             self.ids.menu_a_tendina_variabili.text = ""
 
     def update_form(self):
-        # print "Hai selezionato "+self.ids.menu_a_tendina_entita.text
         self.ids.menu_a_tendina_variabili.values = self.dict_entita[self.ids.menu_a_tendina_entita.text]
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
         self.ids.variable_added.clear_widgets()
-        # If the selected entity exists
         if self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
-            # cycle it
             for tuple in self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text]:
-                # add all variable and value of this entity
                 self.ids.variable_added.add_widget(
                     Button(text=self.ids.menu_a_tendina_entita.text + " - " + tuple[0] + " - " + tuple[1],
-
                            font_size='14sp',
                            on_release=self.destroy_button,
                            background_color=(255, 255, 255, 0.9),
@@ -507,61 +477,45 @@ class MakeSimulation(Screen):
 
     def go_to_home(self):
         if self.manager.current == 'make_simulation':
-            # Reset when you go to home
             self.ids.variable_added.clear_widgets()
-
             self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
             self.ids.menu_a_tendina_variabili.text = ''
             self.ids.input_value_variable.text = ''
-            #TODO: Resetta bene le variabili
-            # Go to home
             self.manager.current = 'home'
 
 
     def go_to_output_variables(self):
         if self.manager.current == 'make_simulation':
-            # you can't go to output variable if you haven't insert nothing
             if len(self.ids.variable_added.children) != 0:
-                # change transition
                 self.manager.transition = kivy.uix.screenmanager.SlideTransition(direction='left')
                 self.manager.transition.duration = .6
                 self.manager.get_screen('output_variable').inizializza_output_variable()
-                # Go to output_variable
                 self.manager.current = 'output_variable'
-                # reset transition
                 self.manager.transition = kivy.uix.screenmanager.TransitionBase()
                 self.manager.transition.duration = .4
 
 
     def exist_tuple(self, dictionary, input_entity, input_variable):
-        # dictionary hasn't "input_entity" into its keys
         if not input_entity in dictionary.keys():
             return False
-        # Example I add something then I delete it
         elif dictionary[input_entity] == []:
             return False
         else:
             for tuple in dictionary[input_entity]:
                 if tuple[0] == input_variable:
                     return True
-        # otherwise
         return False
 
 
     def add_value_and_reset_form(self):
-
-        # if exist value do nothing
         for key in self.dict_of_entity_variable_value.keys():
             for tuple in self.dict_of_entity_variable_value[key]:
                 if tuple[0] == self.ids.input_value_variable.text and tuple[1] == self.ids.input_value_variable.text:
                     return
 
-        # If there are blank value
         if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
-            # You can't add again a certain variable of a certain entity
             if not self.exist_tuple(self.dict_of_entity_variable_value, self.ids.menu_a_tendina_entita.text,
                                     self.ids.menu_a_tendina_variabili.text):
-                # Add button
                 self.ids.variable_added.add_widget(Button(
                     text=self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text + " - " + self.ids.input_value_variable.text,
                     on_release=self.destroy_button,
@@ -569,50 +523,32 @@ class MakeSimulation(Screen):
                     background_color=(255, 255, 255, 0.9),
                     color=(0, 0, 0, 1)))
 
-                # CORRADOOOOOOO
-                # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
-                # PERCHE' LE AGGIUNTO VOLTA VOLTA, QUINDI SE LE RAGGRUPPAVI IN QUALCHE DICT PUOI ANCHE TOGLIERLO
                 self.situations[self.ids.menu_a_tendina_entita.text ].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
                 print self.situations[self.ids.menu_a_tendina_entita.text ].get_choosen_input_variables()
 
-                # EXAMPLE dict_of_entity_variable_value[Persona] = [reddito_totale,10000,prova,10,prova2,11]
-                # inizialize if key is not exists
                 if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
                     self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
 
-                # Add value
-                # add name of variable and value
                 tuple = [self.ids.menu_a_tendina_variabili.text, self.ids.input_value_variable.text]
                 self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text].append(tuple)
 
             else:
                 i = 0
-                # In this case the tuple already exists
-
-                # CORRADOOOOOOO
-                # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
-                # PERCHE' LE AGGIUNTO VOLTA VOLTA, QUINDI SE LE RAGGRUPPAVI IN QUALCHE DICT PUOI ANCHE TOGLIERLO
                 self.situations[self.ids.menu_a_tendina_entita.text].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
 
-                # ROBA DI CORRADO
                 for el in self.ids.variable_added.children:
-                    # splitting
                     entity, variable, value = el.text.split(' - ')
-                    # If "entity - variabile" in button text
                     if (self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text) == (entity + " - " + variable):
-                        # update button value
                         self.ids.variable_added.children[i].text = entity + " - " + variable + " - " + \
                                                                    self.ids.input_value_variable.text
                         break
                     i += 1
 
-                # Replace value of variable
                 for tuple in self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text]:
                     if self.ids.menu_a_tendina_variabili.text in tuple:
                         tuple[1] = self.ids.input_value_variable.text
                         break
 
-            # Reset form
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.input_value_variable.text = ''
 
@@ -622,20 +558,11 @@ class MakeSimulation(Screen):
 
 
     def destroy_button(self, button):
-        # Persona1 - Reddito - 1000
-        # entity = Persona1
-        # variable = Reddito
-        # value = 1000
-
-        # Splitting
         entity, variable, value = button.text.split(" - ")
-        # Find the tuple to delete
         for tuple in self.dict_of_entity_variable_value[entity]:
             if tuple[0] == variable and tuple[1] == value:
-                # delete from dict
                 self.dict_of_entity_variable_value[entity].remove(tuple)
                 break
-        # now i can delete the button
         self.variable_added.remove_widget(button)
 
 
@@ -663,54 +590,18 @@ class OutputVariableScreen(Screen):
         self.ids.menu_a_tendina_variabili_output.values = self.manager.get_screen('make_simulation').dict_entita[
             self.ids.menu_a_tendina_entita_output.text]
         self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
-        self.ids.information_output.text = """
-        [b]Instructions[/b]:
-            - Select a variable
-            - Insert into the text input form its value
-            - Click on "Add Variable"
-
-        [b]Rules[/b]:
-            - You can't insert a blank variable
-            - You can't insert a blank variable value"""
+        self.ids.information.text = ""
+        with open("messages\\instruction_make_simulation.txt", 'r') as f:
+            for line in f.readlines():
+                self.ids.information.text = self.ids.information.text + line
 
     def change_spinner(self):
         pass
 
-        # variables_name = []
-        # if self.ids.id_search_box_input_variable != "":
-        #     #TOFIX
-        #     valori = self.manager.get_screen('make_simulation').dict_entita[self.ids.menu_a_tendina_entita.text]
-        #     for key_variable in valori:
-        #         if (self.ids.id_search_box_input_variable.text in key_variable):
-        #             variables_name.append(key_variable)
-        # # Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
-        # # Quindi devo eliminare ciò che contiene non contiene la nuova stringa
-        # elif self.previous_text_typed in self.ids.id_search_box_input_variable.text:
-        #     for key_variable in self.ids.menu_a_tendina_variabili_output.values:
-        #         if (self.previous_text_typed not in key_variable):
-        #             variables_name.remove(key_variable)
-        # # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
-        # # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
-        # else:
-        #     valori = self.manager.get_screen('make_simulation').dict_entita[self.ids.menu_a_tendina_entita.text]
-        #     for key_variable in valori:
-        #         if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
-        #             variables_name.append(key_variable)
-        #
-        # # Ordina alfabeticamente
-        # variables_name.sort()
-        # self.ids.menu_a_tendina_variabili_output.values = variables_name
-        # if self.ids.menu_a_tendina_variabili_output.values:
-        #     self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
-        # else:
-        #     self.ids.menu_a_tendina_variabili_output.text = ""
-
     def go_to_home(self):
         if self.manager.current == 'output_variable':
-            # Reset when you go to home
             self.ids.variable_added_output.clear_widgets()
             self.ids.menu_a_tendina_variabili_output.text = ''
-            # Reset also the variable of MakeSimulation
             self.manager.get_screen('make_simulation').ids.variable_added.clear_widgets()
             self.manager.get_screen('make_simulation').ids.menu_a_tendina_variabili.text = ''
             self.manager.get_screen('make_simulation').ids.input_value_variable.text = ''
@@ -721,12 +612,9 @@ class OutputVariableScreen(Screen):
             self.ids.menu_a_tendina_entita_output.text]
         self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
         self.ids.variable_added_output.clear_widgets()
-        # If the selected entity exists
         if self.ids.menu_a_tendina_entita_output.text in self.dict_of_entity_variable_value_output.keys():
-            # cycle it
             for tuple in self.dict_of_entity_variable_value_output[
                 self.ids.menu_a_tendina_entita_output.text]:
-                # add all variable and value of this entity
                 self.ids.variable_added_output.add_widget(
                     Button(text=self.ids.menu_a_tendina_entita_output.text + " - " + tuple[0] + " - " + tuple[1],
 
@@ -734,93 +622,66 @@ class OutputVariableScreen(Screen):
                            on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
     def exist_tuple(self, dictionary, input_entity, input_variable):
-        # dictionary hasn't "input_entity" into its keys
         if not input_entity in dictionary.keys():
             return False
-        # Example I add something then I delete it
         elif dictionary[input_entity] == []:
             return False
         else:
             for tuple in dictionary[input_entity]:
                 if tuple[0] == input_variable:
                     return True
-        # otherwise
         return False
 
     def add_value_and_reset_form(self):
-        # If there are blank value
         if self.ids.menu_a_tendina_variabili_output.text != '':
-            # You can't add again a certain variable of a certain entity
             if not self.exist_tuple(self.dict_of_entity_variable_value_output, self.ids.menu_a_tendina_entita_output.text,
                                     self.ids.menu_a_tendina_variabili_output.text):
-                # Add button
                 self.ids.variable_added_output.add_widget(Button(
                     text=self.ids.menu_a_tendina_entita_output.text + " - " + self.ids.menu_a_tendina_variabili_output.text,
                     on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
-                # CORRADOOOOOOO
-                # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
-                # PERCHE' LE AGGIUNTO VOLTA VOLTA, QUINDI SE LE RAGGRUPPAVI IN QUALCHE DICT PUOI ANCHE TOGLIERLO
-
                 self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
                 print self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text ].get_choosen_output_variables()
 
-                # EXAMPLE dict_of_entity_variable_value[Persona] = [reddito_totale,10000,prova,10,prova2,11]
-                # inizialize if key is not exists
                 if not self.ids.menu_a_tendina_entita_output.text in self.dict_of_entity_variable_value_output.keys():
                     self.dict_of_entity_variable_value_output[self.ids.menu_a_tendina_entita_output.text] = []
-                # Add value
-                # add name of variable and value
+
                 tuple = [self.ids.menu_a_tendina_variabili_output.text, ""]
                 self.dict_of_entity_variable_value_output[self.ids.menu_a_tendina_entita_output.text].append(tuple)
 
             else:
                 i = 0
-                # In this case the tuple already exists
-                # CORRADOOOOOOO
-                # QUESTA PARTE MI SERVE PER INIZIALIZZARE LE INPUT VARIABLE PER OGNI SITUAZIONE
-                # PERCHE' LE AGGIUNTO VOLTA VOLTA, QUINDI SE LE RAGGRUPPAVI IN QUALCHE DICT PUOI ANCHE TOGLIERLO
+
                 self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
                 print self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text ].get_choosen_output_variables()
 
                 for el in self.ids.variable_added_output.children:
-                    # splitting
                     entity, variable = el.text.split(' - ')
-                    # If "entity - variabile" in button text
                     if (self.ids.menu_a_tendina_entita_output.text + " - " + self.ids.menu_a_tendina_variabili_output.text) == (
                             entity + " - " + variable):
-                        # update button value
                         self.ids.variable_added_output.children[i].text = entity + " - " + variable
                         break
                     i += 1
 
-
-            # Reset form
             self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
 
     def destroy_button(self, button):
-        # Splitting
         entity, variable = button.text.split(" - ")
-        # Find the tuple to delete
         for tuple in self.dict_of_entity_variable_value_output[entity]:
             if tuple[0] == variable:
-                # delete from dict
                 self.dict_of_entity_variable_value_output[entity].remove(tuple)
                 break
-        # now i can delete the button
         self.variable_added_output.remove_widget(button)
 
 
     def go_to_execute_simulation(self):
         if self.manager.current == 'output_variable':
-            #Content of popup
             string_var_input = "The situation is following:\nInput\n"
             for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
                 string_var_input += "-" + str(el_input.text) + "\n"
             string_var_output = "Output\n"
             for el_output in self.ids.variable_added_output.children:
                 string_var_output += "-" + str(el_output.text) + "\n"
-            #Create a popup
             content = ConfirmPopup(text=str(string_var_input) + "\n" + str(string_var_output))
             content.bind(on_answer=self._on_answer)
             self.popup = Popup(title="Answer Question", content=content, size_hint=(None, None), size=(480, 400),
@@ -828,7 +689,6 @@ class OutputVariableScreen(Screen):
             self.popup.open()
 
     def _on_answer(self, instance, answer):
-        # print "Risposta: " , repr(answer)
         if answer == 'Yes':
             self.manager.get_screen('execute_simulation').run_simulation()
             self.popup.dismiss()
@@ -1193,7 +1053,6 @@ class FormVariableScreen(Screen):
 
     def go_to_home(self):
         if self.manager.current == 'form_variable_screen':
-            #TODO Resetta variabili
             self.manager.current = 'home'
 
 
