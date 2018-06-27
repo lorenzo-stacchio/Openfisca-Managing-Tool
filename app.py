@@ -254,16 +254,6 @@ class ChooseEntityScreen(Screen):
         return True
 
 
-#class LineOfChooser(BoxLayout):
-#    name_label = StringProperty()
-#    def decrementa(self):
-#        if int(self.ids.value.text) > 0:
-#            self.ids.value.text = str(int(self.ids.value.text) - 1)
-#
-#    def incrementa(self):
-#        self.ids.value.text = str(int(self.ids.value.text) + 1)
-
-
 class VisualizeSystemScreen(Screen):
 
     def __init__(self, **kwargs):
@@ -587,10 +577,10 @@ class OutputVariableScreen(Screen):
         self.ids.menu_a_tendina_variabili_output.values = dict_entita[
             self.ids.menu_a_tendina_entita_output.text]
         self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
-        self.ids.information.text = ""
+        self.ids.information_output.text = ""
         with open("messages\\instruction_make_simulation.txt", 'r') as f:
             for line in f.readlines():
-                self.ids.information.text = self.ids.information.text + line
+                self.ids.information_output.text = self.ids.information_output.text + line
 
     def change_spinner(self):
         variables_name = []
@@ -761,10 +751,6 @@ class ExecuteSimulationScreen(Screen):
         self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
 
 
-class LabelLeftTop(Label):
-    pass
-
-
 class ReformsScreen(Screen):
     choice = StringProperty()
 
@@ -828,14 +814,10 @@ class SelectVariableScreen(Screen):
                 for key_variable, variables_content in dict:
                     if (self.ids.id_text_search_box.text in key_variable):
                         variables_name.append(key_variable)
-            #Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
-            #Quindi devo eliminare ciò che contiene non contiene la nuova stringa
             elif self.previous_text_typed in self.ids.id_text_search_box:
                 for key_variable in self.ids.id_spinner_select_variable_screen.values:
                     if(self.previous_text_typed not in key_variable):
                         variables_name.remove(key_variable)
-            # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
-            # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
             else:
                 dict = TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems()
                 for key_variable, variables_content in dict:
@@ -1078,54 +1060,9 @@ class FormVariableScreen(Screen):
             self.manager.current = 'home'
 
 
-class ModifyFormulaPopup(Popup):
-
-    def __init__(self, screen_manager = None , **kwargs):
-        super(ModifyFormulaPopup, self).__init__(**kwargs)
-        if (screen_manager is None) or not (isinstance(screen_manager, ScreenManager)) :
-            raise TypeError("You have to insert a screen manager to instantiate a Modify Formula Popup")
-        else:
-            self.screen_manager = screen_manager
-        Clock.schedule_once(self._finish_init)
-
-
-    def _finish_init(self,dt):
-        if not(self.screen_manager.get_screen("form_variable_screen").formula_to_write_in_popup is None):
-            self.ids.txt_modify_formula.text = "" + self.screen_manager.get_screen("form_variable_screen").formula_to_write_in_popup
-        else:
-            self.ids.txt_modify_formula.text = ""
-        self.open()
-
-
-    def update_lines_basing_on(self, *args):
-        self.screen_manager.get_screen('form_variable_screen').formula_to_write_in_popup = args[0]
-
-
-class WatchingFormulaPopUp(Popup):
-    pass
-
-
 class MyScreenManager(ScreenManager):
     pass
 
-
-class RigaSelezione(BoxLayout):
-    text = StringProperty()
-
-
-class ButtonReforms(Button):
-    pass
-
-
-class ConfirmPopup(GridLayout):
-    text = StringProperty()
-
-    def __init__(self, **kwargs):
-        self.register_event_type('on_answer')
-        super(ConfirmPopup, self).__init__(**kwargs)
-
-    def on_answer(self, *args):
-        pass
 
 
 # App

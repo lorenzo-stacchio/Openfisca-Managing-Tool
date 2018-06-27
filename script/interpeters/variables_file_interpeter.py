@@ -198,6 +198,7 @@ class Variable_for_writing():
 
 class Variable_File_Interpeter():
     __variables__ = [] # will be a list
+    __file_is_a_variable__ = None
     tax_benefit_system_module_class = None
 
     def __init__(self,variable_path):
