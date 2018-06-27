@@ -14,24 +14,12 @@ import site
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-# TODO: optimize importing
-
-
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
 
 
 class Variable_for_writing():
-    variable_name = None
-    value_type = None
-    entity = None
-    definition_period = None
-    label = None
-    formula = None
-    reference = None
-    set_input = None
     __RST_string__ = None
-
 
     def __init__(self, variable_name = None, value_type = None, entity = None, definition_period = None, set_input = None, label = None, reference = None, formula = None, variables_involved_in_formula = None):
         if os.path.exists(PATH_RST_DOCUMENT):
@@ -209,9 +197,7 @@ class Variable_for_writing():
 
 
 class Variable_File_Interpeter():
-    __variables_file_path__ = ""
     __variables__ = [] # will be a list
-    __file_is_a_variable__ = False
     tax_benefit_system_module_class = None
 
     def __init__(self,variable_path):
@@ -246,14 +232,9 @@ class Variable_File_Interpeter():
                             variable_name = variable_name.replace(chs,'')
                         current_Variable = Variable_for_writing(variable_name = variable_name.strip())
                         self.__variables__.append(current_Variable)
-        # found all the variables
-        # Openfisca modules importing, matching variables found
-        # scenario normale
         variables = self.tax_benefit_system_module_class.get_variables()
         for k,v in variables.iteritems():
             for element in self.__variables__:
-                #print "Nome variabile trovata:", element.get_variable_name()
-                #print "Nome variabile attuale:",
                 if k == element.get_variable_name():
                     element.set_value_type(v.value_type.__name__)
                     element.set_entity(v.entity.__name__)
@@ -279,7 +260,6 @@ class Variable_File_Interpeter():
                 if '#' in line:
                     line = line[:line.find('#')]
                 if line:
-                    # if found a formula, we don't have to split the line
                     if formula_found:
                         if ('class' in line and '(Variable):' in line) or ('class' in line and '(Reform):' in line):
                             formula_found = False
@@ -316,7 +296,6 @@ class Variable_File_Interpeter():
                     if 'formula' in pieces[0]:
                         formula_found = True
                         current_Variable.set_formula(' ' + pieces[0].strip())
-            #print self.__variables__
 
 
     def generate_RSTs_variables(self):
