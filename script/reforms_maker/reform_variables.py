@@ -1,11 +1,5 @@
 import os
-import sys
 import inspect
-import datetime
-import time
-import importlib
-import json
-import site
 import re
 from enum import Enum
 
@@ -36,20 +30,15 @@ class Variable_To_Reform():
     type_of_entity = None
     tax_benefit_system_module_class = None
 
-    def __init__(self, name = None, entity = None, type = None, reference = None,  formula = None, label = None, set_input = None, definition_period = None):
+    def __init__(self):
         if   Variable_To_Reform.tax_benefit_system_module_class is None or   Variable_To_Reform.type_of_entity is None:
             raise ValueError("You must import the system to create a variable to reform")
-        self.__name__ = name
-        self.entity = entity
-        self.__type__ = type
-        self.__reference__ = "\"" + str(reference) + "\""
-        self.__label__ = "\"" + str(label) + "\""
-        self.__definition_period__ = definition_period
-        self.__set_input__ = set_input
-        self.__formula__ = formula
 
     def set_name(self, name):
-        self.__name__ = name
+        if name is None:
+            raise ValueError("You must insert the variable name")
+        else:
+            self.__name__ = name
 
     def set_type(self, type):
         accept_value = []
@@ -105,8 +94,12 @@ class Variable_To_Reform():
             accept_value.append(type_accepted.name)
         if set_input in accept_value:
             self.__set_input__ = set_input
+            if self.__set_input__ == TYPEOFSETINPUT.no_set_input_period.name:
+                self.__set_input__ = None
         else:
             raise ValueError("The set_input choosen for the variable is not an openfisca set_input")
+
+
 
 
     @staticmethod
