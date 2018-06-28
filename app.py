@@ -375,7 +375,9 @@ class VisualizeSystemScreen(Screen):
                 self.ids.current_path_parameters.text = self.ids.visualize_file_chooser_parameters.path
                 self.ids.current_path_reforms.text = self.ids.visualize_file_chooser_reforms.path
         except Exception as e:
-            print "Some error ", e
+            self.popup_error_run_simulation = ErrorPopUp()
+            self.popup_error_run_simulation.ids.label_error.text = str(e)
+            self.popup_error_run_simulation.open()
 
     def go_to_home(self):
         if self.manager.current == 'visualize_system':
@@ -397,43 +399,47 @@ class MakeSimulation(Screen):
         self.ids.menu_a_tendina_variabili.dropdown_cls.max_height = self.ids.menu_a_tendina_variabili.height*30
 
         self.situations = {}
-        for k, v in self.manager.get_screen('choose_entity').number_of_entity.items():
-            for entity in self.manager.get_screen('choose_entity').type_of_entity:
-                if entity.key == k:
-                    for index in xrange(1, int(v) + 1):
-                        real_entity = Entity(entity = entity)
-                        period =  str(self.manager.get_screen('choose_entity').period).split("-")
-                        if len(period) == 1:
-                            real_entity.generate_associated_variable_filter(year = period[0])
-                        elif len(period) == 2:
-                            real_entity.generate_associated_variable_filter(year = period[0],month = period[1])
-                        elif len(period) == 3:
-                            real_entity.generate_associated_variable_filter(year = period[0],month = period[1],day = period[2])
-                        for name_ent, variables in real_entity.get_associated_variables().iteritems():
-                            string_name_list = []
-                            for variable in variables:
-                                string_name_list.append(variable.name)
-                            string_name_list.sort()
-                        dict_entita[k + str(index)] = string_name_list
-                        # CREATE SITUATIONS
-                        app_situation = Situation(name_of_situation = str(k + str(index)))
-                        app_situation.set_entity_choose(real_entity)
-                        if len(period) == 1:
-                            app_situation.set_period(year = period[0])
-                        elif len(period) == 2:
-                            app_situation.set_period(year = period[0],month = period[1])
-                        elif len(period) == 3:
-                            app_situation.set_period(year = period[0],month = period[1],day = period[2])
-                        self.situations[str(k + str(index))] = app_situation
-        self.ids.menu_a_tendina_entita.values = dict_entita.keys()
-        self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
-        self.ids.menu_a_tendina_variabili.values = dict_entita[self.ids.menu_a_tendina_entita.text]
-        self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
-        self.ids.information.text = ""
-        with open("messages\\instruction_make_simulation.txt", 'r') as f:
-            for line in f.readlines():
-                self.ids.information.text = self.ids.information.text + line
-
+        try:
+            for k, v in self.manager.get_screen('choose_entity').number_of_entity.items():
+                for entity in self.manager.get_screen('choose_entity').type_of_entity:
+                    if entity.key == k:
+                        for index in xrange(1, int(v) + 1):
+                            real_entity = Entity(entity = entity)
+                            period =  str(self.manager.get_screen('choose_entity').period).split("-")
+                            if len(period) == 1:
+                                real_entity.generate_associated_variable_filter(year = period[0])
+                            elif len(period) == 2:
+                                real_entity.generate_associated_variable_filter(year = period[0],month = period[1])
+                            elif len(period) == 3:
+                                real_entity.generate_associated_variable_filter(year = period[0],month = period[1],day = period[2])
+                            for name_ent, variables in real_entity.get_associated_variables().iteritems():
+                                string_name_list = []
+                                for variable in variables:
+                                    string_name_list.append(variable.name)
+                                string_name_list.sort()
+                            dict_entita[k + str(index)] = string_name_list
+                            # CREATE SITUATIONS
+                            app_situation = Situation(name_of_situation = str(k + str(index)))
+                            app_situation.set_entity_choose(real_entity)
+                            if len(period) == 1:
+                                app_situation.set_period(year = period[0])
+                            elif len(period) == 2:
+                                app_situation.set_period(year = period[0],month = period[1])
+                            elif len(period) == 3:
+                                app_situation.set_period(year = period[0],month = period[1],day = period[2])
+                            self.situations[str(k + str(index))] = app_situation
+            self.ids.menu_a_tendina_entita.values = dict_entita.keys()
+            self.ids.menu_a_tendina_entita.text = self.ids.menu_a_tendina_entita.values[0]
+            self.ids.menu_a_tendina_variabili.values = dict_entita[self.ids.menu_a_tendina_entita.text]
+            self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
+            self.ids.information.text = ""
+            with open("messages\\instruction_make_simulation.txt", 'r') as f:
+                for line in f.readlines():
+                    self.ids.information.text = self.ids.information.text + line
+        except Exception as e:
+            self.popup_error_run_simulation = ErrorPopUp()
+            self.popup_error_run_simulation.ids.label_error.text = str(e)
+            self.popup_error_run_simulation.open()
 
     def change_spinner(self):
         variables_name = []
@@ -458,6 +464,7 @@ class MakeSimulation(Screen):
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
         else:
             self.ids.menu_a_tendina_variabili.text = ""
+
 
     def update_form(self):
         self.ids.menu_a_tendina_variabili.values = dict_entita[self.ids.menu_a_tendina_entita.text]
@@ -520,9 +527,12 @@ class MakeSimulation(Screen):
                     font_size= '14sp',
                     background_color=(255, 255, 255, 0.9),
                     color=(0, 0, 0, 1)))
-
-                self.situations[self.ids.menu_a_tendina_entita.text ].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
-
+                try:
+                    self.situations[self.ids.menu_a_tendina_entita.text ].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
+                except Exception as e:
+                    self.popup_error_run_simulation = ErrorPopUp()
+                    self.popup_error_run_simulation.ids.label_error.text = str(e)
+                    self.popup_error_run_simulation.open()
                 if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
                     self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
 
@@ -531,7 +541,12 @@ class MakeSimulation(Screen):
 
             else:
                 i = 0
-                self.situations[self.ids.menu_a_tendina_entita.text].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
+                try:
+                    self.situations[self.ids.menu_a_tendina_entita.text].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
+                except Exception as e:
+                    self.popup_error_run_simulation = ErrorPopUp()
+                    self.popup_error_run_simulation.ids.label_error.text = str(e)
+                    self.popup_error_run_simulation.open()
 
                 for el in self.ids.variable_added.children:
                     entity, variable, value = el.text.split(' - ')
@@ -562,7 +577,12 @@ class MakeSimulation(Screen):
                 self.dict_of_entity_variable_value[entity].remove(tuple)
                 break
         self.variable_added.remove_widget(button)
-
+        try:
+            self.situations[entity].remove_variable_from_choosen_input_variables(choosen_input_variable_to_remove = variable)
+        except Exception as e:
+            self.popup_error_run_simulation = ErrorPopUp()
+            self.popup_error_run_simulation.ids.label_error.text = str(e)
+            self.popup_error_run_simulation.open()
 
 class OutputVariableScreen(Screen):
     string_var_input = ""
@@ -570,6 +590,7 @@ class OutputVariableScreen(Screen):
     variable_added_output = ObjectProperty()
     dict_of_entity_variable_value_output = {}
     previous_text_typed = ""
+
     def __init__(self, **kwargs):
         super(OutputVariableScreen, self).__init__(**kwargs)
 
@@ -638,7 +659,6 @@ class OutputVariableScreen(Screen):
                 self.ids.menu_a_tendina_entita_output.text]:
                 self.ids.variable_added_output.add_widget(
                     Button(text=self.ids.menu_a_tendina_entita_output.text + " - " + tuple[0] + " - " + tuple[1],
-
                            font_size='14sp',
                            on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
@@ -660,8 +680,12 @@ class OutputVariableScreen(Screen):
                 self.ids.variable_added_output.add_widget(Button(
                     text=self.ids.menu_a_tendina_entita_output.text + " - " + self.ids.menu_a_tendina_variabili_output.text,
                     on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
-
-                self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
+                try:
+                    self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
+                except Exception as e:
+                    self.popup_error_run_simulation = ErrorPopUp()
+                    self.popup_error_run_simulation.ids.label_error.text = str(e)
+                    self.popup_error_run_simulation.open()
 
                 if not self.ids.menu_a_tendina_entita_output.text in self.dict_of_entity_variable_value_output.keys():
                     self.dict_of_entity_variable_value_output[self.ids.menu_a_tendina_entita_output.text] = []
@@ -671,8 +695,13 @@ class OutputVariableScreen(Screen):
 
             else:
                 i = 0
+                try:
+                    self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
+                except Exception as e:
+                    self.popup_error_run_simulation = ErrorPopUp()
+                    self.popup_error_run_simulation.ids.label_error.text = str(e)
+                    self.popup_error_run_simulation.open()
 
-                self.manager.get_screen('make_simulation').situations[self.ids.menu_a_tendina_entita_output.text].add_variable_to_choosen_output_variables(choosen_output_variable = self.ids.menu_a_tendina_variabili_output.text)
                 for el in self.ids.variable_added_output.children:
                     entity, variable = el.text.split(' - ')
                     if (self.ids.menu_a_tendina_entita_output.text + " - " + self.ids.menu_a_tendina_variabili_output.text) == (
@@ -691,6 +720,12 @@ class OutputVariableScreen(Screen):
                 self.dict_of_entity_variable_value_output[entity].remove(tuple)
                 break
         self.variable_added_output.remove_widget(button)
+        try:
+            self.manager.get_screen('make_simulation').situations[entity].remove_variable_from_choosen_output_variables(choosen_output_variable_to_remove = variable)
+        except Exception as e:
+            self.popup_error_run_simulation = ErrorPopUp()
+            self.popup_error_run_simulation.ids.label_error.text = str(e)
+            self.popup_error_run_simulation.open()
 
 
     def go_to_execute_simulation(self):
@@ -709,10 +744,16 @@ class OutputVariableScreen(Screen):
 
     def _on_answer(self, instance, answer):
         if answer == 'Yes':
-            self.manager.get_screen('execute_simulation').run_simulation()
-            self.popup.dismiss()
-            self.manager.current = 'execute_simulation'
-        self.popup.dismiss()
+            try:
+                self.manager.get_screen('execute_simulation').run_simulation()
+                self.popup.dismiss()
+                self.manager.current = 'execute_simulation'
+            except Exception as e:
+                self.popup.dismiss()
+                self.popup_error_run_simulation = ErrorPopUp()
+                self.popup_error_run_simulation.ids.label_error.text = str(e)
+                self.popup_error_run_simulation.open()
+                self.manager.current = 'home'
 
     def go_to_make_simulation(self):
         if self.manager.current == 'output_variable':
@@ -1036,35 +1077,35 @@ class FormVariableScreen(Screen):
         else:
             reform_description = self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text
 
-        try:
-            v_to_add = Variable_To_Reform()
-            v_to_add.set_name(name_input)
-            v_to_add.set_entity(entity_input)
-            v_to_add.set_type(value_type_input)
-            v_to_add.set_reference(reference_input)
-            v_to_add.set_formula(formula)
-            v_to_add.set_label(label_input)
-            v_to_add.set_definition_period(definition_period_input)
-            v_to_add.set_set_input(set_input_period)
-            ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], reform_full_description = reform_description , reform_name = reform_name)
+        #try:
+        v_to_add = Variable_To_Reform()
+        v_to_add.set_name(name_input)
+        v_to_add.set_entity(entity_input)
+        v_to_add.set_type(value_type_input)
+        v_to_add.set_reference(reference_input)
+        v_to_add.set_formula(formula)
+        v_to_add.set_label(label_input)
+        v_to_add.set_definition_period(definition_period_input)
+        v_to_add.set_set_input(set_input_period)
+        ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], reform_full_description = reform_description , reform_name = reform_name)
 
-            if self.manager.get_screen('select_variable_screen').choice == "Update variable":
-                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
-                self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
-                                   auto_dismiss=True)
-                self.popup.open()
-                self.manager.current = 'reforms'
-
-            elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
-                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
-                self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
-                                   auto_dismiss=True)
-                self.popup.open()
-                self.manager.current = 'reforms'
-        except Exception as e:
-            self.popup = Popup(title="Error compiling update variable reform", content = Label(text = "The error:\n" + str(e)), size_hint=(None, None), size=(480, 400),
+        if self.manager.get_screen('select_variable_screen').choice == "Update variable":
+            ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
+            self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
                                auto_dismiss=True)
             self.popup.open()
+            self.manager.current = 'reforms'
+
+        elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+            ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
+            self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                               auto_dismiss=True)
+            self.popup.open()
+            self.manager.current = 'reforms'
+        #except Exception as e:
+            #    self.popup_error_run_simulation = ErrorPopUp()
+            #self.popup_error_run_simulation.ids.label_error.text = str(e)
+        #self.popup_error_run_simulation.open()
 
 
     def go_to_home(self):

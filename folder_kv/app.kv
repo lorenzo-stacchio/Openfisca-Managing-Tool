@@ -780,7 +780,22 @@
 		height: '44sp'
 		Button:
 			text: 'Yes'
-			on_release: root.dispatch('on_answer','Yes')
+			on_press: root.dispatch('on_answer','Yes')
 		Button:
 			text: 'No'
-			on_release: root.dispatch('on_answer', 'No')
+			on_press: root.dispatch('on_answer', 'No')
+
+
+<ErrorPopUp>:
+    size_hint: 0.8,0.8
+    title: "Some error"
+    BoxLayout:
+        orientation:'vertical'
+        Label:
+            id: label_error
+            text_size: self.width, None
+            size_hint: (1.0,0.8)
+        Button:
+            text:"Close this popup"
+            size_hint: (1.0,0.2)
+            on_press:root.dismiss()

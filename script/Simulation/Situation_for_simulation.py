@@ -245,6 +245,17 @@ class Situation(): # defined for one entity
             raise TypeError("The variable you choose, is not defined for the entity or doesn't exist")
 
 
+    def remove_variable_from_choosen_input_variables(self, choosen_input_variable_to_remove):
+        if choosen_input_variable_to_remove is None:
+            raise ValueError("You can't remove a None variable")
+        if self.choosen_input_variables is None or self.choosen_input_variables == {}:
+            raise ValueError("You can't remove an element from the input list if is empty")
+        if choosen_input_variable_to_remove in self.choosen_input_variables:
+            del self.choosen_input_variables[choosen_input_variable_to_remove]
+        else:
+            raise ValueError("The variable you want to remove, doesn't occur in the input variable list")
+
+
     def get_choosen_output_variables(self):
         return self.choosen_output_variables
 
@@ -263,6 +274,17 @@ class Situation(): # defined for one entity
                 break
         if not variable_match:
             raise TypeError("The variable you choose, is not defined for the entity or doesn't exist")
+
+
+    def remove_variable_from_choosen_output_variables(self, choosen_output_variable_to_remove):
+        if choosen_output_variable_to_remove is None:
+            raise ValueError("You can't remove a None variable")
+        if self.choosen_output_variables is None or self.choosen_output_variables == []:
+            raise ValueError("You can't remove an element from the output list if is empty")
+        if choosen_output_variable_to_remove in self.choosen_output_variables:
+            self.choosen_output_variables.remove(choosen_output_variable_to_remove)
+        else:
+            raise ValueError("The variable you want to remove, doesn't occur in the output variable list")
 
 
 class Simulation_generator(): #defined for Italy

@@ -236,17 +236,22 @@ class Variable_reform_manager():
             os.remove(path_new_reform)
         # check if at least one field is changed
         at_least_one_field_is_changed = False
-
         variable_elements_to_check =  [self.__variable__.__type__, self.__variable__.entity,
-        self.__variable__.__definition_period__,self.__variable__.__reference__,self.__variable__.__label__, self.__variable__.__set_input__ ]
-
+        self.__variable__.__definition_period__]
         system_variable_elements_to_check = [variable_to_update.value_type.__name__, variable_to_update.entity.__name__,
-        variable_to_update.definition_period, variable_to_update.reference[0],variable_to_update.label, variable_to_update.set_input.__name__ ]
+                                             variable_to_update.definition_period]
+        if not(variable_to_update.reference == None):
+            variable_elements_to_check.append(self.__variable__.__reference__)
+            system_variable_elements_to_check.append(variable_to_update.reference[0])
+        if not(variable_to_update.label == None):
+            variable_elements_to_check.append(self.__variable__.__label__)
+            system_variable_elements_to_check.append(variable_to_update.label)
+        if not(variable_to_update.set_input == None):
+            variable_elements_to_check.append(self.__variable__.__set_input__)
+            system_variable_elements_to_check.append(str(variable_to_update.set_input.__name__ ))
 
         for var_to_check, sys_var in zip(variable_elements_to_check, system_variable_elements_to_check):
             if not(var_to_check == sys_var) and not(var_to_check==None):
-                print var_to_check
-                print sys_var
                 at_least_one_field_is_changed = True
 
         if self.__variable__.__formula__ and not variable_to_update.is_input_variable():
@@ -271,41 +276,52 @@ class Variable_reform_manager():
                 if not(sys_var_row == curr_var_row):
                     at_least_one_field_is_changed = True
 
+        elif self.__variable__.__formula__ and  variable_to_update.is_input_variable():
+            at_least_one_field_is_changed = True
+
         if not at_least_one_field_is_changed:
             raise ValueError("You must change something to update the variable!!")
 
+        # Start writing the formula
         with open(path_new_reform, 'a') as new_reform:
             new_reform.write("# -*- coding: utf-8 -*-") # to avoid erros
             new_reform.write("\nfrom openfisca_core.model_api import *")
             new_reform.write("\nfrom openfisca_core.model_api import *\n")
             # facultative fields
             new_reform.write("\nclass " + self.__variable__.__name__ + "(Variable):")
+            # facultative fields
+            variable_elements_to_write = [self.__variable__.__type__, self.__variable__.entity,
+                                          self.__variable__.__definition_period__,self.__variable__.__reference__,
+                                          self.__variable__.__label__,self.__variable__.__set_input__]
+            system_variable_elements_to_compare = [variable_to_update.value_type.__name__,
+                                                 variable_to_update.entity.__name__,
+                                                 variable_to_update.definition_period]
+            if not (variable_to_update.reference == None):
+                system_variable_elements_to_check.append(variable_to_update.reference[0])
+            else:
+                system_variable_elements_to_check.append(None)
+            if not (variable_to_update.label == None):
+                system_variable_elements_to_check.append(variable_to_update.label)
+            else:
+                system_variable_elements_to_check.append(None)
+            if not (variable_to_update.set_input == None):
+                system_variable_elements_to_check.append(str(variable_to_update.set_input.__name__))
+            else:
+                system_variable_elements_to_check.append(None)
 
-            if self.__variable__.__type__ and not(self.__variable__.__type__ == variable_to_update.value_type.__name__):
-                new_reform.write("\n\tvalue_type = " + self.__variable__.__type__)
+            string_to_write = ["\n\tvalue_type = ", "\n\tentity = ", "\n\tdefinition_period = ", "\n\treference = ", "\n\tlabel = "
+                               , "\n\tset_input = "]
 
-            if self.__variable__.entity and not(self.__variable__.entity == variable_to_update.entity.__name__):
-                new_reform.write("\n\tentity = " + self.__variable__.entity)
+            for var_to_check, sys_var, curr_str in zip(variable_elements_to_write, system_variable_elements_to_compare, string_to_write):
+               if var_to_check and not (var_to_check == sys_var):
+                   new_reform.write(curr_str + var_to_check)
 
-            if self.__variable__.__definition_period__ and not(self.__variable__.__definition_period__ == variable_to_update.definition_period):
-                new_reform.write("\n\tdefinition_period = " + self.__variable__.__definition_period__)
-
-
-            if self.__variable__.__reference__ and not(self.__variable__.__reference__ == variable_to_update.reference[0]):
-                new_reform.write("\n\treference = " + self.__variable__.__reference__)
-
-            if self.__variable__.__label__ and not(self.__variable__.__label__ == variable_to_update.label):
-                new_reform.write("\n\tlabel = " + self.__variable__.__label__)
-
-            if self.__variable__.__set_input__ and not(self.__variable__.__set_input__ == variable_to_update.set_input):
-                new_reform.write("\n\tset_input = " + self.__variable__.__set_input__)
-
-            if self.__variable__.__formula__ and variable_to_update.is_input_variable():
-                new_reform.write("\n\n\t" + self.__variable__.__formula__)
-            elif self.__variable__.__formula__ and not(self.__variable__.__formula__ == current_formula):
+            # special case formula
+            if (self.__variable__.__formula__ and variable_to_update.is_input_variable()) or (self.__variable__.__formula__ and not(self.__variable__.__formula__ == current_formula)):
                 # formula analysis
+                formula = self.__variable__.__formula__  # get formula if the variable if exist
+                new_reform.write("\n")
                 current_formula = ""
-                formula = inspect.getsource(variable_to_update.get_formula())  # get formula if the variable if exist
                 if "\n" in formula: # if there is more than one line
                     lines = formula.split("\n")
                     formatted_lines = []
@@ -315,13 +331,10 @@ class Variable_reform_manager():
                     final_formatted_lines.append(formatted_lines[0])
                     for line in formatted_lines[1:]: #except the first line
                         final_formatted_lines.append("\t" + line)
-                    formula = ""
                     for line in final_formatted_lines:
-                        current_formula = current_formula + line + "\n"
-                new_reform.write("\n\n\t" + self.__variable__.__formula__)
-
+                        new_reform.write("\n\t" + line)
             # write reform
-            new_reform.write("\n\n\nclass " + self.__reform_name__ + "(Reform):")
+            new_reform.write("\n\nclass " + self.__reform_name__ + "(Reform):")
             if not(self.__reform_full_description__ is None):
                 new_reform.write("\n\tname = " + self.__reform_full_description__)
             new_reform.write("\n\tdef apply(self):\n\t\tself.update_variable(\'" + self.__variable__.__name__ + "\')")

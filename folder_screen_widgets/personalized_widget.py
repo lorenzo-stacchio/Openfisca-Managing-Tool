@@ -59,6 +59,10 @@ class WatchingFormulaPopUp(Popup):
     pass
 
 
+class ErrorPopUp(Popup):
+    pass
+
+
 class ConfirmPopup(GridLayout):
     text = StringProperty()
 
