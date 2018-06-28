@@ -90,12 +90,13 @@ class Reform_for_writing():
 
 class Reform_File_Interpeter():
     __reforms__ = [] # will be a list
-    tax_benefit_system_class = None
-    tax_benefit_system = None
+    tax_benefit_system_module_class = None
 
     def __init__(self,reform_path):
         self.__reforms_file_path__ = reform_path
         self.__file_is_a_reform__ = False
+        if Reform_File_Interpeter.tax_benefit_system_module_class  is None:
+            raise ValueError("You must import the system to create a reform interpeter")
         # check if the file passed contains a variable
         with open(self.__reforms_file_path__,'r') as content_reform:
             for line in content_reform.readlines():

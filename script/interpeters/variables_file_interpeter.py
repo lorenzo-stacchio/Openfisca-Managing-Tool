@@ -203,6 +203,8 @@ class Variable_File_Interpeter():
 
     def __init__(self,variable_path):
         self.__variable_path__ = variable_path
+        if Variable_File_Interpeter.tax_benefit_system_module_class is None:
+            raise ValueError("You must import the system to create a variable interpeter")
         # check if the file passed contains a variable
         with open(self.__variable_path__,'r') as content_variable:
             for line in content_variable.readlines():
