@@ -28,6 +28,8 @@ from script.interpeters.variables_file_interpeter import *
 from script.interpeters.parameters_interpeter import *
 from script.interpeters.reforms_file_interpeter import *
 from script.download_openfisca_system import download_and_install as download_and_install_openfisca
+from script.download_openfisca_system import check_package_is_installed
+from script.download_openfisca_system import install_country_package
 from script.Simulation.Situation_for_simulation import *
 from script.reforms_maker.reform_variables import *
 from multiprocessing.pool import ThreadPool
@@ -59,9 +61,13 @@ class InitScreen(Screen):
                 self.manager.current = 'home'
                 with open('./messages/config_import.json') as f:
                     data_config = json.load(f)
+                if not (check_package_is_installed(country_package_name=os.path.basename(self.PATH_OPENFISCA))):
+                    install_country_package(country_package_name=os.path.basename(self.PATH_OPENFISCA),
+                                            full_path=self.PATH_OPENFISCA)
                 self.init_import_tax_benefit_system(self.PATH_OPENFISCA,data_config)
                 self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
                 self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
+
         else:
             self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
 
