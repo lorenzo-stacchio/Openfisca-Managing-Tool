@@ -100,8 +100,6 @@ class Variable_To_Reform():
             raise ValueError("The set_input choosen for the variable is not an openfisca set_input")
 
 
-
-
     @staticmethod
     def import_depending_on_system(tax_benefit_system_module_class, system_entity_module, system_all_entities_name):
         Variable_To_Reform.tax_benefit_system_module_class = tax_benefit_system_module_class()

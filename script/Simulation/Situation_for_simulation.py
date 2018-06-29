@@ -2,15 +2,14 @@ import os
 import sys
 import inspect
 import datetime
-import time
 import importlib
 import re
-import site
 reload(sys)
 sys.setdefaultencoding('utf8')
 from enum import Enum
-from datetime import date
+from dateutil.parser import parse
 from glob import glob
+from pydoc import locate
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
@@ -236,13 +235,62 @@ class Situation(): # defined for one entity
         for entity, associated_variables in self.entity_choose.get_associated_variables().iteritems():
             for variable in associated_variables:
                 if str(variable.name) == choosen_input_variable:
-                    self.choosen_input_variables[choosen_input_variable] = value
-                    variable_match = True
+                    if self.check_value_is_right_type(openfisca_system_variable=variable, value = value):
+                        self.choosen_input_variables[choosen_input_variable] = value
+                        variable_match = True
                     break
             if variable_match:
                 break
         if not variable_match:
             raise TypeError("The variable you choose, is not defined for the entity or doesn't exist")
+
+
+
+    def check_value_is_right_type(self, openfisca_system_variable ,value):
+        for type_var in TYPEOFVARIABLE:
+            print "openfisca tipo", openfisca_system_variable.type
+            print "tipo variabile corrente", type_var.name
+            print "Valore ", value
+            print "tipo variabile corrente locate", locate(type_var.name)
+            t = locate(type_var.name)
+
+            # special case date
+            if type_var.name == 'date' and self.is_date(value) and openfisca_system_variable.type == 'date':
+                return True
+
+            # special case int e float
+            if not t is None:
+                if ((t.__name__ == "float") or (t.__name__ == "int")):
+                    if self.is_number(value):
+                        if t(value) and t.__name__ == openfisca_system_variable.type:
+                            return True
+                else:
+                    if t(value) and t.__name__ == openfisca_system_variable.type:
+                        return True
+        # if we are here the value is not valid
+        raise TypeError("The value is not valid for the variable type")
+
+    def is_date(self, string):
+        try:
+            parse(string)
+            return True
+        except ValueError:
+            return False
+
+    def is_number(self, s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            pass
+
+        try:
+            import unicodedata
+            unicodedata.numeric(s)
+            return True
+        except (TypeError, ValueError):
+            pass
+        return False
 
 
     def remove_variable_from_choosen_input_variables(self, choosen_input_variable_to_remove):

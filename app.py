@@ -529,37 +529,39 @@ class MakeSimulation(Screen):
                     color=(0, 0, 0, 1)))
                 try:
                     self.situations[self.ids.menu_a_tendina_entita.text ].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
+                    if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
+                        self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
+                    tuple = [self.ids.menu_a_tendina_variabili.text, self.ids.input_value_variable.text]
+                    self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text].append(tuple)
                 except Exception as e:
                     self.popup_error_run_simulation = ErrorPopUp()
                     self.popup_error_run_simulation.ids.label_error.text = str(e)
                     self.popup_error_run_simulation.open()
-                if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
-                    self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
 
-                tuple = [self.ids.menu_a_tendina_variabili.text, self.ids.input_value_variable.text]
-                self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text].append(tuple)
 
             else:
                 i = 0
                 try:
                     self.situations[self.ids.menu_a_tendina_entita.text].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
+                    for el in self.ids.variable_added.children:
+                        entity, variable, value = el.text.split(' - ')
+                        if (self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text) == (
+                                entity + " - " + variable):
+                            self.ids.variable_added.children[i].text = entity + " - " + variable + " - " + \
+                            self.ids.input_value_variable.text
+                            break
+                        i += 1
+
+                    for tuple in self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text]:
+                        if self.ids.menu_a_tendina_variabili.text in tuple:
+                            tuple[1] = self.ids.input_value_variable.text
+                            break
                 except Exception as e:
                     self.popup_error_run_simulation = ErrorPopUp()
                     self.popup_error_run_simulation.ids.label_error.text = str(e)
                     self.popup_error_run_simulation.open()
 
-                for el in self.ids.variable_added.children:
-                    entity, variable, value = el.text.split(' - ')
-                    if (self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text) == (entity + " - " + variable):
-                        self.ids.variable_added.children[i].text = entity + " - " + variable + " - " + \
-                                                                   self.ids.input_value_variable.text
-                        break
-                    i += 1
 
-                for tuple in self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text]:
-                    if self.ids.menu_a_tendina_variabili.text in tuple:
-                        tuple[1] = self.ids.input_value_variable.text
-                        break
 
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.input_value_variable.text = ""
@@ -1077,35 +1079,35 @@ class FormVariableScreen(Screen):
         else:
             reform_description = self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text
 
-        #try:
-        v_to_add = Variable_To_Reform()
-        v_to_add.set_name(name_input)
-        v_to_add.set_entity(entity_input)
-        v_to_add.set_type(value_type_input)
-        v_to_add.set_reference(reference_input)
-        v_to_add.set_formula(formula)
-        v_to_add.set_label(label_input)
-        v_to_add.set_definition_period(definition_period_input)
-        v_to_add.set_set_input(set_input_period)
-        ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], reform_full_description = reform_description , reform_name = reform_name)
+        try:
+            v_to_add = Variable_To_Reform()
+            v_to_add.set_name(name_input)
+            v_to_add.set_entity(entity_input)
+            v_to_add.set_type(value_type_input)
+            v_to_add.set_reference(reference_input)
+            v_to_add.set_formula(formula)
+            v_to_add.set_label(label_input)
+            v_to_add.set_definition_period(definition_period_input)
+            v_to_add.set_set_input(set_input_period)
+            ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], reform_full_description = reform_description , reform_name = reform_name)
 
-        if self.manager.get_screen('select_variable_screen').choice == "Update variable":
-            ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
-            self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
-                               auto_dismiss=True)
-            self.popup.open()
-            self.manager.current = 'reforms'
+            if self.manager.get_screen('select_variable_screen').choice == "Update variable":
+                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
+                self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                                   auto_dismiss=True)
+                self.popup.open()
+                self.manager.current = 'reforms'
 
-        elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
-            ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
-            self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
-                               auto_dismiss=True)
-            self.popup.open()
-            self.manager.current = 'reforms'
-        #except Exception as e:
-            #    self.popup_error_run_simulation = ErrorPopUp()
-            #self.popup_error_run_simulation.ids.label_error.text = str(e)
-        #self.popup_error_run_simulation.open()
+            elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
+                self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                                   auto_dismiss=True)
+                self.popup.open()
+                self.manager.current = 'reforms'
+        except Exception as e:
+            self.popup_error_run_simulation = ErrorPopUp()
+            self.popup_error_run_simulation.ids.label_error.text = str(e)
+        self.popup_error_run_simulation.open()
 
 
     def go_to_home(self):
