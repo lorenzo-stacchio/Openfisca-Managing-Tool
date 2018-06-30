@@ -6,7 +6,6 @@ import sys
 import datetime
 kivy.require("1.10.0")
 from kivy.app import App
-from kivy.uix.widget import Widget
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -188,7 +187,7 @@ class ChooseEntityScreen(Screen):
 
         layout_period = BoxLayout(orientation = "horizontal")
         layout_period.add_widget(Label(text="[color=000000]Period[/color]", markup=True, font_size="20sp"))
-        txt_input = TextInput(id="txt_period")
+        txt_input = TextInput(id="txt_period", text=time.strftime("%Y"), multiline=False)
         layout_period.add_widget(txt_input)
 
         self.entity_box_layout.add_widget(layout_period)
@@ -646,6 +645,7 @@ class OutputVariableScreen(Screen):
         if self.manager.current == 'output_variable':
             self.ids.variable_added_output.clear_widgets()
             self.ids.menu_a_tendina_variabili_output.text = ''
+            self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
             self.manager.get_screen('make_simulation').ids.variable_added.clear_widgets()
             self.manager.get_screen('make_simulation').ids.menu_a_tendina_variabili.text = ''
             self.manager.get_screen('make_simulation').ids.input_value_variable.text = ''
@@ -732,20 +732,45 @@ class OutputVariableScreen(Screen):
 
     def go_to_execute_simulation(self):
         if self.manager.current == 'output_variable':
-            string_var_input = "The situation is following:\nInput\n"
-            for el_input in self.manager.get_screen('make_simulation').ids.variable_added.children:
-                string_var_input += "-" + str(el_input.text) + "\n"
-            string_var_output = "Output\n"
-            for el_output in self.ids.variable_added_output.children:
-                string_var_output += "-" + str(el_output.text) + "\n"
-            content = ConfirmPopup(text=str(string_var_input) + "\n" + str(string_var_output))
-            content.bind(on_answer=self._on_answer)
-            self.popup = Popup(title="Answer Question", content=content, size_hint=(None, None), size=(480, 400),
-                               auto_dismiss=False)
-            self.popup.open()
+            dictionary_of_input = self.manager.get_screen('make_simulation').dict_of_entity_variable_value
+            dictionary_of_output = self.dict_of_entity_variable_value_output
+            if len(dictionary_of_input.keys()) != len(dictionary_of_output.keys()):
+                print "errore"
+            else:
+                message_popup = "Are you sure to continue?"
+                content = ConfirmPopup(text=message_popup)
+                content.bind(on_answer=self._on_answer)
+                self.popup = Popup(title="Question", content=content, auto_dismiss=False)
+                self.popup.open()
 
     def _on_answer(self, instance, answer):
         if answer == 'Yes':
+            self.manager.get_screen('execute_simulation').run_simulation()
+            self.popup.dismiss()
+            dictionary_of_input = self.manager.get_screen('make_simulation').dict_of_entity_variable_value
+            dictionary_of_output = self.dict_of_entity_variable_value_output
+            list = []
+            i = 0
+            for key in dictionary_of_input.keys():
+                str = ""
+                str += key+"\n\n"
+                str += "[b]Input[/b]\n"
+                for element in dictionary_of_input[key]:
+                    str += "\t"+element[0]+": "+element[1]
+                    str += "\n"
+                str += "\n[b]Output[/b]\n"
+                for element in dictionary_of_output[key]:
+                    str += "\t"+element[0]
+                    str += "\n"
+                list.append(str)
+
+            for el in list:
+                print el
+            print list
+
+            pop = Pop("Summary - Entity inserted",list,self.callback,width=self.width-20, height=self.height-20)
+            pop.open()
+        self.popup.dismiss()
             try:
                 self.manager.get_screen('execute_simulation').run_simulation()
                 self.popup.dismiss()
@@ -757,10 +782,12 @@ class OutputVariableScreen(Screen):
                 self.popup_error_run_simulation.open()
                 self.manager.current = 'home'
 
+    def callback(self):
+        exit()
+
     def go_to_make_simulation(self):
         if self.manager.current == 'output_variable':
             self.manager.current = 'make_simulation'
-
 
 class ExecuteSimulationScreen(Screen):
 
