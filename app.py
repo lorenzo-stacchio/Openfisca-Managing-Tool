@@ -745,33 +745,9 @@ class OutputVariableScreen(Screen):
 
     def _on_answer(self, instance, answer):
         if answer == 'Yes':
-            self.manager.get_screen('execute_simulation').run_simulation()
-            self.popup.dismiss()
-            dictionary_of_input = self.manager.get_screen('make_simulation').dict_of_entity_variable_value
-            dictionary_of_output = self.dict_of_entity_variable_value_output
-            list = []
-            i = 0
-            for key in dictionary_of_input.keys():
-                str = ""
-                str += key+"\n\n"
-                str += "[b]Input[/b]\n"
-                for element in dictionary_of_input[key]:
-                    str += "\t"+element[0]+": "+element[1]
-                    str += "\n"
-                str += "\n[b]Output[/b]\n"
-                for element in dictionary_of_output[key]:
-                    str += "\t"+element[0]
-                    str += "\n"
-                list.append(str)
-
-            for el in list:
-                print el
-            print list
-
-            pop = Pop("Summary - Entity inserted",list,self.callback,width=self.width-20, height=self.height-20)
-            pop.open()
-        self.popup.dismiss()
             try:
+                self.manager.get_screen('execute_simulation').run_simulation()
+                self.popup.dismiss()
                 self.manager.get_screen('execute_simulation').run_simulation()
                 self.popup.dismiss()
                 dictionary_of_input = self.manager.get_screen('make_simulation').dict_of_entity_variable_value
@@ -790,6 +766,10 @@ class OutputVariableScreen(Screen):
                         str += "\t" + element[0]
                         str += "\n"
                     list.append(str)
+
+                for el in list:
+                    print el
+                print list
 
                 pop = Pop("Summary - Entity inserted", list, self.callback, width=self.width - 20,
                           height=self.height - 20)
