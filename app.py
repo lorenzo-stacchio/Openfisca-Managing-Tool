@@ -737,19 +737,6 @@ class OutputVariableScreen(Screen):
             if len(dictionary_of_input.keys()) != len(dictionary_of_output.keys()):
                 print "errore"
             else:
-                message_popup = "Are you sure to continue?"
-                content = ConfirmPopup(text=message_popup)
-                content.bind(on_answer=self._on_answer)
-                self.popup = Popup(title="Question", content=content, auto_dismiss=False)
-                self.popup.open()
-
-    def _on_answer(self, instance, answer):
-        if answer == 'Yes':
-            try:
-                self.manager.get_screen('execute_simulation').run_simulation()
-                self.popup.dismiss()
-                self.manager.get_screen('execute_simulation').run_simulation()
-                self.popup.dismiss()
                 dictionary_of_input = self.manager.get_screen('make_simulation').dict_of_entity_variable_value
                 dictionary_of_output = self.dict_of_entity_variable_value_output
                 list = []
@@ -771,9 +758,23 @@ class OutputVariableScreen(Screen):
                     print el
                 print list
 
-                pop = Pop("Summary - Entity inserted", list, self.callback, width=self.width - 20,
+                pop = Pop("Summary - Entity inserted", list, self.close_summary(), width=self.width - 20,
                           height=self.height - 20)
                 pop.open()
+
+
+    def close_summary(self):
+        message_popup = "Are you sure to continue?"
+        content = ConfirmPopup(text=message_popup)
+        content.bind(on_answer=self._on_answer)
+        self.popup = Popup(title="Question", content=content, auto_dismiss=False)
+        self.popup.open()
+
+    def _on_answer(self, instance, answer):
+        if answer == 'Yes':
+            try:
+                self.manager.get_screen('execute_simulation').run_simulation()
+                self.popup.dismiss()
                 self.manager.current = 'execute_simulation'
             except Exception as e:
                 self.popup.dismiss()
