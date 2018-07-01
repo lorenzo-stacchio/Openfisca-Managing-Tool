@@ -520,14 +520,14 @@ class MakeSimulation(Screen):
         if self.ids.menu_a_tendina_variabili.text != '' and self.ids.input_value_variable.text != '':
             if not self.exist_tuple(self.dict_of_entity_variable_value, self.ids.menu_a_tendina_entita.text,
                                     self.ids.menu_a_tendina_variabili.text):
-                self.ids.variable_added.add_widget(Button(
-                    text=self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text + " - " + self.ids.input_value_variable.text,
-                    on_release=self.destroy_button,
-                    font_size= '14sp',
-                    background_color=(255, 255, 255, 0.9),
-                    color=(0, 0, 0, 1)))
                 try:
                     self.situations[self.ids.menu_a_tendina_entita.text ].add_variable_to_choosen_input_variables(choosen_input_variable = self.ids.menu_a_tendina_variabili.text, value = self.ids.input_value_variable.text)
+                    self.ids.variable_added.add_widget(Button(
+                        text=self.ids.menu_a_tendina_entita.text + " - " + self.ids.menu_a_tendina_variabili.text + " - " + self.ids.input_value_variable.text,
+                        on_release=self.destroy_button,
+                        font_size='14sp',
+                        background_color=(255, 255, 255, 0.9),
+                        color=(0, 0, 0, 1)))
                     if not self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
                         self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text] = []
                     tuple = [self.ids.menu_a_tendina_variabili.text, self.ids.input_value_variable.text]
