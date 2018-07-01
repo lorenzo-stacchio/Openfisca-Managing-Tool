@@ -79,6 +79,61 @@ class ConfirmPopup(GridLayout):
         pass
 
 
+class PopupSelectReform(Popup):
+    reforms_name_immutable = []
+    actual_reform = []
+    selected_reform = ""
+    def __init__(self,reform,screen_manager, **kwargs):
+        super(PopupSelectReform, self).__init__(**kwargs)
+        if (screen_manager is None) or not (isinstance(screen_manager, ScreenManager)) :
+            raise TypeError("You have to insert a screen manager to instantiate Popup")
+        else:
+            self.screen_manager = screen_manager
+        #prendi la lista delle riforme
+        list_reforms = list(reform.get_reform_list())
+        #memorizzale (questo oggetto non dovra essere cambiato)
+        self.reforms_name_immutable = list(list_reforms)
+        #metti le riforme nello spinner
+        self.ids.id_spinner_reforms.values = list(list_reforms)
+        #memorizza l'oggetto riforma
+        self.object_reform = reform
+        #setta il valore iniziale dello spinner
+        if self.ids.id_spinner_reforms.values:
+            self.ids.id_spinner_reforms.text = self.ids.id_spinner_reforms.values[0]
+        else:
+            self.ids.id_spinner_reforms.text = ""
+
+
+    def chiudi_popup(self):
+        self.dismiss()
+        self.screen_manager.get_screen('execute_simulation').run_simulation()
+        self.screen_manager.current = 'execute_simulation'
+
+    #runna la riforma se conferma
+    def confirm(self):
+        self.object_reform.set_choose_reform(self.ids.id_spinner_reforms.text)
+        if self.selected_reform != "":
+            self.screen_manager.get_screen('execute_simulation').run_simulation(self.object_reform)
+            self.screen_manager.current = 'execute_simulation'
+
+    def change_spinner(self):
+        self.actual_reform = []
+        self.ids.id_spinner_reforms.value = []
+        if self.ids.id_text_search_box_reforms.text == "":
+            self.actual_reform = list(self.reforms_name_immutable)
+        else:
+            for reform in self.reforms_name_immutable:
+                if(self.ids.id_text_search_box_reforms.text in reform):
+                    self.actual_reform.append(reform)
+        self.actual_reform.sort()
+        self.ids.id_spinner_reforms.values = self.actual_reform
+        if self.ids.id_spinner_reforms.values:
+            self.ids.id_spinner_reforms.text = self.ids.id_spinner_reforms.values[0]
+        else:
+            self.ids.id_spinner_reforms.text = ""
+
+
+
 class Pop(ModalView):
     list=[]
     index = 0

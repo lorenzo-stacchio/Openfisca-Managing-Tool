@@ -773,20 +773,24 @@ class OutputVariableScreen(Screen):
     def _on_answer(self, instance, answer):
         if answer == 'Yes':
             try:
-                self.manager.get_screen('execute_simulation').run_simulation()
+
                 self.popup.dismiss()
-                self.manager.current = 'execute_simulation'
+                #CREATE A NEW POPUP
+                #Creo l'oggetto riforma
+                reform = Reform()
+                #Creo il popup e lo apro passandogli la riforma
+                popup_select_reform = PopupSelectReform(reform,self.manager)
+                popup_select_reform.open()
+
+
             except Exception as e:
                 self.popup.dismiss()
                 self.popup_error_run_simulation = ErrorPopUp()
                 self.popup_error_run_simulation.ids.label_error.text = str(e)
                 self.popup_error_run_simulation.open()
                 self.manager.current = 'home'
-
         self.popup.dismiss()
 
-    def callback(self):
-        exit()
 
     def go_to_make_simulation(self):
         if self.manager.current == 'output_variable':
@@ -797,7 +801,7 @@ class ExecuteSimulationScreen(Screen):
     def __init__(self, **kwargs):
         super(ExecuteSimulationScreen, self).__init__(**kwargs)
 
-    def run_simulation(self):
+    def run_simulation(self,reform=None):
         # situations
         situations =  self.manager.get_screen('make_simulation').situations
         period =  str(self.manager.get_screen('choose_entity').period).split("-")
@@ -811,16 +815,17 @@ class ExecuteSimulationScreen(Screen):
         # get notes to visualize results
         for key_name, value_situation in situations.iteritems():
             simulation_generator.add_situation_to_simulator(value_situation)
-        reform = Reform()
-        reform.set_choose_reform('diminuzione_aliquota_IRPEF_redditi_inferiori_15000')
-        print reform.get_choose_reform()
-        simulation_generator.set_reform(reform)
+
+
+        if reform != None:
+            simulation_generator.set_reform(reform)
         # compute
         simulation_generator.generate_simulation()
         # visualize results
         self.string_rst_documents = simulation_generator.generate_rst_strings_document_after_simulation()
         self.current_index = 0
         self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
+
 
 
     def next_rst_result(self):

@@ -250,3 +250,34 @@
             text:"Click if you finish to modify the formula"
             size_hint: 1,0.1
             on_press:root.dismiss(), root.update_lines_basing_on(root.ids.txt_modify_formula.text)
+
+<PopupSelectReform>:
+    size_hint: 0.8,0.8
+    title: "Select Reform"
+    BoxLayout:
+        orientation:'vertical'
+        Label:
+            text: "Select a reform"
+        TextInput:
+            id: id_text_search_box_reforms
+            size_hint: (0.8,None)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+            multiline: False
+            on_text_validate: root.change_spinner()
+        Label:
+        Spinner:
+            id: id_spinner_reforms
+            size_hint: (0.8,None)
+            pos_hint: {'center_x': .5, 'center_y': .5}
+        Label:
+        GridLayout:
+            size_hint: 1,0.1
+            cols: 2
+            size_hint_y: None
+            height: '44sp'
+            Button:
+                text: 'Select this reform'
+                on_press: root.confirm()
+            Button:
+                text: 'Continue without reform'
+                on_press: root.chiudi_popup()
