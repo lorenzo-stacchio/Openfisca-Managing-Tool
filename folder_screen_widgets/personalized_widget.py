@@ -82,7 +82,6 @@ class ConfirmPopup(GridLayout):
 class PopupSelectReform(Popup):
     reforms_name_immutable = []
     actual_reform = []
-    selected_reform = ""
     def __init__(self,reform,screen_manager, **kwargs):
         super(PopupSelectReform, self).__init__(**kwargs)
         if (screen_manager is None) or not (isinstance(screen_manager, ScreenManager)) :
@@ -112,13 +111,14 @@ class PopupSelectReform(Popup):
     #runna la riforma se conferma
     def confirm(self):
         self.object_reform.set_choose_reform(self.ids.id_spinner_reforms.text)
-        if self.selected_reform != "":
+        if self.ids.id_spinner_reforms.text != "":
             self.screen_manager.get_screen('execute_simulation').run_simulation(self.object_reform)
             self.screen_manager.current = 'execute_simulation'
+        self.dismiss()
 
     def change_spinner(self):
         self.actual_reform = []
-        self.ids.id_spinner_reforms.value = []
+        self.ids.id_spinner_reforms.values = []
         if self.ids.id_text_search_box_reforms.text == "":
             self.actual_reform = list(self.reforms_name_immutable)
         else:
