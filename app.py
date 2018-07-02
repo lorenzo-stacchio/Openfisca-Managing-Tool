@@ -10,7 +10,6 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.lang import Builder
-from kivy.clock import Clock
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.utils import get_color_from_hex
 from kivy.graphics import Rectangle, Color
@@ -31,7 +30,6 @@ from script.download_openfisca_system import check_package_is_installed
 from script.download_openfisca_system import install_country_package
 from script.Simulation.Situation_for_simulation import *
 from script.reforms_maker.reform_variables import *
-from multiprocessing.pool import ThreadPool
 from folder_screen_widgets.personalized_widget import *
 
 TAX_BENEFIT_SYSTEM_MODULE_CLASS = None
@@ -195,7 +193,7 @@ class ChooseEntityScreen(Screen):
             text="[color=000000]You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD[/color]",markup=True,
             font_size="20sp"))
         boxButtons = BoxLayout(orientation="horizontal")
-        boxButtons.add_widget(Button(id="button_go_to_insert_input_variables", text="Click", size_hint=(1.0,0.4), background_color=(0.151, 0.022, 0.064, 1)))
+        boxButtons.add_widget(Button(id="button_go_to_insert_input_variables", text="Confirm", size_hint=(1.0,0.4), background_color=(0.151, 0.022, 0.064, 1)))
         boxButtons.add_widget(Button(id="button_go_to_home", text="Come back to home",size_hint=(1.0,0.4),  background_color=(0.151, 0.022, 0.064, 1)))
         self.entity_box_layout.add_widget(boxButtons)
         Clock.schedule_once(self._finish_init)
@@ -223,14 +221,23 @@ class ChooseEntityScreen(Screen):
                 if el.children[2].text != "0":
                     condition = True
 
+        if not condition:
+            error_popup = ErrorPopUp()
+            error_popup.ids.label_error.text = "Enter at least one entity"
+            error_popup.open()
+
         #save period
         self.period = box_layout[2].children[0].text
         if not self.check_data(self.period):
             self.period = ""
             condition = False
+            error_popup = ErrorPopUp()
+            error_popup.ids.label_error.text = "Data format isn't correct!"
+            error_popup.open()
         if condition:
             self.manager.get_screen('make_simulation').inizializza_make_simulation()
             self.manager.current = 'make_simulation'
+
 
 
     def check_data(self, data):
@@ -490,13 +497,17 @@ class MakeSimulation(Screen):
 
     def go_to_output_variables(self):
         if self.manager.current == 'make_simulation':
-            if len(self.ids.variable_added.children) != 0:
+            if len(self.dict_of_entity_variable_value) ==  len(self.ids.menu_a_tendina_entita.values):
                 self.manager.transition = kivy.uix.screenmanager.SlideTransition(direction='left')
                 self.manager.transition.duration = .6
                 self.manager.get_screen('output_variable').inizializza_output_variable()
                 self.manager.current = 'output_variable'
                 self.manager.transition = kivy.uix.screenmanager.TransitionBase()
                 self.manager.transition.duration = .4
+            else:
+                error_popup = ErrorPopUp()
+                error_popup.ids.label_error.text = "Insert at least a variable for each entity"
+                error_popup.open()
 
 
     def exist_tuple(self, dictionary, input_entity, input_variable):
@@ -560,15 +571,13 @@ class MakeSimulation(Screen):
                     self.popup_error_run_simulation.ids.label_error.text = str(e)
                     self.popup_error_run_simulation.open()
 
-
-
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.input_value_variable.text = ""
             self.ids.id_search_box_input_variable.text = ""
-
-
-    def change_view_added_variables(self):
-        pass
+        else:
+            error_popup = ErrorPopUp()
+            error_popup.ids.label_error.text = "You can't insert an empty variable and/or value"
+            error_popup.open()
 
 
     def destroy_button(self, button):
@@ -714,6 +723,10 @@ class OutputVariableScreen(Screen):
 
             self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
             self.ids.id_search_box_input_variable.text = ""
+        else:
+            error_popup = ErrorPopUp()
+            error_popup.ids.label_error.text = "You can't insert an empty variable"
+            error_popup.open()
 
     def destroy_button(self, button):
         entity, variable = button.text.split(" - ")
@@ -735,7 +748,9 @@ class OutputVariableScreen(Screen):
             dictionary_of_input = self.manager.get_screen('make_simulation').dict_of_entity_variable_value
             dictionary_of_output = self.dict_of_entity_variable_value_output
             if len(dictionary_of_input.keys()) != len(dictionary_of_output.keys()):
-                print "errore"
+                error_popup = ErrorPopUp()
+                error_popup.ids.label_error.text = "You must insert at least an output variable for each entity"
+                error_popup.open()
             else:
                 dictionary_of_input = self.manager.get_screen('make_simulation').dict_of_entity_variable_value
                 dictionary_of_output = self.dict_of_entity_variable_value_output
@@ -821,6 +836,11 @@ class ExecuteSimulationScreen(Screen):
             simulation_generator.set_reform(reform)
         # compute
         simulation_generator.generate_simulation()
+        property_dict_viewer = {"paragraph": "202020ff", "link": "33AAFFff", "background": "ffffffff",
+                                "bullet": "000000ff", "title": "971640ff"}
+        for type,color_type in property_dict_viewer.items():
+            self.ids.document_results_simulation_viewer.colors[type] = color_type
+
         # visualize results
         self.string_rst_documents = simulation_generator.generate_rst_strings_document_after_simulation()
         self.current_index = 0
@@ -839,6 +859,10 @@ class ExecuteSimulationScreen(Screen):
             self.current_index = self.current_index -1
         self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
 
+    def go_to_home(self):
+        if self.manager.current == "execute_simulation":
+            self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
+            self.manager.current = "home"
 
 class ReformsScreen(Screen):
     choice = StringProperty()

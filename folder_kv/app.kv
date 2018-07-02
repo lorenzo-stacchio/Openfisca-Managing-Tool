@@ -747,6 +747,12 @@
         Label:
             text: "Summary of results for each situation"
             size_hint: (1.0,0.05)
+            canvas.before:
+                Color:
+                    rgba: hex('#971640')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
         RstDocument:
             id: document_results_simulation_viewer
             size_hint: (1.0,0.9)
@@ -755,12 +761,19 @@
             size_hint: (1.0,0.05)
             Button:
                 id: left_switch
-                text: "previous_rst"
+                text: "Previous entity"
                 on_press: root.previous_rst_result()
+                background_color: hex('971640')
             Button:
                 id: right_switch
-                text: "next_rst"
+                text: "Next entity"
                 on_press: root.next_rst_result()
+                background_color: hex('971640')
+            Button:
+                id: home_button
+                text: "Go to home"
+                on_press: root.go_to_home()
+                background_color: hex('971640')
 
 <LabelLeftTop>
     padding_x: 20
@@ -787,13 +800,15 @@
 
 
 <ErrorPopUp>:
-    size_hint: 0.8,0.8
+    size_hint: 0.5,0.5
     title: "Some error"
     BoxLayout:
         orientation:'vertical'
         Label:
             id: label_error
             text_size: self.width, None
+            halign: 'center'
+            valign: 'middle'
             size_hint: (1.0,0.8)
         Button:
             text:"Close this popup"
