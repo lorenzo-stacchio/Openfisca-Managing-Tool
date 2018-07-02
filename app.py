@@ -669,7 +669,7 @@ class OutputVariableScreen(Screen):
             for tuple in self.dict_of_entity_variable_value_output[
                 self.ids.menu_a_tendina_entita_output.text]:
                 self.ids.variable_added_output.add_widget(
-                    Button(text=self.ids.menu_a_tendina_entita_output.text + " - " + tuple[0] + " - " + tuple[1],
+                    Button(text=self.ids.menu_a_tendina_entita_output.text + " - " + tuple[0],
                            font_size='14sp',
                            on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
