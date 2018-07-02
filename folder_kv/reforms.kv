@@ -281,3 +281,14 @@
             Button:
                 text: 'Continue without reform'
                 on_press: root.chiudi_popup()
+
+
+<LoadingPopUp>:
+    size_hint: 0.8,0.8
+    title: "Log message"
+    BoxLayout:
+        orientation:'vertical'
+        TextInput:
+            id: txt_log
+            multiline: True
+            size_hint:(1,1)

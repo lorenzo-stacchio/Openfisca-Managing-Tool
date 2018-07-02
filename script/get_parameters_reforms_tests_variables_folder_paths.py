@@ -3,7 +3,8 @@ import os
 
 def are_all_folders(dict_of_paths):
     for key in dict_of_paths:
-        if not (os.path.isdir(dict_of_paths[key]) and os.path.exists(dict_of_paths[key])):
+        if not (os.path.isdir(r""+dict_of_paths[key])) and os.path.exists(r""+dict_of_paths[key]):
+            print "Pippo"
             return False
     return True
 

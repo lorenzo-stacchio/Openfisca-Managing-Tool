@@ -28,6 +28,7 @@
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
                   },
+                    "reforms": "",
                   "entities" : {
                     "entities.py": {
                       "household": "Famille",
@@ -47,6 +48,7 @@
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
                   },
+                  "reforms": "reforms",
                   "entities" :{
                     "entities.py": {
                       "household": "Ménage",
@@ -63,6 +65,7 @@
                   "tax_benefit_system": {
                     "france_taxbenefitsystem.py": "FranceTaxBenefitSystem"
                   },
+                  "reforms": "reforms",
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
                   },
@@ -85,7 +88,7 @@
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
                   },
-                    "reforms": "reforms",
+                  "reforms": "reforms",
                   "entities" :{
                     "entities.py": {
                       "household": "Familia",

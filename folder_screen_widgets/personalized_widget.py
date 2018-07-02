@@ -26,6 +26,7 @@ class LineOfChooser(BoxLayout):
     def incrementa(self):
         self.ids.value.text = str(int(self.ids.value.text) + 1)
 
+
 class LabelLeftTop(Label):
     pass
 
@@ -63,6 +64,9 @@ class ModifyFormulaPopup(Popup):
 class WatchingFormulaPopUp(Popup):
     pass
 
+
+class LoadingPopUp(Popup):
+    pass
 
 class ErrorPopUp(Popup):
     pass

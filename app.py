@@ -3,6 +3,7 @@ import kivy
 import json
 import os
 import sys
+import threading
 import datetime
 kivy.require("1.10.0")
 from kivy.app import App
@@ -10,6 +11,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.lang import Builder
+from kivy.core.image import Image as kivyImage
 from kivy.clock import Clock
 from kivy.properties import StringProperty, ObjectProperty
 from kivy.utils import get_color_from_hex
@@ -31,8 +33,8 @@ from script.download_openfisca_system import check_package_is_installed
 from script.download_openfisca_system import install_country_package
 from script.Simulation.Situation_for_simulation import *
 from script.reforms_maker.reform_variables import *
-from multiprocessing.pool import ThreadPool
 from folder_screen_widgets.personalized_widget import *
+
 
 TAX_BENEFIT_SYSTEM_MODULE_CLASS = None
 ENTITY_MODULE_CLASS = None
@@ -40,20 +42,38 @@ ENTITY_MODULE_CLASS_ALL_ENTITIES = None
 REFORM_MODULE = None
 dict_entita ={}
 
-# Screen
+
 class InitScreen(Screen):
-    download_information = StringProperty("[color=000000] [b] [size=20] Select an openfisca-system[/size] [b][/color]")
+    download_information = StringProperty("[color=000000] [b] [size=20] If you want to download an openfisca-system ,please click ones of the following buttons[/size] [b][/color]")
     PATH_OPENFISCA = None
 
     def __init__(self, **kwargs):
         super(InitScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._finish_init)
+        Clock.schedule_once(self.refresh_system_list_button)
 
-    def _finish_init(self, dt):
-        self.ids.home_file_chooser.path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+    def refresh_system_list_button(self,dt):
+        buttons_instances = []
+        system_names = []
+        self.dict_button_reference = {} # used to know what button is clicked
+        with open('./messages/config_import.json') as f:
+            data_config = json.load(f)
+        for key,value in data_config.items():
+            for key_2, value_2 in value.items():
+                if key_2 == 'project_name':
+                    system_names.append(value_2)
+        system_filename_list = [name for name in os.listdir((os.getcwd()+ "\\openfisca_systems")) if os.path.isdir(os.path.join((os.getcwd()+ "\\openfisca_systems"), name))]
+        for file_name in system_filename_list:
+            for system_name in system_names:
+                if os.path.basename(file_name) == system_name:
+                    button = self.ids[system_name] # get button that has the same id of openfisca_project
+                    button.disabled = False
+                    button.bind(on_press = self.manager.current_screen.selected_file)
+                    btn_image = kivyImage(os.getcwd() + "\\img\\openfisca_system\\"+ file_name + ".png")
+                    button.Image = btn_image
+                    self.dict_button_reference[button] = os.getcwd()+ "\\openfisca_systems\\" + file_name
 
-    def selected_file(self, *args):
-        self.PATH_OPENFISCA = args[1][0]
+    def selected_file(self,button):
+        self.PATH_OPENFISCA = self.dict_button_reference[button]
         dict = get_all_paths(self.PATH_OPENFISCA)
         if dict:
             if self.manager.current == 'init':
@@ -63,12 +83,22 @@ class InitScreen(Screen):
                 if not (check_package_is_installed(country_package_name=os.path.basename(self.PATH_OPENFISCA))):
                     install_country_package(country_package_name=os.path.basename(self.PATH_OPENFISCA),
                                             full_path=self.PATH_OPENFISCA)
+                    reload(site)
                 self.init_import_tax_benefit_system(self.PATH_OPENFISCA,data_config)
-                self.manager.get_screen('visualize_system').ricevi_inizializza_path(self.PATH_OPENFISCA)
-                self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
-
+                load_popup = LoadingPopUp()
+                start = datetime.datetime.now()
+                load_popup.ids.txt_log.text = "Loading modules..."
+                load_popup.open()
+                print datetime.datetime.now() - start
+                Clock.schedule_once(self.manager.get_screen('visualize_system').ricevi_inizializza_path,0.5)
+                Clock.schedule_once(self.manager.get_screen('home').ricevi_inizializza_path,0.5)
+                load_popup.dismiss()
+                #self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
+                #load_pop_up.dismiss()
         else:
-            self.ids.lbl_txt_2.text = "[u][b]The selected directory doesn't \n contain an openfisca regular system[/b][/u]"
+            self.popup_error_run_simulation = ErrorPopUp()
+            self.popup_error_run_simulation.ids.label_error.text = "Environment error, please contact an administrator"
+            self.popup_error_run_simulation.open()
 
 
     def init_import_tax_benefit_system(self, system_selected, json_config_path_object):
@@ -86,7 +116,6 @@ class InitScreen(Screen):
                                 all_entities_classname = entity_elements_value
                 if key == 'reforms':
                     reform_father_folder = value
-        reload(site)
         tax_benefit_system_module = importlib.import_module(system_name + "." + str(tbs_module))
         global TAX_BENEFIT_SYSTEM_MODULE_CLASS
         TAX_BENEFIT_SYSTEM_MODULE_CLASS = getattr(tax_benefit_system_module, tbs_module_class)
@@ -95,7 +124,10 @@ class InitScreen(Screen):
         global ENTITY_MODULE_CLASS_ALL_ENTITIES
         ENTITY_MODULE_CLASS_ALL_ENTITIES = all_entities_classname
         global REFORM_MODULE
-        REFORM_MODULE = importlib.import_module(system_name + "." + reform_father_folder)
+        if reform_father_folder=="":
+            REFORM_MODULE = None
+        else:
+            REFORM_MODULE = importlib.import_module(system_name + "." + reform_father_folder)
         reload(site)
 
 
@@ -115,21 +147,21 @@ class InitScreen(Screen):
             data_config = json.load(f)
         system_selected = id_button.replace("button","openfisca")
         # get system info depending on the choice
-        user_desktop = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
+        system_path = os.getcwd()+ "\\openfisca_systems"
         github_link = data_config[system_selected]["link"]
         project_name = data_config[system_selected]["project_name"]
         # waiting popup
         # TODO: AGGIUSTA IL CAMBIAMENTO DELLA LABEL
         self.download_information= "[color=FF033D] [b] [size=20] [u] Downloading and installing the system[/size] [u] [b] [/color]"
 
-        result = download_and_install_openfisca(user_desktop, project_name, github_link)
+        result = download_and_install_openfisca(system_path, project_name, github_link)
         if result:
             self.generate_pop_up( title = 'System saved!',
-                                    content = Label(text='The system [b]' + system_selected + '[b] was saved in:' + user_desktop, size = self.parent.size, halign="left", valign="middle"))
+                                    content = Label(text='The system [b]' + system_selected + '[b] was saved in:' + system_path, size = self.parent.size, halign="left", valign="middle"))
         else:
             self.generate_pop_up( title = 'System already exist!',
-                            content = Label(text='The system [b]' + system_selected + '[b] already exist in:' + user_desktop + "\n If you want to download a newest version, please erase it!", size = self.parent.size, halign="left", valign="middle"))
-
+                            content = Label(text='The system [b]' + system_selected + '[b] already exist in:' + system_path + "\n If you want to download a newest version, please erase it!", size = self.parent.size, halign="left", valign="middle"))
+        self.refresh_system_list_button(dt=None)
 
     def get_id(self, instance):
             for id, widget in self.ids.items():
@@ -142,7 +174,8 @@ class HomeScreen(Screen):
     def __init__(self, **kwargs):
         super(HomeScreen, self).__init__(**kwargs)
 
-    def ricevi_inizializza_path(self, path):
+    def ricevi_inizializza_path(self,*args):
+        path = self.manager.get_screen('init').PATH_OPENFISCA
         self.dict_path = get_all_paths(path)
         self.ids.label_0_0.text = """[color=000000]
         [b][size=24sp]Hello ![/size][/b]\n
@@ -151,7 +184,7 @@ class HomeScreen(Screen):
             - Visualize variables, reforms and parameters of the selected country;
             - Create and Execute a reform;
             - Execute a Simulation.
-        You have selected this folder: [i]""" + path[:path.rindex('\\') + 1] + "[b]" + os.path.basename(
+        You have selected this folder: [i] [b]""" + os.path.basename(
             path) + "[/i][/b]" + ".[/color][/size]\n\n"
 
     def go_to_visualize(self):
@@ -268,7 +301,8 @@ class VisualizeSystemScreen(Screen):
     def __init__(self, **kwargs):
         super(VisualizeSystemScreen, self).__init__(**kwargs)
 
-    def ricevi_inizializza_path(self, path):
+    def ricevi_inizializza_path(self,*args):
+        path = self.manager.get_screen('init').PATH_OPENFISCA
         self.dict_path = get_all_paths(path)
         self.PATH_OPENFISCA = self.dict_path['inner_system_folder']
         with open('./messages/config_import.json') as f:
@@ -277,11 +311,13 @@ class VisualizeSystemScreen(Screen):
         global TAX_BENEFIT_SYSTEM_MODULE_CLASS
         global ENTITY_MODULE_CLASS
         global ENTITY_MODULE_CLASS_ALL_ENTITIES
+        global REFORM_MODULE
         Variable_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
         Reform_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
         # entity of situation for simulator
         Entity.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, entity_module_class = ENTITY_MODULE_CLASS,entity_module_all_entities = ENTITY_MODULE_CLASS_ALL_ENTITIES)
-        Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, reform_module = REFORM_MODULE)
+        if not(REFORM_MODULE is None):
+            Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, reform_module = REFORM_MODULE)
         Simulation_generator.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS)
         Variable_To_Reform.import_depending_on_system(tax_benefit_system_module_class = TAX_BENEFIT_SYSTEM_MODULE_CLASS, system_entity_module = ENTITY_MODULE_CLASS, system_all_entities_name = ENTITY_MODULE_CLASS_ALL_ENTITIES)
 
@@ -968,7 +1004,9 @@ class SelectVariableScreen(Screen):
             variables_name = []
             for key_variable, variables_content in TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems():
                 if key_variable == self.ids.id_spinner_select_variable_screen.text:
-                    v_r_man = Variable_reform_manager(path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], variable = Variable_To_Reform(name = key_variable), reform_name = "neutralize_" + self.ids.id_spinner_select_variable_screen.text)
+                    var = Variable_To_Reform()
+                    var.set_name(key_variable)
+                    v_r_man = Variable_reform_manager(path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], variable = var, reform_name = "neutralize_" + self.ids.id_spinner_select_variable_screen.text)
                     v_r_man.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)
                     break
         self.popup.dismiss()
@@ -1160,7 +1198,7 @@ class openfisca_managing_tool(App):
     def build(self):
         Builder.load_file('./folder_kv/reforms.kv')
         Builder.load_file('./folder_kv/app.kv')
-        self.icon = 'img/openfisca.ico'
+        self.icon = 'img/openfisca_man.ico'
         self.title = 'Openfisca Managing Tool'
         return MyScreenManager()
 
