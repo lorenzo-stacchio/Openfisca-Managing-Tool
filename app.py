@@ -445,16 +445,16 @@ class MakeSimulation(Screen):
         if self.ids.id_search_box_input_variable != "":
             valori = dict_entita[self.ids.menu_a_tendina_entita.text]
             for key_variable in valori:
-                if (self.ids.id_search_box_input_variable.text in key_variable):
+                if (self.ids.id_search_box_input_variable.text.lower() in key_variable.lower()):
                     variables_name.append(key_variable)
-        elif self.previous_text_typed in self.ids.id_search_box_input_variable.text:
+        elif self.previous_text_typed.lower() in self.ids.id_search_box_input_variable.text.lower():
             for key_variable in self.ids.menu_a_tendina_variabili.values:
-                if (self.previous_text_typed not in key_variable):
+                if (self.previous_text_typed.lower() not in key_variable.lower()):
                     variables_name.remove(key_variable)
         else:
             valori = dict_entita[self.ids.menu_a_tendina_entita.text]
             for key_variable in valori:
-                if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
+                if ((key_variable.lower() not in variables_name.lower()) and self.previous_text_typed.lower() in key_variable.lower()):
                     variables_name.append(key_variable)
 
         variables_name.sort()
@@ -617,20 +617,20 @@ class OutputVariableScreen(Screen):
             #TOFIX
             valori = dict_entita[self.ids.menu_a_tendina_entita_output.text]
             for key_variable in valori:
-                if (self.ids.id_search_box_input_variable.text in key_variable):
+                if (self.ids.id_search_box_input_variable.text.lower() in key_variable.lower()):
                     variables_name.append(key_variable)
         # Se la vecchia stringa è contenuta nella nuova significa che ho aggiunto una lettera
         # Quindi devo eliminare ciò che contiene non contiene la nuova stringa
-        elif self.previous_text_typed in self.ids.id_search_box_input_variable.text:
+        elif self.previous_text_typed.lower() in self.ids.id_search_box_input_variable.text.lower():
             for key_variable in self.ids.menu_a_tendina_variabili_output.values:
-                if (self.previous_text_typed not in key_variable):
+                if (self.previous_text_typed.lower() not in key_variable.lower()):
                     variables_name.remove(key_variable)
         # Se la vecchia stringa non è contenuta nella nuova significa che ho ELIMINATO una lettera
         # Quindi devo aggiungere degli oggetti alla lista dato che filtro meno valori
         else:
             valori = dict_entita[self.ids.menu_a_tendina_entita_output.text]
             for key_variable in valori:
-                if ((key_variable not in variables_name) and self.previous_text_typed in key_variable):
+                if ((key_variable.lower() not in variables_name.lower()) and self.previous_text_typed.lower() in key_variable.lower()):
                     variables_name.append(key_variable)
 
         # Ordina alfabeticamente
@@ -902,16 +902,16 @@ class SelectVariableScreen(Screen):
             if self.ids.id_text_search_box != "":
                 dict = TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems()
                 for key_variable, variables_content in dict:
-                    if (self.ids.id_text_search_box.text in key_variable):
+                    if (self.ids.id_text_search_box.text.lower() in key_variable.lower()):
                         variables_name.append(key_variable)
-            elif self.previous_text_typed in self.ids.id_text_search_box:
+            elif self.previous_text_typed.lower() in self.ids.id_text_search_box.lower():
                 for key_variable in self.ids.id_spinner_select_variable_screen.values:
                     if(self.previous_text_typed not in key_variable):
                         variables_name.remove(key_variable)
             else:
                 dict = TAX_BENEFIT_SYSTEM_MODULE_CLASS().get_variables().iteritems()
                 for key_variable, variables_content in dict:
-                    if((key_variable not in variables_name) and self.previous_text_typed in key_variable):
+                    if((key_variable.lower() not in variables_name.lower()) and self.previous_text_typed.lower() in key_variable.lower()):
                         variables_name.append(key_variable)
 
 

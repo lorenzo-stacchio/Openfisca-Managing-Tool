@@ -123,7 +123,7 @@ class PopupSelectReform(Popup):
             self.actual_reform = list(self.reforms_name_immutable)
         else:
             for reform in self.reforms_name_immutable:
-                if(self.ids.id_text_search_box_reforms.text in reform):
+                if(self.ids.id_text_search_box_reforms.text.lower() in reform.lower()):
                     self.actual_reform.append(reform)
         self.actual_reform.sort()
         self.ids.id_spinner_reforms.values = self.actual_reform
