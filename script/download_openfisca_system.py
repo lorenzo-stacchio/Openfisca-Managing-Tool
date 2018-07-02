@@ -2,9 +2,9 @@ import os
 import json
 from subprocess import check_output,CalledProcessError
 from pip._internal.utils.misc import get_installed_distributions
+import site
 
-
-def download_and_install(path_to_save, project_name, github_link):
+def download_and_install(path_to_save, project_name, github_link,*args):
     current_path = os.getcwd()
     full_path = str(path_to_save + "\\"+ project_name)
     try:
@@ -24,17 +24,19 @@ def download_and_install(path_to_save, project_name, github_link):
                     print error['message']
         full_path = "\""+full_path+"\""
         check_output("pip install --editable " + full_path, shell=True).decode()
+        reload(site)
         os.chdir(current_path)
         return True
     except Exception as e:
         print e
         os.chdir(current_path)
+        print args
         return False
 
 
 def check_package_is_installed(country_package_name):
+    reload(site)
     installed_packages = sorted(["%s==%s" % (i.key, i.version) for i in get_installed_distributions()])
-    print(installed_packages)
     for pack in installed_packages:
         if country_package_name in pack:
             return True

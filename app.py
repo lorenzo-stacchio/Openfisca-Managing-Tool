@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+
 import kivy
 import json
 import os
 import sys
-import threading
 import datetime
+from functools import partial
 kivy.require("1.10.0")
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -51,6 +52,7 @@ class InitScreen(Screen):
         super(InitScreen, self).__init__(**kwargs)
         Clock.schedule_once(self.refresh_system_list_button)
 
+
     def refresh_system_list_button(self,dt):
         buttons_instances = []
         system_names = []
@@ -72,6 +74,7 @@ class InitScreen(Screen):
                     button.Image = btn_image
                     self.dict_button_reference[button] = os.getcwd()+ "\\openfisca_systems\\" + file_name
 
+
     def selected_file(self,button):
         self.PATH_OPENFISCA = self.dict_button_reference[button]
         dict = get_all_paths(self.PATH_OPENFISCA)
@@ -80,21 +83,17 @@ class InitScreen(Screen):
                 self.manager.current = 'home'
                 with open('./messages/config_import.json') as f:
                     data_config = json.load(f)
+                reload(site)
                 if not (check_package_is_installed(country_package_name=os.path.basename(self.PATH_OPENFISCA))):
                     install_country_package(country_package_name=os.path.basename(self.PATH_OPENFISCA),
                                             full_path=self.PATH_OPENFISCA)
-                    reload(site)
                 self.init_import_tax_benefit_system(self.PATH_OPENFISCA,data_config)
                 load_popup = LoadingPopUp()
-                start = datetime.datetime.now()
                 load_popup.ids.txt_log.text = "Loading modules..."
                 load_popup.open()
-                print datetime.datetime.now() - start
                 Clock.schedule_once(self.manager.get_screen('visualize_system').ricevi_inizializza_path,0.5)
                 Clock.schedule_once(self.manager.get_screen('home').ricevi_inizializza_path,0.5)
                 load_popup.dismiss()
-                #self.manager.get_screen('home').ricevi_inizializza_path(self.PATH_OPENFISCA)
-                #load_pop_up.dismiss()
         else:
             self.popup_error_run_simulation = ErrorPopUp()
             self.popup_error_run_simulation.ids.label_error.text = "Environment error, please contact an administrator"
@@ -141,27 +140,29 @@ class InitScreen(Screen):
 
 
     def download_system(self,btn_instance):
-        id_button = self.get_id(btn_instance)
+
+        self.id_button = self.get_id(btn_instance)
+        self.load_popup = LoadingPopUp()
+        self.load_popup.ids.txt_log.text = "Downloading and installing the system"
+        self.load_popup.open()
+        Clock.schedule_once(self.inner_down_function,0.5)
+
+
+    def inner_down_function(self,args):
         # read documents
         with open('messages\\config_import.json') as f:
             data_config = json.load(f)
-        system_selected = id_button.replace("button","openfisca")
+        system_selected = self.id_button.replace("button", "openfisca")
         # get system info depending on the choice
-        system_path = os.getcwd()+ "\\openfisca_systems"
+        system_path = os.getcwd() + "\\openfisca_systems"
         github_link = data_config[system_selected]["link"]
         project_name = data_config[system_selected]["project_name"]
-        # waiting popup
-        # TODO: AGGIUSTA IL CAMBIAMENTO DELLA LABEL
-        self.download_information= "[color=FF033D] [b] [size=20] [u] Downloading and installing the system[/size] [u] [b] [/color]"
-
-        result = download_and_install_openfisca(system_path, project_name, github_link)
-        if result:
-            self.generate_pop_up( title = 'System saved!',
-                                    content = Label(text='The system [b]' + system_selected + '[b] was saved in:' + system_path, size = self.parent.size, halign="left", valign="middle"))
-        else:
-            self.generate_pop_up( title = 'System already exist!',
-                            content = Label(text='The system [b]' + system_selected + '[b] already exist in:' + system_path + "\n If you want to download a newest version, please erase it!", size = self.parent.size, halign="left", valign="middle"))
+        download_and_install_openfisca(system_path, project_name, github_link)
+        reload(site)
         self.refresh_system_list_button(dt=None)
+        self.load_popup.dismiss()
+
+
 
     def get_id(self, instance):
             for id, widget in self.ids.items():

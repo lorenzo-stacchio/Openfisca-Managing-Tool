@@ -211,8 +211,10 @@ class Variable_File_Interpeter():
                 if 'class' in line and '(Variable):' in line:
                     self.__file_is_a_variable__ = True
 
+
     def get_variables(self):
         return self.__variables__
+
 
     def file_is_a_variable(self):
         return self.__file_is_a_variable__
