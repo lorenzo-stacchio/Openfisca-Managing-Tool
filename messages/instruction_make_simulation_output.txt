@@ -1,0 +1,6 @@
+[b]Instructions[/b]:
+    - Select a variable through:
+        - The spinner
+        - The search box (click enter to search)
+    - Click on "Add Variable"
+    - If you want to delete an inserted variable you can click on it

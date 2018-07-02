@@ -511,7 +511,7 @@
                 halign: 'right'
                 valign: 'top'
                 markup: True
-                size_hint: (1.0,0.08)
+                size_hint: (1.0,0.095)
                 canvas.before:
                     Color:
                         rgba: hex('#971640')
@@ -526,7 +526,7 @@
                 size_hint: (0.8,0.1)
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 on_text: root.update_form()
-                background_color: (0, 0.278, 0.172, 0.294)
+
                 text_size: self.width, None
                 height: self.texture_size[1]
                 padding_x: 10
@@ -565,7 +565,7 @@
                 id: menu_a_tendina_variabili
                 size_hint: (0.8,0.15)
                 pos_hint: {'center_x': .5, 'center_y': .5}
-                background_color: (0, 0.278, 0.172, 0.294)
+
                 text_size: self.width, None
                 height: self.texture_size[1]
                 padding_x: 10
@@ -586,7 +586,8 @@
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 on_press: root.add_value_and_reset_form()
                 background_color: hex('B48291')
-
+            Label:
+                size_hint: (1.0,0.05)
             Label:
                 id: information
                 markup: True
@@ -596,7 +597,7 @@
                 padding_x: 50
             Button:
                 text: 'Go to Output variable Screen'
-                size_hint: (1.0,0.085)
+                size_hint: (1.0,0.09)
                 on_press: root.go_to_output_variables()
                 background_color: hex('971640')
 
@@ -649,7 +650,7 @@
                 halign: 'right'
                 valign: 'top'
                 markup: True
-                size_hint: (1.0,0.08)
+                size_hint: (1.0,0.095)
                 canvas.before:
                     Color:
                         rgba: hex('#971640')
@@ -664,7 +665,7 @@
                 size_hint: (0.8,0.1)
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 on_text: root.update_form()
-                background_color: (0, 0.278, 0.172, 0.294)
+
                 text_size: self.width, None
                 height: self.texture_size[1]
                 padding_x: 10
@@ -703,7 +704,7 @@
                 id: menu_a_tendina_variabili_output
                 size_hint: (0.8,0.15)
                 pos_hint: {'center_x': .5, 'center_y': .5}
-                background_color: (0, 0.278, 0.172, 0.294)
+
                 text_size: self.width, None
                 height: self.texture_size[1]
                 padding_x: 10
@@ -716,6 +717,8 @@
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 on_press: root.add_value_and_reset_form()
 
+            Label:
+                size_hint: (1.0,0.05)
             Label:
                 id: information_output
                 markup: True
@@ -778,6 +781,12 @@
         Label:
             text: "Summary of results for each situation"
             size_hint: (1.0,0.05)
+            canvas.before:
+                Color:
+                    rgba: hex('#971640')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
         RstDocument:
             id: document_results_simulation_viewer
             size_hint: (1.0,0.9)
@@ -786,12 +795,19 @@
             size_hint: (1.0,0.05)
             Button:
                 id: left_switch
-                text: "previous_rst"
+                text: "Previous entity"
                 on_press: root.previous_rst_result()
+                background_color: hex('971640')
             Button:
                 id: right_switch
-                text: "next_rst"
+                text: "Next entity"
                 on_press: root.next_rst_result()
+                background_color: hex('971640')
+            Button:
+                id: home_button
+                text: "Go to home"
+                on_press: root.go_to_home()
+                background_color: hex('971640')
 
 <LabelLeftTop>
     padding_x: 20
@@ -818,13 +834,15 @@
 
 
 <ErrorPopUp>:
-    size_hint: 0.8,0.8
+    size_hint: 0.5,0.5
     title: "Some error"
     BoxLayout:
         orientation:'vertical'
         Label:
             id: label_error
             text_size: self.width, None
+            halign: 'center'
+            valign: 'middle'
             size_hint: (1.0,0.8)
         Button:
             text:"Close this popup"
