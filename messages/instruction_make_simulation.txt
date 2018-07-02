@@ -1,8 +1,0 @@
-[b]Instructions[/b]:
-    - Select a variable
-    - Insert into the text input form its value
-    - Click on "Add Variable"
-
-[b]Rules[/b]:
-    - You can't insert a blank variable
-    - You can't insert a blank variable value

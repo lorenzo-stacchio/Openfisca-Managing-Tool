@@ -190,8 +190,8 @@ class ChooseEntityScreen(Screen):
 
         self.entity_box_layout.add_widget(layout_period)
         self.entity_box_layout.add_widget(Label(
-            text="[color=000000]You can insert this type of period AAAA or AAAA-MM or AAAA-MM-DD[/color]",markup=True,
-            font_size="20sp"))
+            text="[color=000000]You must insert:\n- This type of [b]period[/b]: AAAA or AAAA-MM or AAAA-MM-DD\n- At least an [b]entity[/b][/color]",markup=True,
+            font_size="17sp"))
         boxButtons = BoxLayout(orientation="horizontal")
         boxButtons.add_widget(Button(id="button_go_to_insert_input_variables", text="Confirm", size_hint=(1.0,0.4), background_color=(0.151, 0.022, 0.064, 1)))
         boxButtons.add_widget(Button(id="button_go_to_home", text="Come back to home",size_hint=(1.0,0.4),  background_color=(0.151, 0.022, 0.064, 1)))
@@ -439,7 +439,7 @@ class MakeSimulation(Screen):
             self.ids.menu_a_tendina_variabili.values = dict_entita[self.ids.menu_a_tendina_entita.text]
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.information.text = ""
-            with open("messages\\instruction_make_simulation.txt", 'r') as f:
+            with open("messages\\instruction_make_simulation_input.txt", 'r') as f:
                 for line in f.readlines():
                     self.ids.information.text = self.ids.information.text + line
         except Exception as e:
@@ -616,7 +616,7 @@ class OutputVariableScreen(Screen):
             self.ids.menu_a_tendina_entita_output.text]
         self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
         self.ids.information_output.text = ""
-        with open("messages\\instruction_make_simulation.txt", 'r') as f:
+        with open("messages\\instruction_make_simulation_output.txt", 'r') as f:
             for line in f.readlines():
                 self.ids.information_output.text = self.ids.information_output.text + line
 

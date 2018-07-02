@@ -1,0 +1,12 @@
+[b]Instructions[/b]:
+    - Select a variable through:
+        - The spinner
+        - The search box (click enter to search)
+    - Insert into the text input form its value
+    - Click on "Add Variable"
+    - If you want to delete an inserted variable, click on it!
+
+[b]Rules[/b]:
+    - You can't insert a blank variable from the spinner
+    - You can't insert a blank variable value
+
