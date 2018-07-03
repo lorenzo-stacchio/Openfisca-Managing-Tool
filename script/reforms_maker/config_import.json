@@ -8,6 +8,7 @@
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
                   },
+                  "reforms": "reforms",
                   "entities" :{
                     "entita.py": {
                       "household": "Famiglia",
@@ -27,6 +28,7 @@
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
                   },
+                    "reforms": "",
                   "entities" : {
                     "entities.py": {
                       "household": "Famille",
@@ -46,6 +48,7 @@
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
                   },
+                  "reforms": "reforms",
                   "entities" :{
                     "entities.py": {
                       "household": "Ménage",
@@ -62,6 +65,7 @@
                   "tax_benefit_system": {
                     "france_taxbenefitsystem.py": "FranceTaxBenefitSystem"
                   },
+                  "reforms": "reforms",
                   "scenarios" :{
                     "scenarios.py": "Scenario()"
                   },
@@ -74,23 +78,24 @@
                   }
                 },
 
-                "openfisca_barcelona":
-                                  {
-                                  "link": "https://github.com/jvalduvieco/openfisca-barcelona",
-                                  "project_name": "openfisca-barcelona",
-                                  "tax_benefit_system": {
-                                    "barcelona_taxbenefitsystem.py": "BarcelonaTaxBenefitSystem"
-                                  },
-                                  "scenarios" :{
-                                    "scenarios.py": "Scenario()"
-                                  },
-                                  "entities" :{
-                                    "entities.py": {
-                                      "household": "Familia",
-                                      "person":"Persona",
-                                      "all_entities": "entities"
-                                    }
-                                  }
-                                }
+"openfisca_barcelona":
+                  {
+                  "link": "https://github.com/jvalduvieco/openfisca-barcelona",
+                  "project_name": "openfisca-barcelona",
+                  "tax_benefit_system": {
+                    "barcelona_taxbenefitsystem.py": "BarcelonaTaxBenefitSystem"
+                  },
+                  "scenarios" :{
+                    "scenarios.py": "Scenario()"
+                  },
+                  "reforms": "reforms",
+                  "entities" :{
+                    "entities.py": {
+                      "household": "Familia",
+                      "person":"Persona",
+                      "all_entities": "entities"
+                    }
+                  }
+                }
 
 }
