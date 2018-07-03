@@ -20,11 +20,11 @@
 ### Strumenti necessari
 * [Git](https://git-scm.com/)
 * [Python v. 2.7](https://www.python.org/download/releases/2.7/)
+* [Python Kivy](https://kivy.org/#home)
 * [Pip](https://pip.pypa.io/en/stable/installing/)
 * [Numpy](https://pypi.python.org/pypi/numpy)
 * [Pew](https://pypi.python.org/pypi/pew/)
 * [Openfisca-Core](https://github.com/openfisca/openfisca-core)
-* Country package che si vuole utilizzare, ad esempio [openfisca-italy](https://github.com/openfisca/openfisca-italy)
 ## Installazione
 Per ora non esiste ancora una versione del software.
 ## Iniziare a contribuire
