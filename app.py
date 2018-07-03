@@ -45,7 +45,7 @@ dict_entita ={}
 
 
 class InitScreen(Screen):
-    download_information = StringProperty("[color=000000] [b] [size=20] If you want to download an openfisca-system ,please click ones of the following buttons[/size] [b][/color]")
+    download_information = StringProperty("[color=000000][b][size=20]If you want to download an openfisca-system\nplease click ones of the following buttons[/size][b][/color]")
     PATH_OPENFISCA = None
 
     def __init__(self, **kwargs):
@@ -68,6 +68,9 @@ class InitScreen(Screen):
             for system_name in system_names:
                 if os.path.basename(file_name) == system_name:
                     button = self.ids[system_name] # get button that has the same id of openfisca_project
+                    #X image --> Transparency 100%
+                    self.ids[system_name + "-x"].color = [0,0,0,0]
+                    #Button openfisca-country --> Enabled
                     button.disabled = False
                     button.bind(on_press = self.manager.current_screen.selected_file)
                     btn_image = kivyImage(os.getcwd() + "\\img\\openfisca_system\\"+ file_name + ".png")

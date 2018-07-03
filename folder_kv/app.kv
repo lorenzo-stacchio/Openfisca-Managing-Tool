@@ -32,7 +32,7 @@
                 size_hint: (1.0,0.33)
                 font_size: 30
                 markup: True
-                text: "You have to select on of the following system.\n The white ones are available,\n instead the red ones aren't installed yet.\n To install a system, swap page!"
+                text: "You have to select on of the following system.\n The system without \"X\" are already installed.\nTo install a system, swap page!"
                 size: self.texture_size
                 canvas.before:
                     Color:
@@ -41,35 +41,46 @@
                         pos: self.pos
                         size: self.size
             GridLayout:
-                cols: 5
-                rows: 2
+                cols: 3
+                rows: 4
+                padding: 50,50,50,50
                 id: home_system_chooser
                 canvas.before:
                     Color:
-                        rgba: hex('#ff0000')
+                        rgba: hex('#ffffff')
                     Rectangle:
                         pos: self.pos
                         size: self.size
                 Button:
-                    background_normal: "ffffff"
                     disabled: True
                     id: openfisca-france
+                    background_color: (1.0,1.0,1.0,0.0)
                     Image:
                         source: 'img/openfisca_system/openfisca-france.png'
                         pos: self.parent.pos
                         size: self.parent.size
+                    Image:
+                        id: openfisca-france-x
+                        source: 'img/openfisca_system/x.png'
+                        pos: self.parent.pos
+                        size: self.parent.size.
                 Button:
                     disabled: True
-                    background_normal: "ffffff"
                     id: openfisca-italy
+                    background_color: (1.0,1.0,1.0,0.0)
                     Image:
                         source: 'img/openfisca_system/openfisca-italy.png'
                         pos: self.parent.pos
                         size: self.parent.size
+                    Image:
+                        id: openfisca-italy-x
+                        source: 'img/openfisca_system/x.png'
+                        pos: self.parent.pos
+                        size: self.parent.size
                 Button:
                     disabled: True
-                    background_normal: "ffffff"
                     id: openfisca-barcelona
+                    background_color: (1.0,1.0,1.0,0.0)
                     canvas:
                         Color:
                             rgb: 1, 0, 0
@@ -77,20 +88,35 @@
                         source: 'img/openfisca_system/openfisca-barcelona.png'
                         pos: self.parent.pos
                         size: self.parent.size
+                    Image:
+                        id: openfisca-barcelona-x
+                        source: 'img/openfisca_system/x.png'
+                        pos: self.parent.pos
+                        size: self.parent.size
                 Button:
                     disabled: True
-                    background_normal: "ffffff"
                     id: senegal
+                    background_color: (1.0,1.0,1.0,0.0)
                     Image:
-                        source: 'img/openfisca_system/openfisca-senegal.png'
+                        source: 'img/openfisca_system/senegal.png'
+                        pos: self.parent.pos
+                        size: self.parent.size
+                    Image:
+                        id: senegal-x
+                        source: 'img/openfisca_system/x.png'
                         pos: self.parent.pos
                         size: self.parent.size
                 Button:
                     disabled: True
                     id: openfisca-tunisia
-                    background_normal: "ffffff"
+                    background_color: (1.0,1.0,1.0,0.0)
                     Image:
                         source: 'img/openfisca_system/openfisca-tunisia.png'
+                        pos: self.parent.pos
+                        size: self.parent.size
+                    Image:
+                        id: openfisca-tunisia-x
+                        source: 'img/openfisca_system/x.png'
                         pos: self.parent.pos
                         size: self.parent.size
 
@@ -563,7 +589,7 @@
 
             Spinner:
                 id: menu_a_tendina_variabili
-                size_hint: (0.8,0.15)
+                size_hint: (0.8,0.10)
                 pos_hint: {'center_x': .5, 'center_y': .5}
 
                 text_size: self.width, None
@@ -702,7 +728,7 @@
 
             Spinner:
                 id: menu_a_tendina_variabili_output
-                size_hint: (0.8,0.15)
+                size_hint: (0.8,0.10)
                 pos_hint: {'center_x': .5, 'center_y': .5}
 
                 text_size: self.width, None
@@ -716,7 +742,7 @@
                 size_hint: (0.5,0.05)
                 pos_hint: {'center_x': .5, 'center_y': .5}
                 on_press: root.add_value_and_reset_form()
-
+                background_color: hex('B48291')
             Label:
                 size_hint: (1.0,0.05)
             Label:
