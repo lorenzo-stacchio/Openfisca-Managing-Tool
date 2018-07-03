@@ -62,8 +62,8 @@
                     Image:
                         id: openfisca-france-x
                         source: 'img/openfisca_system/x.png'
-                        pos: self.parent.pos
-                        size: self.parent.size.
+                        pos: self.parent.pos[0],self.parent.pos[1]+50
+                        size: self.parent.size[0]-50, self.parent.size[1]-50
                 Button:
                     disabled: True
                     id: openfisca-italy
@@ -75,8 +75,8 @@
                     Image:
                         id: openfisca-italy-x
                         source: 'img/openfisca_system/x.png'
-                        pos: self.parent.pos
-                        size: self.parent.size
+                        pos: self.parent.pos[0],self.parent.pos[1]+50
+                        size: self.parent.size[0]-50, self.parent.size[1]-50
                 Button:
                     disabled: True
                     id: openfisca-barcelona
@@ -91,8 +91,8 @@
                     Image:
                         id: openfisca-barcelona-x
                         source: 'img/openfisca_system/x.png'
-                        pos: self.parent.pos
-                        size: self.parent.size
+                        pos: self.parent.pos[0],self.parent.pos[1]+50
+                        size: self.parent.size[0]-50, self.parent.size[1]-50
                 Button:
                     disabled: True
                     id: senegal
@@ -104,8 +104,8 @@
                     Image:
                         id: senegal-x
                         source: 'img/openfisca_system/x.png'
-                        pos: self.parent.pos
-                        size: self.parent.size
+                        pos: self.parent.pos[0],self.parent.pos[1]+50
+                        size: self.parent.size[0]-50, self.parent.size[1]-50
                 Button:
                     disabled: True
                     id: openfisca-tunisia
@@ -117,8 +117,8 @@
                     Image:
                         id: openfisca-tunisia-x
                         source: 'img/openfisca_system/x.png'
-                        pos: self.parent.pos
-                        size: self.parent.size
+                        pos: self.parent.pos[0],self.parent.pos[1]+50
+                        size: self.parent.size[0]-50, self.parent.size[1]-50
 
 
         GridLayout:
