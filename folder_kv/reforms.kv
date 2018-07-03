@@ -68,12 +68,26 @@
 
 <SelectVariableScreen>
     name: "select_variable_screen"
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
     BoxLayout:
+        padding: 20,20,20,0
         orientation: "vertical"
         Label:
+            size_hint: (1.0,0.1)
+            font_size: "18sp"
+            color: (0,0,0,1)
         Label:
             text: "Type to filter"
+            size_hint: (1.0,0.2)
+            font_size: "18sp"
+            color: (0,0,0,1)
         Label:
+            size_hint: (1.0,0.1)
         TextInput:
             id: id_text_search_box
             size_hint: (0.8,None)
@@ -81,49 +95,65 @@
             multiline: False
             on_text_validate: root.change_spinner()
         Label:
+            size_hint: (1.0,0.1)
         Spinner:
             id: id_spinner_select_variable_screen
             size_hint: (0.8,None)
             pos_hint: {'center_x': .5, 'center_y': .5}
+            background_color: hex('971640')
         Label:
+            size_hint: (1.0,0.1)
         GridLayout:
             cols: 2
             Label:
                 id: id_label_reform_name
                 text: "Reform name:"
+                font_size: "18sp"
+                color: (0,0,0,1)
             TextInput:
                 id: id_input_reform_name
                 text: ""
             Label:
+                size_hint: (1.0,0.1)
+            Label:
+                size_hint: (1.0,0.1)
+            Label:
                 id: id_label_reform_description
                 text: "Description:"
+                font_size: "18sp"
+                color: (0,0,0,1)
             TextInput:
                 id: id_input_reform_description
                 text: ""
-
+        Label:
         BoxLayout:
             orientation: "horizontal"
+            size_hint: (1.0,0.4)
             Button:
-                size_hint: (1.0,0.2)
                 text: 'Select'
                 background_color: hex('971640')
                 on_press: root.select_variable()
             Button:
-                size_hint: (1.0,0.2)
                 text: 'Come back to home'
                 background_color: hex('971640')
                 on_press: root.go_to_home()
 
 <FormVariableScreen>:
     name: "form_variable_screen"
-
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
     BoxLayout:
         orientation: "vertical"
         BoxLayout:
             padding: (30,30,30,0)
             orientation: "horizontal"
             Label:
-                text: "Name"
+                text: "[color=000000][b]Name[/b][/color]"
+                markup: True
                 size_hint:(0.3,1)
             TextInput:
                 id: name_input
@@ -134,38 +164,45 @@
             padding: (30,30,30,0)
             orientation: "horizontal"
             Label:
-                text: "Value type"
+                text: "[color=000000][b]Value type[/b][/color]"
+                markup: True
                 size_hint:(0.3,1)
             Spinner:
                 id: value_type_input
                 size_hint:(0.7,1)
+                background_color: hex('971640')
 
         BoxLayout:
             padding: (30,30,30,0)
             orientation: "horizontal"
             Label:
-                text: "Entity"
+                text: "[color=000000][b]Entity[/b][/color]"
+                markup: True
                 size_hint:(0.3,1)
             Spinner:
                 id: entity_input
                 #multiline: False
                 size_hint:(0.7,1)
+                background_color: hex('971640')
 
         BoxLayout:
             padding: (30,30,30,0)
             orientation: "horizontal"
             Label:
-                text: "Set input period"
+                text: "[color=000000][b]Set input period[/b][/color]"
+                markup: True
                 size_hint:(0.3,1)
             Spinner:
                 id: set_input_period
                 size_hint:(0.7,1)
+                background_color: hex('971640')
 
         BoxLayout:
             padding: (30,30,30,0)
             orientation: "horizontal"
             Label:
-                text: "Label"
+                text: "[color=000000][b]Label[/b][/color]"
+                markup: True
                 size_hint:(0.3,1)
             TextInput:
                 id: label_input
@@ -176,18 +213,21 @@
             padding: (30,30,30,0)
             orientation: "horizontal"
             Label:
-                text: "Definition period"
+                text: "[color=000000][b]Definition period[/b][/color]"
+                markup: True
                 size_hint:(0.3,1)
             Spinner:
                 id: definition_period_input
                 #values: ["MONTH","YEAR","ETERNITY"]
                 size_hint:(0.7,1)
+                background_color: hex('971640')
 
         BoxLayout:
             padding: (30,30,30,0)
             orientation: "horizontal"
             Label:
-                text: "Reference"
+                text: "[color=000000][b]Reference[/b][/color]"
+                markup: True
                 size_hint:(0.3,1)
             TextInput:
                 id: reference_input
@@ -198,18 +238,21 @@
             padding: (30,30,30,0)
             orientation: "horizontal"
             Label:
-                text: "Formula"
+                text: "[color=000000][b]Formula[/b][/color]"
+                markup: True
                 size_hint:(0.3,1)
             Button:
                 text: "Visualize formula"
                 id: watch_formula
                 on_press: root.create_pop_up_watch_formula()
                 size_hint:(0.35,1)
+                background_color: hex('971640')
             Button:
                 text: "Modify formula"
                 id: modify_formula
                 on_press: root.create_pop_up_modify_formula()
                 size_hint:(0.35,1)
+                background_color: hex('971640')
 
         BoxLayout:
             padding: (0,30,0,0)
