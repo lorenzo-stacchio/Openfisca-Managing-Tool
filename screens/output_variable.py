@@ -224,7 +224,7 @@ class OutputVariableScreen(Screen):
         message_popup = "Are you sure to continue?"
         content = ConfirmPopup(text=message_popup)
         content.bind(on_answer=self._on_answer)
-        self.popup = Popup(title="Question", content=content, auto_dismiss=False)
+        self.popup = Popup(title="Question", content=content, auto_dismiss=False,size_hint=(None, None), size=(480, 400))
         self.popup.open()
 
     def _on_answer(self, instance, answer):

@@ -155,9 +155,9 @@ class Pop(ModalView):
         if self.preferred_width:
             self.width = self.preferred_width
         elif Window.width > 500:  # Big screen?
-            self.width = 0.7 * Window.width
+            self.width = 0.5 * Window.width
         else:
-            self.width = Window.width - 2
+            self.width = 0.7 * Window.width
 
         self.playout = BoxLayout(orientation='vertical',
                                  padding=["2dp", "5dp",
@@ -183,15 +183,15 @@ class Pop(ModalView):
                              text_size=(self.width- dp(20), None))
 
         self.pbutton = Button(text='Close',
-                              size_hint_y=None, height="18dp")
+                              size_hint_y=None, height="33dp")
         self.pbutton.bind(on_release=self.close)
 
         self.buttonforward = Button(text='<',
-                              size_hint_y=None, height="18dp")
+                              size_hint_y=None, height="33dp")
 
         self.buttonforward.bind(on_release=self.minus_one_index)
         self.buttonbackward = Button(text='>',
-                              size_hint_y=None, height="18dp")
+                              size_hint_y=None, height="33dp")
         self.buttonbackward.bind(on_release=self.plus_one_index)
 
         self.boxlayout_button = BoxLayout(orientation="horizontal")
