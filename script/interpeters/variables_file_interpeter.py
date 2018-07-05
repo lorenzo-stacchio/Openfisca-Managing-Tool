@@ -294,9 +294,13 @@ class Variable_File_Interpeter():
                         current_Variable.set_set_input(pieces[1].strip())
                     if 'reference' in pieces[0]:
                         reference = pieces[1]
+                        print reference
                         for chs in ['\"']:
                             reference = reference.replace(chs,'')
-                        reference = re.search("(?P<url>https?://[^\s]+)", reference).group("url")
+                        if re.search("(?P<url>https?://[^\s]+)", reference):
+                            reference = re.search("(?P<url>https?://[^\s]+)", reference).group("url")
+                        else:
+                            raise ValueError("The URL contained in the reform isn't correct, please modify it or contact an amministrator")
                         current_Variable.set_reference(reference.strip())
                     if 'formula' in pieces[0]:
                         formula_found = True

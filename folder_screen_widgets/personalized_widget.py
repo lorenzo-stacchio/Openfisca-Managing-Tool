@@ -15,7 +15,7 @@ from kivy.uix.modalview import ModalView
 from kivy.uix.scrollview import ScrollView
 from kivy.metrics import dp
 from kivy.graphics import Rectangle, Color
-
+import common_modules
 
 class LineOfChooser(BoxLayout):
     name_label = StringProperty()

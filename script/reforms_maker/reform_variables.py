@@ -61,7 +61,12 @@ class Variable_To_Reform():
             raise ValueError("The entity choosen doesn't exist in openfisca")
 
     def set_reference(self, reference):
-        self.__reference__ = reference
+        if re.search("(?P<url>https?://[^\s]+)", reference):
+            reference = re.search("(?P<url>https?://[^\s]+)", reference).group("url")
+            self.__reference__ = reference
+        else:
+            raise ValueError(
+                "The URL isn't correct, if you don't have a valid URL please leave the field empty")
 
     def set_formula(self, formula):
         if not(formula is None or formula==""):
