@@ -1,0 +1,144 @@
+#:kivy 1.10.0
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
+#: import hex kivy.utils.get_color_from_hex
+#: import utils kivy.utils
+
+<VisualizeSystemScreen>:
+    name: "visualize_system"
+    fullscreen: True
+    on_parent: if args[1] and switch_object_visualize.current_tab == tabbed_variables: root.show_variables()
+
+    TabbedPanel:
+        id: switch_object_visualize
+        do_default_tab: False
+        canvas.before:
+            Color:
+                rgb: hex("9C2542")
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TabbedPanelItem:
+            id: tabbed_variables
+            text: 'Variables'
+            on_release: root.show_variables()
+            background_color: (1, 0, 0, .5)
+            BoxLayout:
+                id: box_variables
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgb: hex("771C33")
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                BoxLayout:
+                    id: box_variables_inner
+                    orientation: 'horizontal'
+                    size_hint: (1.0,0.95)
+                    FileChooserListView:
+                        id: visualize_file_chooser_variables
+                        size_hint: (0.70,1.0)
+                        filter_dirs: True
+                        filters: [root.file_allowed]
+                        on_selection: root.selected_file(*args)
+                    RstDocument:
+                        id: document_variables_viewer
+
+                GridLayout:
+                    rows: 1
+                    cols: 2
+                    size_hint: (1.0,0.05)
+                    Label:
+                        id: current_path_variables
+                        font_size: 12
+                        valign: 'middle'
+                        halign: 'center'
+                    Button:
+                        id: back_home
+                        size_hint: (0.3,1.0)
+                        on_press: root.go_to_home()
+                        text: 'Come back to home'
+                        background_color: hex('971640')
+
+        TabbedPanelItem:
+            id: tabbed_parameters
+            text: 'Parameters'
+            on_release: root.show_parameters()
+            background_color: (1, 0, 0, .5)
+            BoxLayout:
+                id: box_parameters
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgb: hex("771C33")
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                BoxLayout:
+                    id: box_parameters_inner
+                    orientation: 'horizontal'
+                    size_hint: (1.0,0.95)
+                    FileChooserListView:
+                        id: visualize_file_chooser_parameters
+                        size_hint: (0.70,1.0)
+                        filters: [root.file_allowed]
+                        on_selection: root.selected_file(*args)
+                    RstDocument:
+                        id: document_parameters_viewer
+                GridLayout:
+                    rows: 1
+                    cols: 2
+                    size_hint: (1.0,0.05)
+                    Label:
+                        id: current_path_parameters
+                        font_size: 12
+                        valign: 'middle'
+                        halign: 'center'
+                    Button:
+                        id: back_home_from_parameters
+                        size_hint: (0.3,1.0)
+                        on_press: root.go_to_home()
+                        text: 'Come back to home'
+                        background_color: hex('971640')
+
+        TabbedPanelItem:
+            id: tabbed_reforms
+            text: 'Reforms'
+            on_release: root.show_reforms()
+            background_color: (1, 0, 0, .5)
+            BoxLayout:
+                id: box_reforms
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgb: hex("771C33")
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                BoxLayout:
+                    id: box_reforms_inner
+                    orientation: 'horizontal'
+                    size_hint: (1.0,0.95)
+                    FileChooserListView:
+                        id: visualize_file_chooser_reforms
+                        size_hint: (0.70,1.0)
+                        filters: [root.file_allowed]
+                        on_selection: root.selected_file(*args)
+                    RstDocument:
+                        id: document_reforms_viewer
+                GridLayout:
+                    rows: 1
+                    cols: 2
+                    size_hint: (1.0,0.05)
+                    Label:
+                        id: current_path_reforms
+                        font_size: 12
+                        valign: 'middle'
+                        halign: 'center'
+                    Button:
+                        id: back_home_from_parameters
+                        size_hint: (0.3,1.0)
+                        on_press: root.go_to_home()
+                        text: 'Come back to home'
+                        background_color: hex('971640')
+

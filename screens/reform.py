@@ -1,12 +1,11 @@
-
 import kivy
+kivy.require("1.10.0")
 import json
 import os
 import sys
 import importlib
 import datetime
 from functools import partial
-kivy.require("1.10.0")
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label

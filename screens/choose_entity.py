@@ -40,7 +40,7 @@ class ChooseEntityScreen(Screen):
     def __init__(self, **kwargs):
         super(ChooseEntityScreen, self).__init__(**kwargs)
         self.number_of_entity = {}
-        self.entity_box_layout = BoxLayout(orientation='vertical', padding=(50,50,50,50))
+        self.entity_box_layout = BoxLayout(orientation='vertical', padding=(50,50,50,0))
         self.add_widget(self.entity_box_layout)
 
 
@@ -60,8 +60,8 @@ class ChooseEntityScreen(Screen):
             text="[color=000000]You must insert:\n- This type of [b]period[/b]: AAAA or AAAA-MM or AAAA-MM-DD\n- At least an [b]entity[/b][/color]",markup=True,
             font_size="17sp"))
         boxButtons = BoxLayout(orientation="horizontal")
-        boxButtons.add_widget(Button(id="button_go_to_insert_input_variables", text="Confirm", size_hint=(1.0,0.4), background_color=(0.151, 0.022, 0.064, 1)))
-        boxButtons.add_widget(Button(id="button_go_to_home", text="Come back to home",size_hint=(1.0,0.4),  background_color=(0.151, 0.022, 0.064, 1)))
+        boxButtons.add_widget(Button(id="button_go_to_insert_input_variables", text="Confirm", size_hint=(1.0,0.4), background_color=(151/255.0, 22/255.0, 64/255.0, 0.9)))
+        boxButtons.add_widget(Button(id="button_go_to_home", text="Come back to home",size_hint=(1.0,0.4),  background_color=(151/255.0, 22/255.0, 64/255.0, 0.9)))
         self.entity_box_layout.add_widget(boxButtons)
         Clock.schedule_once(self._finish_init)
 

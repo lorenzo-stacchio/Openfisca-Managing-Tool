@@ -26,12 +26,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import DictProperty
 from kivy.uix.textinput import TextInput
 from script.get_parameters_reforms_tests_variables_folder_paths import *
-from script.interpeters.variables_file_interpeter import *
-from script.interpeters.parameters_interpeter import *
-from script.interpeters.reforms_file_interpeter import *
-from script.download_openfisca_system import download_and_install as download_and_install_openfisca
-from script.download_openfisca_system import check_package_is_installed
-from script.download_openfisca_system import install_country_package
 from script.Simulation.Situation_for_simulation import *
 from script.reforms_maker.reform_variables import *
 from folder_screen_widgets.personalized_widget import *

@@ -125,11 +125,17 @@ class MakeSimulation(Screen):
         if self.ids.menu_a_tendina_entita.text in self.dict_of_entity_variable_value.keys():
             for tuple in self.dict_of_entity_variable_value[self.ids.menu_a_tendina_entita.text]:
                 self.ids.variable_added.add_widget(
-                    Button(text=self.ids.menu_a_tendina_entita.text + " - " + tuple[0] + " - " + tuple[1],
-                           font_size='14sp',
-                           on_release=self.destroy_button,
-                           background_color=(255, 255, 255, 0.9),
-                           color=(0, 0, 0, 1)))
+                    Button( text=self.ids.menu_a_tendina_entita.text + " - " + tuple[0] + " - " + tuple[1],
+                            font_size='12sp',
+                            on_release=self.destroy_button,
+                            background_color=(255, 255, 255, 0.9),
+                            color=(0, 0, 0, 1)
+                ))
+
+
+
+
+
 
 
     def go_to_home(self):

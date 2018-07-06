@@ -1,0 +1,145 @@
+#:kivy 1.10.0
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
+#: import hex kivy.utils.get_color_from_hex
+#: import utils kivy.utils
+
+
+<MakeSimulation>:
+    variable_added : variable_added
+    name: "make_simulation"
+    fullscreen: True
+
+    BoxLayout:
+        orientation: 'horizontal'
+        BoxLayout:
+            canvas.before:
+                Color:
+                    rgba: hex('#B48291')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            orientation: 'vertical'
+            Label:
+                text: 'Select [b]entity[/b]'
+                halign: 'right'
+                valign: 'top'
+                markup: True
+                size_hint: (1.0,0.095)
+                canvas.before:
+                    Color:
+                        rgba: hex('#971640')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            Label:
+                size_hint: (1.0,0.05)
+
+            Spinner:
+                id: menu_a_tendina_entita
+                size_hint: (0.8,0.1)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_text: root.update_form()
+
+                text_size: self.width, None
+                height: self.texture_size[1]
+                padding_x: 10
+            Label:
+                size_hint: (1.0,0.05)
+
+            Label:
+                text: 'Select [b]input variable[/b]'
+                halign: 'right'
+                valign: 'top'
+                markup: True
+                size_hint: (1.0,0.07)
+                canvas.before:
+                    Color:
+                        rgba: hex('#971640')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+            Label:
+                size_hint: (1.0,0.05)
+            Label:
+                text: "Search Box (enter to search)"
+                size_hint: (1.0,0.08)
+            TextInput:
+                id: id_search_box_input_variable
+                size_hint: (0.8,0.1)
+                hint_text: 'Insert a value to filter'
+                multiline: False
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_text_validate: root.change_spinner()
+            Label:
+                size_hint: (1.0,0.05)
+
+            Spinner:
+                id: menu_a_tendina_variabili
+                size_hint: (0.8,0.10)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+
+                text_size: self.width, None
+                height: self.texture_size[1]
+                padding_x: 10
+
+            Label:
+                size_hint: (1.0,0.05)
+            TextInput:
+                id: input_value_variable
+                multiline: False
+                hint_text: 'Insert a value'
+                size_hint: (0.8,0.1)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+            Label:
+                size_hint: (1.0,0.05)
+            Button:
+                text: 'Add variable'
+                size_hint: (0.4,0.1)
+                pos_hint: {'center_x': .5, 'center_y': .5}
+                on_press: root.add_value_and_reset_form()
+                background_color: hex('B48291')
+            Label:
+                size_hint: (1.0,0.05)
+            Label:
+                id: information
+                markup: True
+                valign: 'center'
+                text_size: self.width, None
+                height: self.texture_size[1]
+                padding_x: 50
+            Button:
+                text: 'Go to Output variable Screen'
+                size_hint: (1.0,0.09)
+                on_press: root.go_to_output_variables()
+                background_color: hex('971640')
+
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Added variable(s)'
+                halign: 'right'
+                valign: 'top'
+                size_hint: (1.0,0.05)
+                canvas.before:
+                    Color:
+                        rgba: hex('#971640')
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+            ScrollView:
+                canvas.before:
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                do_scroll_x: False
+                BoxLayout:
+                    id: variable_added
+                    orientation: 'vertical'
+            Button:
+                id: back_home
+                size_hint: (1.0,0.05)
+                on_press: root.go_to_home()
+                text: 'Come back to home'
+                background_color: hex('971640')
+

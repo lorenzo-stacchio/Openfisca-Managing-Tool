@@ -1,0 +1,42 @@
+#:kivy 1.10.0
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
+#: import hex kivy.utils.get_color_from_hex
+#: import utils kivy.utils
+
+
+
+<ExecuteSimulationScreen>
+    name: "execute_simulation"
+    GridLayout:
+        rows: 3
+        cols: 1
+        Label:
+            text: "Summary of results for each situation"
+            size_hint: (1.0,0.05)
+            canvas.before:
+                Color:
+                    rgba: hex('#971640')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        RstDocument:
+            id: document_results_simulation_viewer
+            size_hint: (1.0,0.9)
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint: (1.0,0.05)
+            Button:
+                id: left_switch
+                text: "Previous entity"
+                on_press: root.previous_rst_result()
+                background_color: hex('971640')
+            Button:
+                id: right_switch
+                text: "Next entity"
+                on_press: root.next_rst_result()
+                background_color: hex('971640')
+            Button:
+                id: home_button
+                text: "Go to home"
+                on_press: root.go_to_home()
+                background_color: hex('971640')

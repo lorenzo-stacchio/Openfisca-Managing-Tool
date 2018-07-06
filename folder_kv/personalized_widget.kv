@@ -1,0 +1,45 @@
+#:kivy 1.10.0
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
+#: import hex kivy.utils.get_color_from_hex
+#: import utils kivy.utils
+
+
+<LabelLeftTop>
+    padding_x: 20
+    halign: "left"
+    valign: "top"
+    text_size: self.size
+    markup: True
+    text: ""
+
+<ConfirmPopup>:
+    cols:1
+	Label:
+		text: root.text
+	GridLayout:
+		cols: 2
+		size_hint_y: None
+		height: '44sp'
+		Button:
+			text: 'Yes'
+			on_press: root.dispatch('on_answer','Yes')
+		Button:
+			text: 'No'
+			on_press: root.dispatch('on_answer', 'No')
+
+
+<ErrorPopUp>:
+    size_hint: 0.5,0.5
+    title: "Some error"
+    BoxLayout:
+        orientation:'vertical'
+        Label:
+            id: label_error
+            text_size: self.width, None
+            halign: 'center'
+            valign: 'middle'
+            size_hint: (1.0,0.8)
+        Button:
+            text:"Close this popup"
+            size_hint: (1.0,0.2)
+            on_press:root.dismiss()
