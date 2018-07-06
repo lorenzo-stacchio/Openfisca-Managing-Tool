@@ -56,6 +56,7 @@ class ReformsScreen(Screen):
 
     def go_to_update_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Update variable"
+        self.manager.get_screen('select_variable_screen').ids.id_text_search_box.disabled = False
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = False
         self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text = ""
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
@@ -65,6 +66,7 @@ class ReformsScreen(Screen):
 
     def go_to_neutralize_variable(self):
         self.manager.get_screen('select_variable_screen').choice = "Neutralize variable"
+        self.manager.get_screen('select_variable_screen').ids.id_text_search_box.disabled = False
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.disabled = False
         self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text = ""
         self.manager.get_screen('select_variable_screen').ids.id_spinner_select_variable_screen.text = ""
