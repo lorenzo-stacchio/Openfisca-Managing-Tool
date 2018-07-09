@@ -1,7 +1,6 @@
 import os
 import json
 from subprocess import check_output,CalledProcessError
-from pip._internal.utils.misc import get_installed_distributions
 import site
 
 def download_and_install(path_to_save, project_name, github_link,*args):
