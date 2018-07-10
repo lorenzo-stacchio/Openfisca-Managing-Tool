@@ -180,7 +180,7 @@ class Variable_reform_manager():
         if variable_exist == True:
             raise ValueError("The variable you want update already exist please update it!")
 
-        path_new_reform = self.__path_to_save_reform__ + "\\" + self.__reform_name__ + ".py"
+        path_new_reform = self.__path_to_save_reform__ + "/" + self.__reform_name__ + ".py"
         if os.path.exists(path_new_reform):
             os.remove(path_new_reform)
         with open(path_new_reform, 'a') as new_reform:
@@ -227,7 +227,7 @@ class Variable_reform_manager():
         if variable_exist == False:
             raise ValueError("The variable you want update doesn't exist")
 
-        path_new_reform = self.__path_to_save_reform__ + "\\" + str(self.__reform_name__) + ".py"
+        path_new_reform = self.__path_to_save_reform__ + "/" + str(self.__reform_name__) + ".py"
         if os.path.exists(path_new_reform):
             os.remove(path_new_reform)
         # check if at least one field is changed
@@ -356,7 +356,7 @@ class Variable_reform_manager():
         if variable_exist == False:
             raise ValueError("The variable you want neutralize doesn't exist")
 
-        path_new_reform = self.__path_to_save_reform__ + "\\" + self.__reform_name__ + ".py"
+        path_new_reform = self.__path_to_save_reform__ + "/" + self.__reform_name__ + ".py"
 
         if os.path.exists(path_new_reform):
             os.remove(path_new_reform)

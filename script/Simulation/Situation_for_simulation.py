@@ -134,7 +134,7 @@ class Reform():
             # create a key that will be used to import the reform
             start_index = re.search(self.reform_folder_name, str(file)).start()
             key = str(file)[(start_index + len(self.reform_folder_name) + 1):]
-            key = key.replace("\\", ".") # used to create a correct module path
+            key = key.replace("/", ".") # used to create a correct module path
             key = key.replace(".py", "") # erase the extension
             self.reforms_file_dict[key] = []
             with open(file, 'r') as f_r:

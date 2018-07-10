@@ -58,7 +58,7 @@ class OutputVariableScreen(Screen):
             self.ids.menu_a_tendina_entita_output.text]
         self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
         self.ids.information_output.text = ""
-        with open("messages\\instruction_make_simulation_output.txt", 'r') as f:
+        with open("messages/instruction_make_simulation_output.txt", 'r') as f:
             for line in f.readlines():
                 self.ids.information_output.text = self.ids.information_output.text + line
 

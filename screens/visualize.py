@@ -94,9 +94,9 @@ class VisualizeSystemScreen(Screen):
             self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
             self.ids.visualize_file_chooser_parameters.path = self.dict_path['parameters']
             self.ids.visualize_file_chooser_reforms.path = self.dict_path['reforms']
-            self.ids.document_variables_viewer.source = "messages\\file_not_allowed.rst"
-            self.ids.document_parameters_viewer.source = "messages\\file_not_allowed.rst"
-            self.ids.document_reforms_viewer.source = "messages\\file_not_allowed.rst"
+            self.ids.document_variables_viewer.source = "messages/file_not_allowed.rst"
+            self.ids.document_parameters_viewer.source = "messages/file_not_allowed.rst"
+            self.ids.document_reforms_viewer.source = "messages/file_not_allowed.rst"
             return False
 
     def selected_file(self, *args):

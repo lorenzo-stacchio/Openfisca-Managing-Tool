@@ -18,7 +18,8 @@ setup(
         'Kivy-Garden >= 0.1.4',
         'kivy.deps.glew >= 0.1.9',
         'kivy.deps.gstreamer  >= 0.1.12',
-        'python-dateutil >= 2.7'
+        'python-dateutil >= 2.7',
+        'importlib >= 1.0'
         ],
     extras_require = {
         'api': [
