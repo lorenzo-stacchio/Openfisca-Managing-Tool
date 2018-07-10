@@ -306,35 +306,35 @@ class FormVariableScreen(Screen):
         else:
             reform_description = self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text
 
-        try:
-            v_to_add = Variable_To_Reform()
-            v_to_add.set_name(name_input)
-            v_to_add.set_entity(entity_input)
-            v_to_add.set_type(value_type_input)
-            v_to_add.set_reference(reference_input)
-            v_to_add.set_formula(formula)
-            v_to_add.set_label(label_input)
-            v_to_add.set_definition_period(definition_period_input)
-            v_to_add.set_set_input(set_input_period)
-            ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], reform_full_description = reform_description , reform_name = reform_name)
+        #try:
+        v_to_add = Variable_To_Reform()
+        v_to_add.set_name(name_input)
+        v_to_add.set_entity(entity_input)
+        v_to_add.set_type(value_type_input)
+        v_to_add.set_reference(reference_input)
+        v_to_add.set_formula(formula)
+        v_to_add.set_label(label_input)
+        v_to_add.set_definition_period(definition_period_input)
+        v_to_add.set_set_input(set_input_period)
+        ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], reform_full_description = reform_description , reform_name = reform_name)
 
-            if self.manager.get_screen('select_variable_screen').choice == "Update variable":
-                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
-                self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
-                                   auto_dismiss=True)
-                self.popup.open()
-                self.manager.current = 'reforms'
+        if self.manager.get_screen('select_variable_screen').choice == "Update variable":
+            ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.update_variable)
+            self.popup = Popup(title="Variable updated", content = Label(text = "The reform that update\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                               auto_dismiss=True)
+            self.popup.open()
+            self.manager.current = 'reforms'
 
-            elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
-                ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
-                self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
-                                   auto_dismiss=True)
-                self.popup.open()
-                self.manager.current = 'reforms'
-        except Exception as e:
-            self.popup_error_run_simulation = ErrorPopUp()
-            self.popup_error_run_simulation.ids.label_error.text = str(e)
-            self.popup_error_run_simulation.open()
+        elif self.manager.get_screen('select_variable_screen').choice == "Add variable":
+            ref_var_man.do_reform(command = TYPEOFREFORMVARIABILE.add_variable)
+            self.popup = Popup(title="Variable added", content = Label(text = "The reform that add\n" + name_input + "\nwas written, you can check in the legislation explorer!"), size_hint=(None, None), size=(480, 400),
+                               auto_dismiss=True)
+            self.popup.open()
+            self.manager.current = 'reforms'
+        # except Exception as e:
+        #     self.popup_error_run_simulation = ErrorPopUp()
+        #     self.popup_error_run_simulation.ids.label_error.text = str(e)
+        #     self.popup_error_run_simulation.open()
 
 
     def go_to_home(self):

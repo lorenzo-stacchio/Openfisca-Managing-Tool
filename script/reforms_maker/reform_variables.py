@@ -60,8 +60,11 @@ class Variable_To_Reform():
         if self.entity is None:
             raise ValueError("The entity choosen doesn't exist in openfisca")
 
+
     def set_reference(self, reference):
-        if re.search("(?P<url>https?://[^\s]+)", reference):
+        if reference is None:
+            self.__reference__=None
+        elif re.search("(?P<url>https?://[^\s]+)", reference):
             reference = re.search("(?P<url>https?://[^\s]+)", reference).group("url")
             self.__reference__ = reference
         else:
@@ -136,8 +139,10 @@ class Variable_reform_manager():
         self.__path_to_save_reform__ = path_to_save_reform
         self.__reform_full_description__ = "\"" + str(reform_full_description) + "\""
 
+
     def set_description(self,reform_full_description):
         self.__reform_full_description__ = "\"" + reform_full_description + "\""
+
 
     def set_variable(self, variable):
         if isinstance(variable, Variable_To_Reform):

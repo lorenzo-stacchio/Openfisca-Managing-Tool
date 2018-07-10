@@ -3,3 +3,5 @@ messages/rst_da_visualizzare.txt
 .idea/*
 \.idea/
 .openfisca_systems/*
+
+openfisca_systems/
