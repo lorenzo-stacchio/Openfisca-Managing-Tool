@@ -32,11 +32,17 @@ from folder_screen_widgets.personalized_widget import *
 import common_modules
 
 class ExecuteSimulationScreen(Screen):
-
+    """
+    Execute Simulation screen, The output of the simulation
+    """
     def __init__(self, **kwargs):
         super(ExecuteSimulationScreen, self).__init__(**kwargs)
 
     def run_simulation(self,reform=None):
+        """
+        Execution of simulation
+        :param reform: reform in input (DEFAULT: None)
+        """
         # situations
         situations =  self.manager.get_screen('make_simulation').situations
         period =  str(self.manager.get_screen('choose_entity').period).split("-")
@@ -69,17 +75,26 @@ class ExecuteSimulationScreen(Screen):
 
 
     def next_rst_result(self):
+        """
+        Next rst document result
+        """
         if self.current_index < (len(self.string_rst_documents)-1):
             self.current_index = self.current_index + 1
         self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
 
 
     def previous_rst_result(self):
+        """
+        Previous rst document result
+        """
         if self.current_index > 0:
             self.current_index = self.current_index -1
         self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
 
     def go_to_home(self):
+        """
+        Go to home
+        """
         if self.manager.current == "execute_simulation":
             self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets()
             self.manager.get_screen('output_variable').ids.variable_added_output.clear_widgets()

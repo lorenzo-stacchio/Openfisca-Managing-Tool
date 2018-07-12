@@ -36,7 +36,9 @@ from script.reforms_maker.reform_variables import *
 from folder_screen_widgets.personalized_widget import *
 
 class ChooseEntityScreen(Screen):
-
+    """
+    Choose Entity Screen, I select an/some entity/entities for simulation
+    """
     def __init__(self, **kwargs):
         super(ChooseEntityScreen, self).__init__(**kwargs)
         self.number_of_entity = {}
@@ -45,6 +47,9 @@ class ChooseEntityScreen(Screen):
 
 
     def init_content_screen(self):
+        """
+        Inizialize content of screen
+        """
         self.type_of_entity = getattr(common_modules.ENTITY_MODULE_CLASS, common_modules.ENTITY_MODULE_CLASS_ALL_ENTITIES)
         for entity in self.type_of_entity:
             self.entity_box_layout.add_widget(LineOfChooser())
@@ -72,12 +77,20 @@ class ChooseEntityScreen(Screen):
         self.children[0].children[0].children[0].bind(on_release=self.go_to_home)
 
 
-    def go_to_home(self, a):
+    def go_to_home(self, a=""):
+        """
+        Go to home
+        """
         self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
         self.manager.current = 'home'
 
 
     def go_to_insert_input_variables(self, instance):
+        """
+        Go forward
+        :param instance:
+        :return:
+        """
         # verify that there aren't all zeros
         condition = False
         box_layout = self.children[0].children
@@ -108,6 +121,11 @@ class ChooseEntityScreen(Screen):
 
 
     def check_data(self, data):
+        """
+        Check data
+        :param data: input data
+        :return: true if is valid else false
+        """
         if(len(data)==4):
             try:
                 year = int(data)

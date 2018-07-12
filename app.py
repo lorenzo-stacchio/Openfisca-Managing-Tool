@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 import kivy
 kivy.require("1.10.0")
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -22,6 +23,10 @@ class MyScreenManager(ScreenManager):
 # App
 class openfisca_managing_tool(App):
     def build(self):
+        """
+        Setting up the deisgn of app
+        :return: screen manager
+        """
         Builder.load_file('./folder_kv/app.kv')
         Builder.load_file('./folder_kv/init.kv')
         Builder.load_file('./folder_kv/home.kv')
@@ -39,4 +44,7 @@ class openfisca_managing_tool(App):
 
 # main
 if __name__ == '__main__':
+    """
+        Execute the runner of app
+    """
     openfisca_managing_tool().run()

@@ -22,6 +22,9 @@ from folder_screen_widgets.personalized_widget import *
 
 
 class InitScreen(Screen):
+    """
+    Initial screen
+    """
     download_information = StringProperty("[color=000000][b][size=20]If you want to download an openfisca-system\nplease click ones of the following buttons[/size][b][/color]")
     PATH_OPENFISCA = None
 
@@ -31,6 +34,11 @@ class InitScreen(Screen):
 
 
     def refresh_system_list_button(self,dt):
+        """
+        Refreshing of list system
+        :param dt:
+        :return:
+        """
         buttons_instances = []
         system_names = []
         self.dict_button_reference = {} # used to know what button is clicked
@@ -56,6 +64,10 @@ class InitScreen(Screen):
 
 
     def selected_file(self,button):
+        """
+        Select file (used how callback)
+        :param button: button pressed
+        """
         self.PATH_OPENFISCA = self.dict_button_reference[button]
         dict = get_all_paths(self.PATH_OPENFISCA)
         if dict:
@@ -81,6 +93,12 @@ class InitScreen(Screen):
 
 
     def init_import_tax_benefit_system(self, system_selected, json_config_path_object):
+        """
+        Init and import tax benefit system
+        :param system_selected: system selected
+        :param json_config_path_object: json config path object
+        :return:
+        """
         system_name = str(os.path.basename(system_selected)).replace("-","_")
         for key, value in json_config_path_object[system_name].items():
                 if key == 'tax_benefit_system':
@@ -107,6 +125,11 @@ class InitScreen(Screen):
 
 
     def generate_pop_up(self, title, content):
+        """
+        Generate a popup
+        :param title: popup title
+        :param content: popup content
+        """
         popup = Popup(title = title,
                 content = content,
                 markup = True,
@@ -116,7 +139,10 @@ class InitScreen(Screen):
 
 
     def download_system(self,btn_instance):
-
+        """
+        Download system of clicked button (callback)
+        :param btn_instance: selected button
+        """
         self.id_button = self.get_id(btn_instance)
         self.load_popup = LoadingPopUp()
         self.load_popup.ids.txt_log.text = "Downloading and installing the system"
@@ -125,6 +151,11 @@ class InitScreen(Screen):
 
 
     def inner_down_function(self,args):
+        """
+        ??????
+        :param args:
+        :return:
+        """
         # read documents
         with open('messages/config_import.json') as f:
             data_config = json.load(f)
@@ -141,6 +172,11 @@ class InitScreen(Screen):
 
 
     def get_id(self, instance):
-            for id, widget in self.ids.items():
-                if widget.__self__ == instance:
-                    return id
+        """
+        Get id of instance
+        :param instance: instance
+        :return: instance id
+        """
+        for id, widget in self.ids.items():
+            if widget.__self__ == instance:
+                return id

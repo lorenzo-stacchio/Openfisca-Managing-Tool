@@ -36,6 +36,9 @@ from folder_screen_widgets.personalized_widget import *
 import common_modules
 
 class ReformsScreen(Screen):
+    """
+    Reform screen where I can select all function for manage reform
+    """
     choice = StringProperty()
 
     def __init__(self, **kwargs):

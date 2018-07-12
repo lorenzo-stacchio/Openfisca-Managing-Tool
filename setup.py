@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup, find_packages
 
+"""
+    Setting up of app
+"""
 setup(
     name='OpenFisca-Management-Tool',
     version='0.1.0',

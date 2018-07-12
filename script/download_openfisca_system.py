@@ -6,6 +6,14 @@ import platform
 import site
 
 def download_and_install(path_to_save, project_name, github_link,*args):
+    """
+    Download and install selected openfisca system
+    :param path_to_save: Destination path
+    :param project_name: Name of the project
+    :param github_link: github's link
+    :param args:
+    :return: true if there isn't error else false
+    """
     current_path = os.getcwd()
     full_path = str(path_to_save + "/"+ project_name)
     try:
@@ -43,6 +51,11 @@ def download_and_install(path_to_save, project_name, github_link,*args):
 
 
 def check_package_is_installed(country_package_name):
+    """
+    Check if a package is installed
+    :param country_package_name: name of country package
+    :return: true if is installed else false
+    """
     reload(site)
     installed_packages = sorted(["%s==%s" % (i.key, i.version) for i in get_installed_distributions()])
     for pack in installed_packages:
@@ -52,6 +65,12 @@ def check_package_is_installed(country_package_name):
 
 
 def install_country_package(country_package_name, full_path):
+    """
+    Install a country package
+    :param country_package_name: name of country package
+    :param full_path: full path of country package
+    :return: true
+    """
     actual_path = os.getcwd()
     if platform.system() == "Windows":
         check_output("python -m pip install --upgrade pip", shell=True).decode()

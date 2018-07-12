@@ -37,6 +37,9 @@ from folder_screen_widgets.personalized_widget import *
 
 
 class MakeSimulation(Screen):
+    """
+    Make Simulation screen, where I insert input variables for the simulation
+    """
     variable_added = ObjectProperty()
     dict_of_entity_variable_value = {}
     previous_text_typed = ""
@@ -46,6 +49,9 @@ class MakeSimulation(Screen):
 
 
     def inizializza_make_simulation(self):
+        """
+        Inizialize make simulation
+        """
         #Resize max height of dropdown
         self.ids.menu_a_tendina_entita.dropdown_cls.max_height = self.ids.menu_a_tendina_entita.height*30
         self.ids.menu_a_tendina_variabili.dropdown_cls.max_height = self.ids.menu_a_tendina_variabili.height*30
@@ -94,6 +100,9 @@ class MakeSimulation(Screen):
             self.popup_error_run_simulation.open()
 
     def change_spinner(self):
+        """
+        Action when I change value of spinner
+        """
         variables_name = []
         if self.ids.id_search_box_input_variable != "":
             valori = common_modules.dict_entita[self.ids.menu_a_tendina_entita.text]
@@ -119,6 +128,9 @@ class MakeSimulation(Screen):
 
 
     def update_form(self):
+        """
+        Update form
+        """
         self.ids.menu_a_tendina_variabili.values = common_modules.dict_entita[self.ids.menu_a_tendina_entita.text]
         self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
         self.ids.variable_added.clear_widgets()
@@ -139,6 +151,9 @@ class MakeSimulation(Screen):
 
 
     def go_to_home(self):
+        """
+        Go to home
+        """
         if self.manager.current == 'make_simulation':
             self.ids.variable_added.clear_widgets()
             self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
@@ -148,6 +163,9 @@ class MakeSimulation(Screen):
 
 
     def go_to_output_variables(self):
+        """
+        Go to output variables screen
+        """
         if self.manager.current == 'make_simulation':
             if len(self.dict_of_entity_variable_value) ==  len(self.ids.menu_a_tendina_entita.values):
                 self.manager.transition = kivy.uix.screenmanager.SlideTransition(direction='left')
@@ -163,6 +181,13 @@ class MakeSimulation(Screen):
 
 
     def exist_tuple(self, dictionary, input_entity, input_variable):
+        """
+        Check if a tuple exist
+        :param dictionary: input dictionary
+        :param input_entity: input entity to find
+        :param input_variable: input variable to find
+        :return: true if exist else false
+        """
         if not input_entity in dictionary.keys():
             return False
         elif dictionary[input_entity] == []:
@@ -175,6 +200,9 @@ class MakeSimulation(Screen):
 
 
     def add_value_and_reset_form(self):
+        """
+        Add a new variable and reset the form
+        """
         for key in self.dict_of_entity_variable_value.keys():
             for tuple in self.dict_of_entity_variable_value[key]:
                 if tuple[0] == self.ids.input_value_variable.text and tuple[1] == self.ids.input_value_variable.text:
@@ -233,6 +261,10 @@ class MakeSimulation(Screen):
 
 
     def destroy_button(self, button):
+        """
+        Destroy button when I click it
+        :param button: button clicked
+        """
         entity, variable, value = button.text.split(" - ")
         for tuple in self.dict_of_entity_variable_value[entity]:
             if tuple[0] == variable and tuple[1] == value:

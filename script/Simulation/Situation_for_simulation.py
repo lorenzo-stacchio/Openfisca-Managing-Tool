@@ -14,6 +14,9 @@ GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
 # show the names in GUI
 class TYPEOFVARIABLE(Enum):
+    """
+    Type of variable
+    """
     float = "Float type"
     bool = "Bool type"
     date = "Date type"
@@ -23,19 +26,35 @@ class TYPEOFVARIABLE(Enum):
 
 
 class TYPEOFSETINPUT(Enum):
+    """
+    Type of set input
+    """
     set_input_divide_by_period = "The 12 months are set equal to the 12th of the input value"
     set_input_dispatch_by_period = "The 12 months are set equal to input value"
 
 
 class TYPEOFDEFINITIONPERIOD(Enum):
+    """
+    Type of definition period
+    """
     month = "Monthly variable"
     year = "Year variable"
     eternity = "Eternal variable"
 
 
 class Variable():
-
+    """
+    Variable class
+    """
     def __init__(self, name = "", entity = None, type=None, set_input=None, definition_period = datetime.datetime.now().year):
+        """
+        Constructor of Variable
+        :param name: name of variable
+        :param entity: entity
+        :param type: type of variable
+        :param set_input: type of set_input
+        :param definition_period: period of variable
+        """
         self.name = name
         self.entity = entity
         self.type = type
@@ -45,19 +64,33 @@ class Variable():
 
 
     def __repr__(self):
+        """
+        Representation of variable
+        :return: string of variable
+        """
         return "\n\nName: " + self.name + "\nType: " + self.type + "\nEntity: " + self.entity + "\nDefinition period: " + self.definition_period
 
 
     def set_value(self,value):
+        """
+        Change variable value
+        :param value: new value
+        """
         self.value = value
 
 
 class Entity():
-
+    """
+    Class Entity
+    """
     tax_benefit_system_module_class = None
     entity_module_all_entities = None
 
     def __init__(self, entity = None):
+        """
+        Constructor of Entity
+        :param entity: ....
+        """
         if Entity.tax_benefit_system_module_class is None or Entity.entity_module_all_entities is None:
             raise ValueError("You must import the system before you can create entity")
         print self.entity_module_all_entities
@@ -73,10 +106,23 @@ class Entity():
 
     @staticmethod
     def import_depending_on_system(tax_benefit_system_module_class,entity_module_class,  entity_module_all_entities):
+        """
+        ?????????????
+        :param tax_benefit_system_module_class:
+        :param entity_module_class:
+        :param entity_module_all_entities:
+        :return:
+        """
         Entity.tax_benefit_system_module_class = tax_benefit_system_module_class()
         Entity.entity_module_all_entities = getattr(entity_module_class,entity_module_all_entities)
 
     def generate_associated_variable_filter(self, year = None, month = None, day = None):
+        """
+        Generate associated variable filter
+        :param year: year of variable
+        :param month: month of variable
+        :param day: day of variable
+        """
         if year and not month and not day:
             if re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4:
                 self.period_to_filter_variables = TYPEOFDEFINITIONPERIOD.year
@@ -104,6 +150,9 @@ class Entity():
 
 
     def generate_all_associated_variable(self):
+        """
+        Generate all associated variable
+        """
         # validates
         self.associated_variables = []
         for key_variable, variables_content in self.tax_benefit_system_module_class.get_variables(entity = self.entity).iteritems():
@@ -111,6 +160,10 @@ class Entity():
 
 
     def get_associated_variables(self):
+        """
+        Generate associated variable
+        :return: dict with {entity_name: associated_variables}
+        """
         try:
             return {self.entity_name: self.associated_variables}
         except AttributeError:
@@ -118,11 +171,17 @@ class Entity():
 
 
 class Reform():
+    """
+    Class Reform
+    """
     tax_benefit_system_module_class = None
     reform_module = None
 
 
     def __init__(self):
+        """
+        Constructor of Reform class
+        """
         if self.tax_benefit_system_module_class is None or self.reform_module is None:
             raise ValueError("You must import the system and add the reform path, before you can create a reform")
         self.choose_reform = None # reform used for simulation
@@ -151,6 +210,10 @@ class Reform():
 
 
     def get_reform_list(self):
+        """
+        Get all reform
+        :return: list of all reform
+        """
         list = []
         if self.reforms_file_dict == None:
             raise ValueError("You must init the reform!")
@@ -161,6 +224,10 @@ class Reform():
 
 
     def set_choose_reform(self, reform_name):
+        """
+        Set the choosen reform
+        :param reform_name: new reform name
+        """
         for k,v in self.reforms_file_dict.iteritems():
             if reform_name in v:
                 self.choose_reform = {k : reform_name}
@@ -169,6 +236,10 @@ class Reform():
 
 
     def get_choose_reform(self):
+        """
+        Get the choosen reform
+        :return: choosen reform
+        """
         if self.choose_reform is None:
             raise TypeError("You have to set the reform to get it")
         else:
@@ -177,13 +248,25 @@ class Reform():
 
     @staticmethod
     def import_depending_on_system(tax_benefit_system_module_class, reform_module):
+        """
+        ??????????
+        :param tax_benefit_system_module_class:
+        :param reform_module:
+        :return:
+        """
         Reform.tax_benefit_system_module_class = tax_benefit_system_module_class()
         Reform.reform_module = reform_module
 
 
 class Situation(): # defined for one entity
-
+    """
+    Class Situation (one for entity)
+    """
     def __init__(self, name_of_situation = "situazione_prova"):
+        """
+        Construction of Situation
+        :param name_of_situation: name of situation
+        """
         self.name_of_situation = name_of_situation
         self.choosen_input_variables = None
         self.choosen_output_variables = None
@@ -191,16 +274,30 @@ class Situation(): # defined for one entity
 
 
     def __repr__(self):
+        """
+        String of situation
+        :return:
+        """
         return "\nSituation name: " + str(self.name_of_situation) + "\nSituation period: " + str(self.period) + "\nNumber of input variables: " + str(len(self.choosen_input_variables)) #+ "\nNumber of output variables: " + str(len(self.choosen_output_variables))
 
 
     def set_entity_choose(self, entity_choose):
+        """
+        Set choosen entity
+        :param entity_choose: new entity
+        """
         if isinstance(entity_choose, Entity):
                 self.entity_choose = entity_choose
         else:
             raise TypeError("The object used is not an entity")
 
     def set_period(self,year = None, month = None, day = None):
+        """
+        Set period of situation
+        :param year: year of situation
+        :param month: month of situation
+        :param day: day of situation
+        """
         if year and not month and not day:
             if not (re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4):
                 raise ValueError("No valid date selected")
@@ -220,14 +317,27 @@ class Situation(): # defined for one entity
             raise ValueError("No valid date selected")
 
     def get_period(self):
+        """
+        Get period of situation
+        :return: period
+        """
         return self.period
 
 
     def get_choosen_input_variables(self):
+        """
+        Get choosen input variables
+        :return: input variables
+        """
         return self.choosen_input_variables
 
 
     def add_variable_to_choosen_input_variables(self, choosen_input_variable, value):
+        """
+        Add an input variable into a situation
+        :param choosen_input_variable: new input variable
+        :param value: value of variable
+        """
         if self.choosen_input_variables is None:
             self.choosen_input_variables = {}
         variable_match = False
@@ -246,6 +356,12 @@ class Situation(): # defined for one entity
 
 
     def check_value_is_right_type(self, openfisca_system_variable ,value):
+        """
+        Check value of openfisca system variable
+        :param openfisca_system_variable: variable
+        :param value: value
+        :return: true if is correct else false
+        """
         for type_var in TYPEOFVARIABLE:
             print "openfisca tipo", openfisca_system_variable.type
             print "tipo variabile corrente", type_var.name
@@ -270,6 +386,11 @@ class Situation(): # defined for one entity
         raise TypeError("The value is not valid for the variable type")
 
     def is_date(self, string):
+        """
+        Check if is a date
+        :param string: date string
+        :return:
+        """
         try:
             parse(string)
             return True
@@ -277,6 +398,11 @@ class Situation(): # defined for one entity
             return False
 
     def is_number(self, s):
+        """
+        Check if is a number
+        :param s: string
+        :return: true if is a number else false
+        """
         try:
             float(s)
             return True
@@ -293,6 +419,10 @@ class Situation(): # defined for one entity
 
 
     def remove_variable_from_choosen_input_variables(self, choosen_input_variable_to_remove):
+        """
+        Remove a variable from choosen input variables
+        :param choosen_input_variable_to_remove: input vaiable to remove
+        """
         if choosen_input_variable_to_remove is None:
             raise ValueError("You can't remove a None variable")
         if self.choosen_input_variables is None or self.choosen_input_variables == {}:
@@ -304,10 +434,18 @@ class Situation(): # defined for one entity
 
 
     def get_choosen_output_variables(self):
+        """
+        Get choosen output variables
+        :return: choosen output variables
+        """
         return self.choosen_output_variables
 
 
     def add_variable_to_choosen_output_variables(self, choosen_output_variable):
+        """
+        Add an output variable into a situation
+        :param choosen_output_variable: new output variable
+        """
         if self.choosen_output_variables is None:
             self.choosen_output_variables = []
         variable_match = False
@@ -324,6 +462,10 @@ class Situation(): # defined for one entity
 
 
     def remove_variable_from_choosen_output_variables(self, choosen_output_variable_to_remove):
+        """
+        Remove a variable from choosen output variables
+        :param choosen_output_variable_to_remove: output variable to remove
+        """
         if choosen_output_variable_to_remove is None:
             raise ValueError("You can't remove a None variable")
         if self.choosen_output_variables is None or self.choosen_output_variables == []:
@@ -335,9 +477,15 @@ class Situation(): # defined for one entity
 
 
 class Simulation_generator(): #defined for Italy
+    """
+    Simulation generator Class
+    """
     tax_benefit_system_module_class = None
 
     def __init__(self):
+        """
+        Construction of Simulation Generator
+        """
         if Simulation_generator.tax_benefit_system_module_class is None:
             raise ValueError("You must import the system before you can create simulator")
         self.situations = None #take n situations
@@ -347,6 +495,13 @@ class Simulation_generator(): #defined for Italy
 
 
     def init_profile(self, scenario, situation_period, entity_situation):
+        """
+        Inizialize profile of simulation generator
+        :param scenario: input scenario
+        :param situation_period: input situation period
+        :param entity_situation: entity situation
+        :return: scenario
+        """
         scenario.init_single_entity(
             period = situation_period,
             parent1 = entity_situation
@@ -355,6 +510,12 @@ class Simulation_generator(): #defined for Italy
 
 
     def set_period(self,year = None, month = None, day = None):
+        """
+        Set period simulation generator
+        :param year: new year
+        :param month: new month
+        :param day: new day
+        """
         if year and not month and not day:
             if not (re.match(r'.*([1-3][0-9]{3})', year) and len(year) == 4):
                 raise ValueError("No valid date selected")
@@ -370,6 +531,10 @@ class Simulation_generator(): #defined for Italy
 
 
     def set_reform(self, reform):
+        """
+        Set reform
+        :param reform: new reform
+        """
         if not isinstance(reform, Reform):
             raise TypeError("The object you passed is not a valid reform")
         elif reform is None:
@@ -379,6 +544,13 @@ class Simulation_generator(): #defined for Italy
 
 
     def add_to_result(self, situation, name_of_variable_calculated, result):
+        """
+        ??????
+        :param situation:
+        :param name_of_variable_calculated:
+        :param result:
+        :return:
+        """
         if self.results is None: # initialize if it is empty
             self.results = {}
         if not situation in self.results:
@@ -387,10 +559,18 @@ class Simulation_generator(): #defined for Italy
 
 
     def __repr__(self):
+        """
+        Representation of situation generator
+        :return: string of summary situations
+        """
         return "\nNumber of situations: " + str(len(self.situations)) + "\nPeriod: " + str(self.period)
 
 
     def get_results(self):
+        """
+        Get results of situation
+        :return: results
+        """
         if not(self.results is None):
             return self.results
         else:
@@ -398,6 +578,10 @@ class Simulation_generator(): #defined for Italy
 
 
     def add_situation_to_simulator(self, situation): # you can add situations with the same content
+        """
+        Add situation to simulator
+        :param situation: situation to insert
+        """
         if self.situations is None:
             self.situations = []
         if isinstance(situation, Situation):
@@ -407,6 +591,9 @@ class Simulation_generator(): #defined for Italy
 
 
     def generate_simulation(self):
+        """
+        Generate simulation
+        """
         if not (self.situations == []) and not (self.situations is None):
             # import reform if it used
             if not (self.reform is None):
@@ -443,6 +630,10 @@ class Simulation_generator(): #defined for Italy
 
 
     def generate_rst_strings_document_after_simulation(self):
+        """
+        Generate rst after simulation
+        :return: rst string
+        """
         strings_RST = []
         for situation in self.situations:
             string_RST= ""
@@ -481,4 +672,8 @@ class Simulation_generator(): #defined for Italy
 
     @staticmethod
     def import_depending_on_system(tax_benefit_system_module_class):
+        """
+        Import class of tax benefit system
+        :param tax_benefit_system_module_class: input class
+        """
         Simulation_generator.tax_benefit_system_module_class = tax_benefit_system_module_class()

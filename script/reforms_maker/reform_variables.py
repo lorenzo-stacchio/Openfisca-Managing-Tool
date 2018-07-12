@@ -6,6 +6,9 @@ from enum import Enum
 
 # show the names in GUI
 class TYPEOFVARIABLE(Enum):
+    """
+    Type of variable Class
+    """
     float = "Float type"
     bool = "Bool type"
     date = "Date type"
@@ -15,32 +18,51 @@ class TYPEOFVARIABLE(Enum):
 
 
 class TYPEOFSETINPUT(Enum):
+    """
+    Type of set input Class
+    """
     no_set_input_period = "There's no set_input_period"
     set_input_divide_by_period = "The 12 months are set equal to the 12th of the input value"
     set_input_dispatch_by_period = "The 12 months are set equal to input value"
 
 
 class TYPEOFDEFINITIONPERIOD(Enum):
+    """
+    Type of definition period Class
+    """
     month = "Monthly variable"
     year = "Year variable"
     eternity = "Eternal variable"
 
 class Variable_To_Reform():
-
+    """
+    Variable to reform  Class
+    """
     type_of_entity = None
     tax_benefit_system_module_class = None
 
     def __init__(self):
+        """
+        Construction Variable to Reform
+        """
         if   Variable_To_Reform.tax_benefit_system_module_class is None or   Variable_To_Reform.type_of_entity is None:
             raise ValueError("You must import the system to create a variable to reform")
 
     def set_name(self, name):
+        """
+        Set name of variable
+        :param name: new name
+        """
         if name is None:
             raise ValueError("You must insert the variable name")
         else:
             self.__name__ = name
 
     def set_type(self, type):
+        """
+        Set type of variable
+        :param type: new type
+        """
         accept_value = []
         for type_accepted in TYPEOFVARIABLE:
             accept_value.append(type_accepted.name)
@@ -50,6 +72,10 @@ class Variable_To_Reform():
             raise ValueError("The type choosen for the variable is not an openfisca type")
 
     def set_entity(self, entity):
+        """
+        Set entity of variable
+        :param entity: new entity
+        """
         entity_names = []
         self.entity = None
         for entity_name in Variable_To_Reform.type_of_entity:
@@ -62,6 +88,10 @@ class Variable_To_Reform():
 
 
     def set_reference(self, reference):
+        """
+        Set reference of variable
+        :param reference: new reference
+        """
         if reference is None:
             self.__reference__=None
         elif re.search("(?P<url>https?://[^\s]+)", reference):
@@ -72,6 +102,10 @@ class Variable_To_Reform():
                 "The URL isn't correct, if you don't have a valid URL please leave the field empty")
 
     def set_formula(self, formula):
+        """
+        Set formula of variable
+        :param formula: new formula
+        """
         if not(formula is None or formula==""):
             f = re.compile("def formula\(([a-zA-Z\, ]*)\)\:")
             if f.match(formula):
@@ -82,9 +116,17 @@ class Variable_To_Reform():
             self.__formula__ = formula
 
     def set_label(self, label):
+        """
+        Set label of variable
+        :param label: new label
+        """
         self.__label__ = label
 
     def set_definition_period(self, definition_period):
+        """
+        Set definition period of variable
+        :param definition_period: new definition period
+        """
         accept_value = []
         for type_accepted in TYPEOFDEFINITIONPERIOD:
             accept_value.append(type_accepted.name)
@@ -97,6 +139,10 @@ class Variable_To_Reform():
             raise ValueError("The definition_period choosen for the variable is not an openfisca definition_period")
 
     def set_set_input(self, set_input):
+        """
+        Set the set_input field
+        :param set_input: new set_input
+        """
         accept_value = []
         for type_accepted in TYPEOFSETINPUT:
             accept_value.append(type_accepted.name)
@@ -110,23 +156,46 @@ class Variable_To_Reform():
 
     @staticmethod
     def import_depending_on_system(tax_benefit_system_module_class, system_entity_module, system_all_entities_name):
+        """
+        ?????????
+        :param tax_benefit_system_module_class:
+        :param system_entity_module:
+        :param system_all_entities_name:
+        :return:
+        """
         Variable_To_Reform.tax_benefit_system_module_class = tax_benefit_system_module_class()
         Variable_To_Reform.type_of_entity = getattr(system_entity_module,system_all_entities_name)
 
 
     def __repr__(self):
+        """
+        Representation of variable to reform
+        :return:
+        """
         return "\n\nName: " + self.__name__ + "\nType: " + self.__type__ + "\nEntity: " + self.entity + "\nDefinition period: " + self.__definition_period__ + "\nLabel: " + self.__label__ +  "\nSet_input: " + self.__set_input__ +  "\nReference: " + self.__reference__
 
 
 class TYPEOFREFORMVARIABILE(Enum):
+    """
+    Type of reform variable Enum
+    """
     update_variable = "Update an existing variable"
     add_variable = "Add a new variable"
     neutralize_variable = " Neutralize an existent variable"
 
 
 class Variable_reform_manager():
-
+    """
+    Variable reform manager Class
+    """
     def __init__(self, variable = None, reform_name = None, path_to_save_reform = None, reform_full_description = None):
+        """
+        Construction of variable reform
+        :param variable: variable
+        :param reform_name: reform name
+        :param path_to_save_reform: path to save reform
+        :param reform_full_description: reform full description
+        """
         if isinstance(variable, Variable_To_Reform):
             self.__variable__ = variable
         else:
@@ -141,16 +210,28 @@ class Variable_reform_manager():
 
 
     def set_description(self,reform_full_description):
+        """
+        Set description of reform
+        :param reform_full_description: new reform
+        """
         self.__reform_full_description__ = "\"" + reform_full_description + "\""
 
 
     def set_variable(self, variable):
+        """
+        Set variable value
+        :param variable: new variable
+        """
         if isinstance(variable, Variable_To_Reform):
             self.__variable__ = variable
         else:
             raise TypeError("The passed value is not a correct Variable")
 
     def do_reform(self, command):
+        """
+        Run reform with a command (For the commands see TYPEOFREFORMVARIABILE)
+        :param command: command input
+        """
         if self.__variable__ == None:
             raise ValueError("You have to choose a variable to do a reform")
         accept_value = []
@@ -169,6 +250,9 @@ class Variable_reform_manager():
 
 
     def __add_variable__(self):
+        """
+        Add variable reform
+        """
         if self.__reform_name__ is None:
             self.__reform_name__ = "add_" + self.__variable__.__name__
         # check the necessary fields, which are name, type, definition_period and entity
@@ -217,6 +301,9 @@ class Variable_reform_manager():
 
 
     def __update_variable__(self):
+        """
+        Update variable reform
+        """
         if self.__reform_name__ is None:
             self.__reform_name__ = "update_" + self.__variable__.__name__
 
@@ -342,6 +429,9 @@ class Variable_reform_manager():
 
 
     def __neutralize_variable__(self):
+        """
+        Neutralize variable reform
+        """
         if self.__reform_name__ is None:
             self.__reform_name__ = "neutralize_" + self.__variable__.__name__
 

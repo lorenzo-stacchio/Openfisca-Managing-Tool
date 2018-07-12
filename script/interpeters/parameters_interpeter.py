@@ -14,12 +14,18 @@ GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 PATH_RST_DOCUMENT = os.getcwd() + "/messages/rst_da_visualizzare.rst"
 
 class ParameterType(Enum):
+    """
+    Type parameter enum
+    """
     non_parametro = "The file doesn't contain a valid parameter"
     normal = "The parameter is a simple parameter"
     scale = "The parameter is a scale parameter"
     fancy_indexing = "The parameter is a fancy indexing parameter"
 
 class NormalParameter():
+    """
+    Normal parameter class
+    """
     __description__ = None
     __reference__ = None
     __unit__ = None
@@ -27,6 +33,14 @@ class NormalParameter():
     __parameter_name__ = None
 
     def __init__(self, parameter_name=None, description = None, reference = None, unit = None, dict_data_value=None):
+        """
+        Costruction of normal parameter class
+        :param parameter_name: name of normal parameter
+        :param description: description of normal parameter
+        :param reference: reference of normal parameter
+        :param unit: unit of normal parameter
+        :param dict_data_value: dict data value of normal parameter
+        """
         self.__description__ = description
         self.__reference__ = reference
         self.__dict_data_value__ = dict_data_value
@@ -34,27 +48,60 @@ class NormalParameter():
         self.__parameter_name__ = parameter_name
 
     def __repr__(self):
-        return "\nNome: " + str(self.__parameter_name__) + "\nDescrizione: " + str(self.__description__) + "\nReference: " + str(self.__reference__) + "\nUnit: " + str(self.__unit__) + "\nDict value: " + str(self.__dict_data_value__)
+        """
+        Representation of normal parameters
+        :return: string of normal parameters
+        """
+        return "\nName: " + str(self.__parameter_name__) + "\nDescription: " + str(self.__description__) + "\nReference: " + str(self.__reference__) + "\nUnit: " + str(self.__unit__) + "\nDict value: " + str(self.__dict_data_value__)
 
     def set_description(self,description):
+        """
+        Set description normal parameter
+        :param description: new description
+        """
         self.__description__ = description
 
     def set_parameter_name(self,parameter_name):
+        """
+        Set normal parameter name
+        :param parameter_name: new name
+        """
         self.__parameter_name__ = parameter_name
 
     def set_reference(self,reference):
+        """
+        Set reference name
+        :param reference: new reference
+        """
         self.__reference__ = reference
 
     def set_unit(self,unit):
+        """
+        Set unit
+        :param unit: new unit
+        """
         self.__unit__ = unit
 
     def set_dict_data_value(self,dict_data_value):
+        """
+        Set dict data value
+        :param dict_data_value: new dict data value
+        """
         self.__dict_data_value__ = dict_data_value
 
     def set_element_to_dict_key(self,key,value):
+        """
+        Set element of dict data value
+        :param key: input key
+        :param value: new value
+        """
         self.__dict_data_value__[key] =  value
 
     def string_RST(self):
+        """
+        Stringify in a RST document
+        :return: string RST
+        """
         string_RST = ""
         #parameter name
         for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
@@ -132,6 +179,10 @@ class NormalParameter():
 
 
     def generate_RST(self):
+        """
+        Generate RST document
+        :return: path rst document
+        """
         if os.path.exists(PATH_RST_DOCUMENT):
             os.remove(PATH_RST_DOCUMENT)
         with open(PATH_RST_DOCUMENT,'a') as rst:
@@ -212,33 +263,67 @@ class NormalParameter():
 
 
 class ScaleParameter():
+    """
+    Scale parameter class
+    """
     __description__ = None
     __reference__ = None
     __brackets__ = None #dict
     __parameter_name__ = None
 
     def __init__(self, parameter_name=None,reference=None, description = None, brackets=None):
+        """
+        Constructor of Scale parameter
+        :param parameter_name: name of scale parameter
+        :param reference: reference of scale parameter
+        :param description: description of scale parameter
+        :param brackets: brackets of scale parameter
+        """
         self.__description__ = description
         self.__reference__ = reference
         self.__brackets__ = brackets
         self.__parameter_name__ = parameter_name
 
     def __repr__(self):
-        return "\nNome: " + str(self.__parameter_name__) + "\nDescrizione: " + str(self.__description__) + "\nReference: " + str(self.__reference__) + "\nBrackets: " + str(self.__brackets__)
+        """
+        Representation of Scale Parameter
+        :return: string of scale parameter
+        """
+        return "\nName: " + str(self.__parameter_name__) + "\nDescription: " + str(self.__description__) + "\nReference: " + str(self.__reference__) + "\nBrackets: " + str(self.__brackets__)
 
     def set_description(self,description):
+        """
+        Set scale parameter description
+        :param description: new description
+        """
         self.__description__ = description
 
     def set_parameter_name(self,parameter_name):
+        """
+        Set scale parameter name
+        :param parameter_name: new name
+        """
         self.__parameter_name__ = parameter_name
 
     def set_reference(self,reference):
+        """
+        Set scale parameter reference
+        :param reference: new reference
+        """
         self.__reference__ = reference
 
     def set_brackets(self,brackets):
+        """
+        Set scale parameter brackets
+        :param brackets: new brackets
+        """
         self.__brackets__ = brackets
 
     def generate_RST(self):
+        """
+        Generate RST document
+        :return: rst string
+        """
         if os.path.exists(PATH_RST_DOCUMENT):
             os.remove(PATH_RST_DOCUMENT)
         with open(PATH_RST_DOCUMENT,'a') as rst:
@@ -342,20 +427,41 @@ class ScaleParameter():
 
 
 class FancyIndexingParamater():
+    """
+    Fancy indexing parameter class
+    """
     __parameter_name__ = None
     __code_dict__ = None # contain key and normal parameter associated
 
     def __init__(self,parameter_name=None,values=None,code_dict= None):
+        """
+        Construction of fancy index parameter
+        :param parameter_name: fancy index parameter name
+        :param values: fancy index parameter values
+        :param code_dict: fancy index parameter code dict
+        """
         self.__parameter_name__  = parameter_name
         self.__code_dict__ = code_dict
 
     def set_code_dict(self,code_dict):
+        """
+        Set fancy index parameter dict
+        :param code_dict: new code dict
+        """
         self.__code_dict__ = code_dict
 
     def __repr__(self):
+        """
+        Representation of fancy index parameter
+        :return:
+        """
         return "\n\nParameter name: " + str(self.__parameter_name__) + "\nCode dict" + str(self.__code_dict__)
 
     def generate_RST(self):
+        """
+        Generate RST document
+        :return: rst string
+        """
         if os.path.exists(PATH_RST_DOCUMENT):
             os.remove(PATH_RST_DOCUMENT)
         with open(PATH_RST_DOCUMENT,'a') as rst:
@@ -379,9 +485,16 @@ class FancyIndexingParamater():
 
 
 class ParameterInterpeter():
+    """
+    Parameter interpreter class
+    """
     __actual_parameter__ = None
 
     def __init__(self,parameter_path):
+        """
+        Construction of Parameter interpreter
+        :param parameter_path: path parameter
+        """
         self.__parameter_path__  = parameter_path
         self.__parameter_name__ = os.path.basename(parameter_path)
         self.__parameter_type__ = ParameterType.non_parametro
@@ -389,6 +502,10 @@ class ParameterInterpeter():
 
 
     def understand_type(self):
+        """
+        Unterstand type of parameter
+        :return: parameter type
+        """
         count_values_word = 0
         count_brackets_word = 0
         # first check
@@ -423,6 +540,9 @@ class ParameterInterpeter():
 
     #NORMAL PARAMETER
     def __interpeter_normal_parameter__(self):
+        """
+        Interpreter of normal parameter
+        """
         if (self.__parameter_type__ == ParameterType.normal):
             self.__actual_parameter__ = NormalParameter()
             self.__actual_parameter__.set_dict_data_value(self.__yaml_file__['values'])
@@ -437,6 +557,9 @@ class ParameterInterpeter():
 
     #SCALE PARAMETER
     def __interpeter_scale_parameter__(self):
+        """
+        Interpreter of scale parameter
+        """
         if (self.__parameter_type__ == ParameterType.scale):
             self.__actual_parameter__ = ScaleParameter()
             self.__actual_parameter__.set_brackets(self.__yaml_file__['brackets'])
@@ -450,6 +573,12 @@ class ParameterInterpeter():
 
 
     def __interpeter_normal_parameter_for_fancy_indexing__(self, normal_yaml_parameter = None, parameter_name = None):
+        """
+        Interpreter of normal parameter for fancy indexing
+        :param normal_yaml_parameter: normal yaml parameter
+        :param parameter_name: parameter name
+        :return: normal parameter
+        """
         if normal_yaml_parameter:
             actual_normal = NormalParameter()
             actual_normal.set_dict_data_value(normal_yaml_parameter['values'])
@@ -464,6 +593,9 @@ class ParameterInterpeter():
 
 
     def __interpeter_fancy_indexing_parameter__(self):
+        """
+        Interpreter fancy indexing parameter
+        """
         if (self.__parameter_type__ == ParameterType.fancy_indexing):
             self.__actual_parameter__ = FancyIndexingParamater(parameter_name = self.__parameter_name__)
             formatted_dict = {}
@@ -478,9 +610,17 @@ class ParameterInterpeter():
 
 
     def generate_RST_parameter(self):
+        """
+        Generate RST parameter
+        :return: actual parameter rst document
+        """
         if not (self.__parameter_type__ == ParameterType.non_parametro):
             return self.__actual_parameter__.generate_RST()
 
 
     def return_type(self):
+        """
+        Get parameter type
+        :return: parameter type
+        """
         return self.__parameter_type__

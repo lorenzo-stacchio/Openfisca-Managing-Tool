@@ -18,6 +18,9 @@ GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 PATH_RST_DOCUMENT = os.getcwd() + "/messages/rst_da_visualizzare.rst"
 
 class TypeReformAction(Enum):
+    """
+    Type reform action Enum
+    """
     add_variable = "Aggiunta variabile"
     modify_variable = "Modificata variabile esistente"
     add_parameter = "Aggiunto Parametro"
@@ -25,8 +28,17 @@ class TypeReformAction(Enum):
 
 
 class Reform_for_writing():
-
+    """
+    Reform for writing class
+    """
     def __init__(self, reform_name = None, reform_full_name = None, reference = None, reform_actions = []):
+        """
+        Construction of reform for writing class
+        :param reform_name: name of reform
+        :param reform_full_name: fullname of reform
+        :param reference: reference of reform
+        :param reform_actions: reform actions
+        """
         if os.path.exists(PATH_RST_DOCUMENT):
             os.remove(PATH_RST_DOCUMENT)
         self.__reform_name__ = reform_name
@@ -35,27 +47,59 @@ class Reform_for_writing():
         self.__reform_full_name__ = reform_full_name
 
     def __repr__(self):
+        """
+        Representation of reform for writing
+        :return: string reform for writing
+        """
         return "\n" + str(self.__reform_name__) + "," + str(self.__reform_full_name__) + "," + str(self.__reference__) + "," +  str(self.__reform_actions__)
 
     def set_reform_name(self, reform_name):
+        """
+        Set reform name
+        :param reform_name: new name
+        """
         self.__reform_name__ = reform_name
 
     def set_reform_full_name(self, reform_full_name):
+        """
+        Set reform fullname
+        :param reform_full_name: new fullname
+        """
         self.__reform_full_name__ = reform_full_name
 
     def get_reform_actions(self):
+        """
+        Get refomr actions
+        :return: reform actions
+        """
         return self.__reform_actions__
 
     def set_reference(self, reference):
+        """
+        Set reference
+        :param reference: new reference
+        """
         self.__reference__ = reference
 
     def set_reform_actions(self, reform_actions):
+        """
+        Set reform action
+        :param reform_actions: new reform actions
+        """
         self.__reform_actions__ = reform_actions
 
     def append_reform_action(self, reform_action):
+        """
+        Append a reform actions on current reform
+        :param reform_action: new reform action
+        """
         self.__reform_actions__.append(reform_action)
 
     def generate_RST_reform(self):
+        """
+        Generate RST reform
+        :return: path rst document
+        """
         with open(PATH_RST_DOCUMENT,'a') as rst:
             #reform name
             for n in range(1,GRANDEZZA_STRINGHE_INTESTAZIONE):
@@ -89,10 +133,17 @@ class Reform_for_writing():
 
 
 class Reform_File_Interpeter():
+    """
+    Reform file interpreter class
+    """
     __reforms__ = [] # will be a list
     tax_benefit_system_module_class = None
 
     def __init__(self,reform_path):
+        """
+        Construction of Reform file interpreter
+        :param reform_path: reform path
+        """
         self.__reforms_file_path__ = reform_path
         self.__file_is_a_reform__ = False
         if Reform_File_Interpeter.tax_benefit_system_module_class  is None:
@@ -105,10 +156,18 @@ class Reform_File_Interpeter():
 
     @staticmethod
     def import_depending_on_system(tax_benefit_system_module_class):
+        """
+        ????????
+        :param tax_benefit_system_module_class:
+        :return:
+        """
         Reform_File_Interpeter.tax_benefit_system_module_class = tax_benefit_system_module_class()
 
 
     def __find_and_bind_variables__(self):
+        """
+        Find and bind variables
+        """
         for reform in self.__reforms__:
             for action in reform.get_reform_actions():
                 for key,value in action.iteritems():
@@ -184,6 +243,9 @@ class Reform_File_Interpeter():
 
 
     def __find_and_bind_modifier_func__(self):
+        """
+        Find and bind modifier func
+        """
         modifier_function_found = False
         modifier_function_dict = {}
         with open(self.__reforms_file_path__,'r') as content_variable:
@@ -210,6 +272,9 @@ class Reform_File_Interpeter():
                                 action[key] = action[key] + value_name
 
     def start_interpetration_reforms(self):
+        """
+        Start interpretation reform
+        """
         self.__reforms__ = []
         reform_apply_fun_found = False
         current_reform_index = -1
@@ -276,9 +341,17 @@ class Reform_File_Interpeter():
 
 
     def generate_RST_reforms(self):
+        """
+        Generate rst reforms
+        :return: path rst reforms
+        """
         for reform in self.__reforms__:
             path = reform.generate_RST_reform()
         return path
 
     def file_is_a_reform(self):
+        """
+        Check if file is a reform
+        :return: true of false
+        """
         return self.__file_is_a_reform__

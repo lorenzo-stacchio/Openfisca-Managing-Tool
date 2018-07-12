@@ -37,6 +37,9 @@ from folder_screen_widgets.personalized_widget import *
 import common_modules
 
 class OutputVariableScreen(Screen):
+    """
+    Output variable screen, when I must insert output variable for the simulation
+    """
     string_var_input = ""
     string_var_output = ""
     variable_added_output = ObjectProperty()
@@ -47,6 +50,9 @@ class OutputVariableScreen(Screen):
         super(OutputVariableScreen, self).__init__(**kwargs)
 
     def inizializza_output_variable(self):
+        """
+        Inizialize output variable
+        """
         # Resize max height of dropdown
         self.ids.menu_a_tendina_entita_output.dropdown_cls.max_height = self.ids.menu_a_tendina_entita_output.height * 30
         self.ids.menu_a_tendina_variabili_output.dropdown_cls.max_height = self.ids.menu_a_tendina_variabili_output.height * 30
@@ -63,9 +69,11 @@ class OutputVariableScreen(Screen):
                 self.ids.information_output.text = self.ids.information_output.text + line
 
     def change_spinner(self):
+        """
+        Action when I change value of spinner
+        """
         variables_name = []
         if self.ids.id_search_box_input_variable != "":
-            #TOFIX
             valori = common_modules.dict_entita[self.ids.menu_a_tendina_entita_output.text]
             for key_variable in valori:
                 if (self.ids.id_search_box_input_variable.text.lower() in key_variable.lower()):
@@ -93,6 +101,9 @@ class OutputVariableScreen(Screen):
             self.ids.menu_a_tendina_variabili_output.text = ""
 
     def go_to_home(self):
+        """
+        Go to home
+        """
         if self.manager.current == 'output_variable':
             self.ids.variable_added_output.clear_widgets()
             self.ids.menu_a_tendina_variabili_output.text = ''
@@ -103,6 +114,9 @@ class OutputVariableScreen(Screen):
             self.manager.current = 'home'
 
     def update_form(self):
+        """
+        Update form
+        """
         self.ids.menu_a_tendina_variabili_output.values = common_modules.dict_entita[
             self.ids.menu_a_tendina_entita_output.text]
         self.ids.menu_a_tendina_variabili_output.text = self.ids.menu_a_tendina_variabili_output.values[0]
@@ -116,6 +130,13 @@ class OutputVariableScreen(Screen):
                            on_release=self.destroy_button, background_color=(255, 255, 255, 0.9), color=(0, 0, 0, 1)))
 
     def exist_tuple(self, dictionary, input_entity, input_variable):
+        """
+        Check if a tuple exist
+        :param dictionary: input dictionary
+        :param input_entity: input entity to find
+        :param input_variable: input variable to find
+        :return: true if exist else false
+        """
         if not input_entity in dictionary.keys():
             return False
         elif dictionary[input_entity] == []:
@@ -127,6 +148,9 @@ class OutputVariableScreen(Screen):
         return False
 
     def add_value_and_reset_form(self):
+        """
+        Add new variable and reset the form
+        """
         if self.ids.menu_a_tendina_variabili_output.text != '':
             if not self.exist_tuple(self.dict_of_entity_variable_value_output, self.ids.menu_a_tendina_entita_output.text,
                                     self.ids.menu_a_tendina_variabili_output.text):
@@ -171,6 +195,10 @@ class OutputVariableScreen(Screen):
             error_popup.open()
 
     def destroy_button(self, button):
+        """
+        Destroy button when I click it
+        :param button: button clicked
+        """
         entity, variable = button.text.split(" - ")
         for tuple in self.dict_of_entity_variable_value_output[entity]:
             if tuple[0] == variable:
@@ -186,6 +214,9 @@ class OutputVariableScreen(Screen):
 
 
     def go_to_execute_simulation(self):
+        """
+        Go to execute simulation
+        """
         if self.manager.current == 'output_variable':
             dictionary_of_input = self.manager.get_screen('make_simulation').dict_of_entity_variable_value
             dictionary_of_output = self.dict_of_entity_variable_value_output
@@ -221,6 +252,9 @@ class OutputVariableScreen(Screen):
 
 
     def close_summary(self):
+        """
+        Check if you are sure to continue
+        """
         message_popup = "Are you sure to continue?"
         content = ConfirmPopup(text=message_popup)
         content.bind(on_answer=self._on_answer)
@@ -228,6 +262,9 @@ class OutputVariableScreen(Screen):
         self.popup.open()
 
     def _on_answer(self, instance, answer):
+        """
+        Check the answer of close_summary method
+        """
         if answer == 'Yes':
             try:
 
@@ -250,5 +287,8 @@ class OutputVariableScreen(Screen):
 
 
     def go_to_make_simulation(self):
+        """
+        Go to make simulation
+        """
         if self.manager.current == 'output_variable':
             self.manager.current = 'make_simulation'

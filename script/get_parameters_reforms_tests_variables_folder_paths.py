@@ -2,14 +2,23 @@
 import os
 
 def are_all_folders(dict_of_paths):
+    """
+    Check if in the dict there is all path
+    :param dict_of_paths: dict of path
+    :return: true if are all valid path else false
+    """
     for key in dict_of_paths:
         if not (os.path.isdir(r""+dict_of_paths[key])) and os.path.exists(r""+dict_of_paths[key]):
-            print "Pippo"
             return False
     return True
 
 
 def get_all_paths(path_di_partenza):
+    """
+    Get all paths from source path in input
+    :param path_di_partenza:  source path
+    :return: a dict of paths
+    """
     if os.path.isdir(path_di_partenza) and os.path.exists(path_di_partenza):
         #folder of the project
         project_folder = ""

@@ -12,10 +12,12 @@ from enum import Enum
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))) # get father directory
 from script.interpeters import parameters_interpeter
 
-
 class Parameter_reform_manager():
-
     def __init__(self, system_parameter_path = None):
+        """
+        Inizialize the Parameter reform manager
+        :param system_parameter_path: path of system parameter
+        """
         if system_parameter_path is None:
             raise ValueError("You must insert the path in which parameters files are based")
         self.system_parameter_path = system_parameter_path
@@ -28,14 +30,26 @@ class Parameter_reform_manager():
         self.fill_dict_type_parameters()
 
     def set_type_of_parameter_to_reform(self, type_of_parameter_to_reform):
+        """
+        Set the type of parameter for the reform
+        :param type_of_parameter_to_reform: type of reform
+        """
         self.type_of_parameter_to_reform = type_of_parameter_to_reform
 
 
     def set_system_parameter_path(self, system_parameter_path):
+        """
+        Edit the path of system parameter
+        :param system_parameter_path: path of system parameter
+        """
         self.system_parameter_path = system_parameter_path
 
 
     def fill_dict_type_parameters(self):
+        """
+        Fill the dict type parameters
+        :return: a dict with all parameters
+        """
         if self.system_parameter_path is None:
             raise ValueError("You have to set the path in which parameters files are based")
 
@@ -70,6 +84,15 @@ class Parameter_reform_manager():
 
 
     def get_parameters_of_the_choosen_type(self, type_of_parameter):
+        """
+        Get the parameters of the type_of_parameter's type.
+        The type are:
+        - Normal
+        - Scale
+        - Fancy Indexing
+        :param type_of_parameter: a parameter
+        :return: dict of parameters
+        """
         if self.system_parameter_path is None:
             raise ValueError("You have to set the path in which parameters files are based")
 
@@ -85,6 +108,3 @@ class Parameter_reform_manager():
             return self.dict_scale_parameters
         elif type_of_parameter is parameters_interpeter.ParameterType.fancy_indexing:
             return self.dict_fancy_indexing_parameters
-
-
-
