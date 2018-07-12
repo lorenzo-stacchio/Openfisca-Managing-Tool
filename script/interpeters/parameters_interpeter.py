@@ -11,7 +11,7 @@ from script.interpeters.reforms_file_interpeter import *
 # FONDAMENTALE, COSI PRENDI TUTTI I PARAMETRI ESISTENTI
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
-PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
+PATH_RST_DOCUMENT = os.getcwd() + "/messages/rst_da_visualizzare.rst"
 
 class ParameterType(Enum):
     non_parametro = "The file doesn't contain a valid parameter"
@@ -203,10 +203,11 @@ class NormalParameter():
             # writing the formatted the dates
             for date,value_dict in self.__dict_data_value__.iteritems(): #key are the dates
                 true_value = value_dict['value'] #is ever one element
-                if date <= datetime.datetime.now().date(): # check if the value is future or not
-                    rst.write("- Dal **" + date.strftime('%Y/%m/%d') + "** il parametro é valso **" + str(true_value) + "**\n")
+                date_to_compare = datetime.datetime(year=date_parser(date).date().year, month=date_parser(date).date().month, day=date_parser(date).date().day)
+                if date_to_compare.date() <= datetime.datetime.now().date(): # check if the value is future or not
+                    rst.write("- Dal **" + date_to_compare.date().strftime('%Y/%m/%d') + "** il parametro é valso **" + str(true_value) + "**\n")
                 else:
-                    rst.write("- Dal **" + date.strftime('%Y/%m/%d') + "** si presume che il parametro varrà **" + str(true_value) + "**\n")
+                    rst.write("- Dal **" + date_to_compare.date().strftime('%Y/%m/%d') + "** si presume che il parametro varrà **" + str(true_value) + "**\n")
             return PATH_RST_DOCUMENT #return path of written file
 
 

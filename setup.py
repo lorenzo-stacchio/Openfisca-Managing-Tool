@@ -16,10 +16,10 @@ setup(
         'OpenFisca-Core >= 22.0, < 24.0',
         'Kivy >= 1.10.0',
         'Kivy-Garden >= 0.1.4',
-        'kivy.deps.angle >= 0.1.6',
         'kivy.deps.glew >= 0.1.9',
         'kivy.deps.gstreamer  >= 0.1.12',
-        'kivy.deps.sdl2 >= 0.1.17'
+        'python-dateutil >= 2.7',
+        'importlib >= 1.0'
         ],
     extras_require = {
         'api': [

@@ -40,7 +40,7 @@ class InitScreen(Screen):
             for key_2, value_2 in value.items():
                 if key_2 == 'project_name':
                     system_names.append(value_2)
-        system_filename_list = [name for name in os.listdir((os.getcwd()+ "\\openfisca_systems")) if os.path.isdir(os.path.join((os.getcwd()+ "\\openfisca_systems"), name))]
+        system_filename_list = [name for name in os.listdir((os.getcwd()+ "/openfisca_systems")) if os.path.isdir(os.path.join((os.getcwd()+ "/openfisca_systems"), name))]
         for file_name in system_filename_list:
             for system_name in system_names:
                 if os.path.basename(file_name) == system_name:
@@ -50,9 +50,9 @@ class InitScreen(Screen):
                     #Button openfisca-country --> Enabled
                     button.disabled = False
                     button.bind(on_press = self.manager.current_screen.selected_file)
-                    btn_image = kivyImage(os.getcwd() + "\\img\\openfisca_system\\"+ file_name + ".png")
+                    btn_image = kivyImage(os.getcwd() + "/img/openfisca_system/"+ file_name + ".png")
                     button.Image = btn_image
-                    self.dict_button_reference[button] = os.getcwd()+ "\\openfisca_systems\\" + file_name
+                    self.dict_button_reference[button] = os.getcwd()+ "/openfisca_systems/" + file_name
 
 
     def selected_file(self,button):
@@ -126,11 +126,11 @@ class InitScreen(Screen):
 
     def inner_down_function(self,args):
         # read documents
-        with open('messages\\config_import.json') as f:
+        with open('messages/config_import.json') as f:
             data_config = json.load(f)
         system_selected = self.id_button.replace("button", "openfisca")
         # get system info depending on the choice
-        system_path = os.getcwd() + "\\openfisca_systems"
+        system_path = os.getcwd() + "/openfisca_systems"
         github_link = data_config[system_selected]["link"]
         project_name = data_config[system_selected]["project_name"]
         download_and_install_openfisca(system_path, project_name, github_link)

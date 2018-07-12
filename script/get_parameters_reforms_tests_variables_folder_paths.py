@@ -15,8 +15,8 @@ def get_all_paths(path_di_partenza):
         project_folder = ""
         #I'm looking for the name
         for sub in os.listdir(path_di_partenza):
-            if(sub.startswith("openfisca") and os.path.isdir(path_di_partenza + "\\" +sub)):
-                project_folder = path_di_partenza + "\\" +sub
+            if(sub.startswith("openfisca") and os.path.isdir(path_di_partenza + "/" +sub)):
+                project_folder = path_di_partenza + "/" +sub
         if project_folder:
             dict_path = {}
             dict_path['initial_path'] = str(path_di_partenza)

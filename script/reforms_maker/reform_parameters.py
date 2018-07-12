@@ -88,7 +88,3 @@ class Parameter_reform_manager():
 
 
 
-# main
-p_man = Parameter_reform_manager(system_parameter_path = "C:\\Users\\Lorenzo Stacchio\\Desktop\\openfisca-italy\\openfisca_italy\\parameters" )
-print p_man.get_parameters_of_the_choosen_type(type_of_parameter = parameters_interpeter.ParameterType.fancy_indexing)
-#print p_man.get_parameters_of_the_choosen_type()

@@ -15,7 +15,7 @@ from variables_file_interpeter import *
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
 
-PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
+PATH_RST_DOCUMENT = os.getcwd() + "/messages/rst_da_visualizzare.rst"
 
 class TypeReformAction(Enum):
     add_variable = "Aggiunta variabile"

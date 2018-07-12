@@ -15,7 +15,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
-PATH_RST_DOCUMENT = os.getcwd() + "\\messages\\rst_da_visualizzare.rst"
+PATH_RST_DOCUMENT = os.getcwd() + "/messages/rst_da_visualizzare.rst"
 
 
 class Variable_for_writing():
