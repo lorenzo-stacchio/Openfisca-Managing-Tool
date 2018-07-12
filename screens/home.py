@@ -2,6 +2,10 @@ import kivy
 kivy.require("1.10.0")
 from kivy.uix.screenmanager import ScreenManager, Screen
 from script.get_parameters_reforms_tests_variables_folder_paths import *
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+
+
 
 class HomeScreen(Screen):
     """
@@ -18,15 +22,7 @@ class HomeScreen(Screen):
         """
         path = self.manager.get_screen('init').PATH_OPENFISCA
         self.dict_path = get_all_paths(path)
-        self.ids.label_0_0.text = """[color=000000]
-        [b][size=24sp]Hello ![/size][/b]\n
-        [size=20sp]Thanks for installing [size=20sp][b]OpenFisca Tool Manager[/b][/size]!\n
-        This software will help you to manage some feature provided by OpenFisca, in particular you can:
-            - Visualize variables, reforms and parameters of the selected country;
-            - Create and Execute a reform;
-            - Execute a Simulation.
-        You have selected this folder: [i] [b]""" + os.path.basename(
-            path) + "[/i][/b]" + ".[/color][/size]\n\n"
+
 
     def go_to_visualize(self):
         """
@@ -50,4 +46,14 @@ class HomeScreen(Screen):
         if self.manager.current == 'home':
             self.manager.get_screen('choose_entity').init_content_screen()
             self.manager.current = 'choose_entity'
+
+    def create_popup_information(self):
+        """
+        Create a popup with the information
+        """
+        lbl = Label(text="BLABLABLALBLALBLALBLALBLALBLAL")
+        self.popup = Popup(title="Information", content=lbl, auto_dismiss=True, size_hint=(None, None),
+                           size=(480, 400))
+        self.popup.open()
+
 
