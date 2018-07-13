@@ -401,25 +401,28 @@ class ScaleParameter():
                     rst.write('"')
                 rst.write("\n\n")
                 for date, values in date_dict.iteritems():
+                    date_to_compare = datetime.datetime(year=date_parser(date).date().year,
+                                                        month=date_parser(date).date().month,
+                                                        day=date_parser(date).date().day)
                     # 1 value
-                    if len(values)==1 and date < datetime.datetime.now().date():
+                    if len(values)==1 and date_to_compare.date() < datetime.datetime.now().date():
                         if 'threshold' in values:
                             to_write = str('In **' + str(date) +'** it was defined the threshold for this rate as: **' + str(values['threshold']).strip()).strip() +'**\n\n'
                         else:
                             to_write = str('In **' + str(date) +'** it was defined the value for this rate as: **' + str(values['rate']).strip()).strip() +'**\n\n'
                         rst.write(to_write)
-                    if len(values)==1 and date >= datetime.datetime.now().date():
+                    if len(values)==1 and date_to_compare.date() >= datetime.datetime.now().date():
                         if 'threshold' in values:
                             to_write = str('In **' + str(date) +'** it will be defined the threshold for this rate as: **' + str(values['threshold']).strip()).strip() +'**\n\n'
                         else:
                             to_write = str('In **' + str(date) +'** it will be defined the value for this rate as: **' + str(values['rate']).strip()).strip() +'**\n\n'
                         rst.write(to_write)
                     # 2 values
-                    if len(values)==2 and date < datetime.datetime.now().date():
+                    if len(values)==2 and date_to_compare.date() < datetime.datetime.now().date():
                         if 'threshold' in values:
                             to_write = str('In **' + str(date) +'** were defined both: \n - The threshold for this rate: **' + str(values['threshold']).strip() + '**; \n - The value for this rate: **'+ str(values['rate']).strip()).strip() +'**\n\n'
                         rst.write(to_write)
-                    if len(values)==2 and date >= datetime.datetime.now().date():
+                    if len(values)==2 and date_to_compare.date() >= datetime.datetime.now().date():
                         if 'threshold' in values:
                             to_write = str('In **' + str(date) +'** will be defined both: \n - The threshold for this rate: **' + str(values['threshold']).strip() + ' **; \n - The value for this rate: **'+ str(values['rate']).strip()).strip() +'**\n\n'
                         rst.write(to_write)
