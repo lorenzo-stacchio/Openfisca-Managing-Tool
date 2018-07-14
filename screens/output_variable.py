@@ -105,10 +105,13 @@ class OutputVariableScreen(Screen):
         Go to home
         """
         if self.manager.current == 'output_variable':
+
             self.ids.variable_added_output.clear_widgets()
             self.ids.menu_a_tendina_variabili_output.text = ''
+            self.dict_of_entity_variable_value_output = {}
             self.manager.get_screen("choose_entity").entity_box_layout.clear_widgets();
             self.manager.get_screen('make_simulation').ids.variable_added.clear_widgets()
+            self.manager.get_screen('make_simulation').dict_of_entity_variable_value = {}
             self.manager.get_screen('make_simulation').ids.menu_a_tendina_variabili.text = ''
             self.manager.get_screen('make_simulation').ids.input_value_variable.text = ''
             self.manager.current = 'home'
