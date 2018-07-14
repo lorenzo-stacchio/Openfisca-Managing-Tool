@@ -45,7 +45,7 @@ class VisualizeSystemScreen(Screen):
         path = self.manager.get_screen('init').PATH_OPENFISCA
         self.dict_path = get_all_paths(path)
         self.PATH_OPENFISCA = self.dict_path['inner_system_folder']
-        with open('./messages/config_import.json') as f:
+        with open('./config_files/config_import.json') as f:
             data_config = json.load(f)
         Variable_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = common_modules.TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
         Reform_File_Interpeter.import_depending_on_system(tax_benefit_system_module_class = common_modules.TAX_BENEFIT_SYSTEM_MODULE_CLASS) #static method
@@ -94,9 +94,9 @@ class VisualizeSystemScreen(Screen):
             self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
             self.ids.visualize_file_chooser_parameters.path = self.dict_path['parameters']
             self.ids.visualize_file_chooser_reforms.path = self.dict_path['reforms']
-            self.ids.document_variables_viewer.source = "messages/file_not_allowed.rst"
-            self.ids.document_parameters_viewer.source = "messages/file_not_allowed.rst"
-            self.ids.document_reforms_viewer.source = "messages/file_not_allowed.rst"
+            self.ids.document_variables_viewer.source = "config_files/file_not_allowed.rst"
+            self.ids.document_parameters_viewer.source = "config_files/file_not_allowed.rst"
+            self.ids.document_reforms_viewer.source = "config_files/file_not_allowed.rst"
             return False
 
     def selected_file(self, *args):

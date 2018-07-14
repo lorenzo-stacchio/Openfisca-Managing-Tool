@@ -4,6 +4,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from script.get_parameters_reforms_tests_variables_folder_paths import *
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+from folder_screen_widgets.personalized_widget import PopupHomeInstructions
 
 
 
@@ -51,9 +52,7 @@ class HomeScreen(Screen):
         """
         Create a popup with the information
         """
-        lbl = Label(text="BLABLABLALBLALBLALBLALBLALBLAL")
-        self.popup = Popup(title="Information", content=lbl, auto_dismiss=True, size_hint=(None, None),
-                           size=(480, 400))
+        self.popup = PopupHomeInstructions()
         self.popup.open()
 
 

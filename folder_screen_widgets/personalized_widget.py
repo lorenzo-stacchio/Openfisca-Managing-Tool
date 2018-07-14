@@ -137,6 +137,9 @@ class PopupSelectReform(Popup):
             self.ids.id_spinner_reforms.text = ""
 
 
+class PopupHomeInstructions(Popup):
+    pass
+
 
 class Pop(ModalView):
     list=[]

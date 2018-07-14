@@ -86,3 +86,39 @@
                         pos: self.pos
                         size: self.size
 
+
+<PopupHomeInstructions>:
+    size_hint: 0.9, 0.9
+    title: "Instructions for Use"
+    name: "visualize_instructions"
+    fullscreen: True
+    TabbedPanel:
+        id: switch_instructions_visualize
+        do_default_tab: False
+        canvas.before:
+            Color:
+                rgb: hex("9C2542")
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TabbedPanelItem:
+            id: tabbed_italy
+            text: 'English'
+            #on_release: root.show_variables()
+            background_color: (1, 0, 0, .5)
+            BoxLayout:
+                id: box_italian_instructions
+                orientation: 'vertical'
+                canvas.before:
+                    Color:
+                        rgb: hex("771C33")
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                BoxLayout:
+                    id: box_variables_inner
+                    orientation: 'horizontal'
+                    size_hint: (1.0,0.95)
+                    RstDocument:
+                        id: document_variables_viewer
+                        source: 'config_files/instruction_strings/use_openfisca_MT.rst'

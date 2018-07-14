@@ -11,7 +11,7 @@ from script.interpeters.reforms_file_interpeter import *
 # FONDAMENTALE, COSI PRENDI TUTTI I PARAMETRI ESISTENTI
 
 GRANDEZZA_STRINGHE_INTESTAZIONE = 1000
-PATH_RST_DOCUMENT = os.getcwd() + "/messages/rst_da_visualizzare.rst"
+PATH_RST_DOCUMENT = os.getcwd() + "/config_files/rst_file/rst_da_visualizzare.rst"
 
 class ParameterType(Enum):
     """

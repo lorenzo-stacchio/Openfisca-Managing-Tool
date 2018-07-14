@@ -91,7 +91,7 @@ class MakeSimulation(Screen):
             self.ids.menu_a_tendina_variabili.values = common_modules.dict_entita[self.ids.menu_a_tendina_entita.text]
             self.ids.menu_a_tendina_variabili.text = self.ids.menu_a_tendina_variabili.values[0]
             self.ids.information.text = ""
-            with open("messages/instruction_make_simulation_input.txt", 'r') as f:
+            with open("config_files/instruction_strings/instruction_make_simulation_input.txt", 'r') as f:
                 for line in f.readlines():
                     self.ids.information.text = self.ids.information.text + line
         except Exception as e:

@@ -42,7 +42,7 @@ class InitScreen(Screen):
         buttons_instances = []
         system_names = []
         self.dict_button_reference = {} # used to know what button is clicked
-        with open('./messages/config_import.json') as f:
+        with open('./config_files/config_import.json') as f:
             data_config = json.load(f)
         for key,value in data_config.items():
             for key_2, value_2 in value.items():
@@ -72,7 +72,7 @@ class InitScreen(Screen):
         dict = get_all_paths(self.PATH_OPENFISCA)
         if dict:
             if self.manager.current == 'init':
-                with open('./messages/config_import.json') as f:
+                with open('./config_files/config_import.json') as f:
                     data_config = json.load(f)
                 reload(site)
                 if not (check_package_is_installed(country_package_name=os.path.basename(self.PATH_OPENFISCA))):
@@ -157,7 +157,7 @@ class InitScreen(Screen):
         :return:
         """
         # read documents
-        with open('messages/config_import.json') as f:
+        with open('config_files/config_import.json') as f:
             data_config = json.load(f)
         system_selected = self.id_button.replace("button", "openfisca")
         # get system info depending on the choice
