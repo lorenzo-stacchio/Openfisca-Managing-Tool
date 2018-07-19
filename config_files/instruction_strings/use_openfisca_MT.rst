@@ -138,11 +138,75 @@ the generated reform in legislationExplorer_.
 
 Neutralize variable
 ====================================================================================
+If you wish to neutralize a variable, you must select the option "**Neutraliza Variable**" in the reforms menù.
+Next, you can name the reform and add a description to it.
 
+Note that the first two fields are enabled because you have to select an **existing variable** to neutralized it.
+For sure, you can't neutralize a variable that doesn't exist!
+
+.. image:: img/openfisca_system/openfisca_instruction/reform_maker/neutralize_variable.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+However, you can decide to avoid the naming of the reform or/and to insert a description for it: the system will provide a standard naming.
+Next you can choose to turn back home or apply the reform for the selected variable.
+
+You can check the generated reform in legislationExplorer_.
 
 .. _simulationMaker:
 
 ************************************************************************************
 Simulation Maker
 ************************************************************************************
-aldo
+This feature allow to make some **openfisca simulation** in a simply way.
+
+The first step to make a simulation is setting up the **various fiscal situation**. In the first section, you have to choose
+at least one entity from the existing ones, remembering that you'll have to set up a fiscal situation for each entity you'll choose.
+
+You have to choose a fiscal period that will be used by the system, to set up the **openfisca simulation environment**. The accepted period format are **AAAA, AAAA-MM OR AAAA-MM-DD**
+
+.. image:: img/openfisca_system/openfisca_instruction/simulation/simulation1.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+After you chose a certain number of entity that you want to use, you'll have to set up a **fiscal situation** for each of them.
+
+An **Openfisca fiscal situation** is composed by couples of **<Input variable - Value>**. In the second section, you can set up all the variables you want
+for each fiscal situation, remembering that you have to choose **at least one input variable** for each entity (so for each fiscal situation).
+
+.. image:: img/openfisca_system/openfisca_instruction/simulation/simulation2.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+Then you have to choose the **openfisca output variables** you want to calculate basing on the fiscal situation for each entity you chose.
+
+The rules are the same of the previous section, except that you can't define a value for these variables because they have to be calculated from the **openfisca simulator**.
+
+.. image:: img/openfisca_system/openfisca_instruction/simulation/simulation3.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+Now, you set all the fiscal situation, we are ready to make the simulation! However, there are two additional steps:
+- You have to confirm the various fiscal situation (you can go back and modify them);
+- You can integrate a **reform**. If you decide to integrate a reform, the simulator will calculate for you all the output variables using the **actual fiscal system** and the **reformed one**.
+
+.. image:: img/openfisca_system/openfisca_instruction/simulation/simulation4.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+.. image:: img/openfisca_system/openfisca_instruction/simulation/simulation5.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+After the simulator calculation, the system will show you a logs that contain **<Fiscal situation, Values of output variables>**.
+
+.. image:: img/openfisca_system/openfisca_instruction/simulation/simulation6.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
