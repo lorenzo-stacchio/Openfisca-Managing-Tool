@@ -7,12 +7,13 @@ In this document, we will see how to use the three main functionalities of this 
 
 - The legislationExplorer_;
 - The reformMaker_;
-- The simulationMaker_ .
+- The simulationMaker_;
+
+.. _legislationExplorer:
 
 ************************************************************************************
 Legislation Explorer
 ************************************************************************************
-.. _legislationExplorer:
 
 This feature allow to see what's inside an **openfisca-country system**.
 
@@ -42,10 +43,11 @@ You can choose any file within the set and see all the data structures that cont
    :width: 600 px
    :scale: 50 %
 
+.. _reformMaker:
+
 ************************************************************************************
 Reform Maker
 ************************************************************************************
-.. _reformMaker:
 
 This feature allow to create an **openfisca-reform**.
 
@@ -54,13 +56,93 @@ This feature allow to create an **openfisca-reform**.
    :width: 600 px
    :scale: 50 %
 
+Once you've clicked the button you could select between three reforms type:
+
+- The addVariable_;
+- The updateVariable_;
+- The neutralizeVariable_;
+- The other options are not available.
+
+
+.. image:: img/openfisca_system/openfisca_instruction/reform_maker/all_reforms.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+
+.. _addVariable:
+
+Add variable
+====================================================================================
+If you wish to add a variable, you must select the option "**Add Variable**" in the reforms menù. Next, you can name
+the reform and add a description to it.
+
+Note that the first two fields are disabled, you could use those when you'll decide to **Update a variable**.
+
+.. image:: img/openfisca_system/openfisca_instruction/reform_maker/add_variable1.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+However, you can decide to avoid the naming of the reform or/and to insert a description for it: the system will provide a standard naming.
+Next you can choose to turn back home or goes to specify the fields of the new variable.
+
+.. image:: img/openfisca_system/openfisca_instruction/reform_maker/add_variable2.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+As you can see in the image above, you can specify all the fields typical of an Openfisca variable.
+To make sure that the reform will be created, you must specify the necessary fields to define a variable which are:
+
+- The **name**;
+- The **entity**;
+- The **type**;
+- The **period**.
+
+Of course you can specify the other fields too. Once you've finish you can select the **Run operation** button and see
+the generated reform in legislationExplorer_.
+
+.. _updateVariable:
+
+Update variable
+====================================================================================
+If you wish to update a variable, you must select the option "**Update Variable**" in the reforms menù.
+Next, you can name the reform and add a description to it.
+
+Note that the first two fields are enabled because you have to select an **existing variable** to update it.
+For sure, you can't modify a variable that doesn't exist!
+
+.. image:: img/openfisca_system/openfisca_instruction/reform_maker/up_variable1.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+However, you can decide to avoid the naming of the reform or/and to insert a description for it: the system will provide a standard naming.
+Next you can choose to turn back home or goes to modify the fields of the selected variable.
+
+.. image:: img/openfisca_system/openfisca_instruction/reform_maker/up_variable2.png
+   :height: 300px
+   :width: 600 px
+   :scale: 50 %
+
+As you can see in the image above, when you decide to update a variable, all the current information of that Openfisca variable
+are displayed.
+
+To make sure that the reform will be created, you must modify at least one field except the name (which is unchangeable).
+
+Of course you can modify from one to n fields. Once you've finish you can select the **Run operation** button and see
+the generated reform in legislationExplorer_.
+
+.. _neutralizeVariable:
+
+Neutralize variable
+====================================================================================
+
+
+.. _simulationMaker:
+
 ************************************************************************************
 Simulation Maker
 ************************************************************************************
-.. _simulationMaker:
-
-Once you've clicked the button you could select between three reforms type:
-
-- The **Add variable**;
-- The **Update variable**;
-- The **Neutralize variable**.
+aldo
