@@ -66,16 +66,19 @@ class VisualizeSystemScreen(Screen):
         viewer.underline_color = "971640ff"
 
     def show_variables(self):
+        self.ids.visualize_file_chooser_variables._update_files()
         self.ids.visualize_file_chooser_variables.path = self.dict_path['variables']
         self.ids.current_path_variables.text = self.ids.visualize_file_chooser_variables.path
         self.do_layout()
 
     def show_parameters(self):
+        self.ids.visualize_file_chooser_parameters._update_files()
         self.ids.visualize_file_chooser_parameters.path = self.dict_path['parameters']
         self.ids.current_path_parameters.text = self.ids.visualize_file_chooser_parameters.path
         self.do_layout()
 
     def show_reforms(self):
+        self.ids.visualize_file_chooser_reforms._update_files()
         self.ids.visualize_file_chooser_reforms.path = self.dict_path['reforms']
         self.ids.current_path_reforms.text = self.ids.visualize_file_chooser_reforms.path
         self.do_layout();

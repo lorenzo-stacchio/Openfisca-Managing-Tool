@@ -91,6 +91,7 @@ class ExecuteSimulationScreen(Screen):
             self.current_index = self.current_index -1
         self.ids.document_results_simulation_viewer.text = self.string_rst_documents[self.current_index]
 
+
     def go_to_home(self):
         """
         Go to home
