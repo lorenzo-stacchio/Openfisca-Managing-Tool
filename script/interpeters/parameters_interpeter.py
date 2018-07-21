@@ -254,7 +254,9 @@ class NormalParameter():
             # writing the formatted the dates
             for date,value_dict in self.__dict_data_value__.iteritems(): #key are the dates
                 true_value = value_dict['value'] #is ever one element
-                date_to_compare = datetime.datetime(year=date_parser(date).date().year, month=date_parser(date).date().month, day=date_parser(date).date().day)
+                date_to_compare = datetime.datetime(year=date.year,
+                                                        month=date.month,
+                                                        day=date.day)
                 if date_to_compare.date() <= datetime.datetime.now().date(): # check if the value is future or not
                     rst.write("- Dal **" + date_to_compare.date().strftime('%Y/%m/%d') + "** il parametro é valso **" + str(true_value) + "**\n")
                 else:
@@ -401,9 +403,9 @@ class ScaleParameter():
                     rst.write('"')
                 rst.write("\n\n")
                 for date, values in date_dict.iteritems():
-                    date_to_compare = datetime.datetime(year=date_parser(date).date().year,
-                                                        month=date_parser(date).date().month,
-                                                        day=date_parser(date).date().day)
+                    date_to_compare = datetime.datetime(year=date.year,
+                                                        month=date.month,
+                                                        day=date.day)
                     # 1 value
                     if len(values)==1 and date_to_compare.date() < datetime.datetime.now().date():
                         if 'threshold' in values:
