@@ -324,6 +324,7 @@ class Variable_reform_manager():
             os.remove(path_new_reform)
         # check if at least one field is changed
         at_least_one_field_is_changed = False
+
         variable_elements_to_check =  [self.__variable__.__type__, self.__variable__.entity,
         self.__variable__.__definition_period__]
         system_variable_elements_to_check = [variable_to_update.value_type.__name__, variable_to_update.entity.__name__,
@@ -331,9 +332,11 @@ class Variable_reform_manager():
         if not(variable_to_update.reference == None):
             variable_elements_to_check.append(self.__variable__.__reference__)
             system_variable_elements_to_check.append(variable_to_update.reference[0])
+
         if not(variable_to_update.label == None):
             variable_elements_to_check.append(self.__variable__.__label__)
             system_variable_elements_to_check.append(variable_to_update.label)
+
         if not(variable_to_update.set_input == None):
             variable_elements_to_check.append(self.__variable__.__set_input__)
             system_variable_elements_to_check.append(str(variable_to_update.set_input.__name__ ))
@@ -393,14 +396,21 @@ class Variable_reform_manager():
             else:
                 system_variable_elements_to_check.append(None)
             if not (variable_to_update.set_input == None):
+                print str(variable_to_update.set_input.__name__)
+                print system_variable_elements_to_check
                 system_variable_elements_to_check.append(str(variable_to_update.set_input.__name__))
+                print system_variable_elements_to_check
             else:
                 system_variable_elements_to_check.append(None)
 
             string_to_write = ["\n\tvalue_type = ", "\n\tentity = ", "\n\tdefinition_period = ", "\n\treference = ", "\n\tlabel = "
                                , "\n\tset_input = "]
-
-            for var_to_check, sys_var, curr_str in zip(variable_elements_to_write, system_variable_elements_to_compare, string_to_write):
+            print variable_elements_to_check
+            print system_variable_elements_to_check
+            print string_to_write
+            for var_to_check, sys_var, curr_str in zip(variable_elements_to_write, system_variable_elements_to_check, string_to_write):
+               print "VAR NEW VALUE", var_to_check
+               print "OLD VAR", sys_var
                if var_to_check and not (var_to_check == sys_var):
                    new_reform.write(curr_str + var_to_check)
 

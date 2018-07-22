@@ -295,7 +295,12 @@ class FormVariableScreen(Screen):
         value_type_input=self.ids.value_type_input.text.replace(" ","")
         entity_input=self.ids.entity_input.text.replace(" ","")
         definition_period_input=self.ids.definition_period_input.text.replace(" ","")
-        set_input_period = self.ids.set_input_period.text
+
+        if self.ids.set_input_period.text == TYPEOFSETINPUT.no_set_input_period:
+            set_input_period = None
+        else:
+            set_input_period = self.ids.set_input_period.text
+
 
         if self.ids.label_input.text == "":
             label_input = None
@@ -331,6 +336,7 @@ class FormVariableScreen(Screen):
             v_to_add.set_formula(formula)
             v_to_add.set_label(label_input)
             v_to_add.set_definition_period(definition_period_input)
+            print "SONO IN MAIN",set_input_period
             v_to_add.set_set_input(set_input_period)
             ref_var_man = Variable_reform_manager(variable = v_to_add, path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], reform_full_description = reform_description , reform_name = reform_name)
 
