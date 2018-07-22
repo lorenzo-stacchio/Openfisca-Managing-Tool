@@ -167,7 +167,19 @@ class SelectVariableScreen(Screen):
                 if key_variable == self.ids.id_spinner_select_variable_screen.text:
                     var = Variable_To_Reform()
                     var.set_name(key_variable)
-                    v_r_man = Variable_reform_manager(path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], variable = var, reform_name = "neutralize_" + self.ids.id_spinner_select_variable_screen.text)
+                    # get the reform name and reform reference if defined
+                    if self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text == "":
+                        reform_name = "neutralize_" + self.ids.id_spinner_select_variable_screen.text
+                    else:
+                        reform_name = self.manager.get_screen(
+                            'select_variable_screen').ids.id_input_reform_name.text.strip()
+
+                    if self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text == "":
+                        reform_description = None
+                    else:
+                        reform_description = self.manager.get_screen(
+                            'select_variable_screen').ids.id_input_reform_description.text.strip()
+                    v_r_man = Variable_reform_manager(path_to_save_reform = self.manager.get_screen('visualize_system').dict_path['reforms'], variable = var, reform_name = reform_name, reform_full_description = reform_description)
                     v_r_man.do_reform(TYPEOFREFORMVARIABILE.neutralize_variable)
                     break
         self.popup.dismiss()
@@ -302,12 +314,13 @@ class FormVariableScreen(Screen):
         if self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text == "":
             reform_name = None
         else:
-            reform_name = self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text
+            reform_name = self.manager.get_screen('select_variable_screen').ids.id_input_reform_name.text.strip()
 
         if self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text == "":
             reform_description = None
         else:
-            reform_description = self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text
+            reform_description = self.manager.get_screen('select_variable_screen').ids.id_input_reform_description.text.strip()
+            print reform_description
 
         try:
             v_to_add = Variable_To_Reform()
